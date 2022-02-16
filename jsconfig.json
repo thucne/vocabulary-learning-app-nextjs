@@ -30,7 +30,10 @@
         "@reducers/*": ["reducers/*"],
         "@actions": ["actions"],
         "@actions/*": ["actions/*"],
-        "@consts": ["constants"]
+        "@consts": ["constants"],
+
+        // meta
+        "@meta": ["components/Meta"],
       }
     }
   }

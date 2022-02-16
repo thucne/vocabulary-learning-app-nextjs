@@ -4,7 +4,7 @@ import { FB } from '@config';
 const Meta = ({
     title = 'Dashboard - VIP',
     description = 'A better way to practice your vocabularies, idioms and phrases.',
-    image = 'https://res.cloudinary.com/katyperrycbt/image/upload/v1644755235/VIp_1_eq4dw9.jpg',
+    image = 'https://res.cloudinary.com/katyperrycbt/image/upload/v1644992547/LEARNING_WHILE_ifxgvn.png',
     url = 'https://vip.trantrongthuc.com/',
     canonical = 'https://vip.trantrongthuc.com/',
     publishedTime = undefined,
@@ -20,15 +20,17 @@ const Meta = ({
         <Head>
             <link rel="icon" href="/favicon.ico" />
             <link rel="shortcut icon" href="/favicon.ico" />
-            <link rel="apple-touch-icon" type="image/png" href="/vip.256.png" />
-            <link rel="apple-touch-icon-precomposed" type="image/png" href="/vip.256.png" />
+            <link rel="apple-touch-icon" type="image/png" href="/logo.icon.192.png" />
+            <link rel="apple-touch-icon-precomposed" type="image/png" href="/logo.icon.192.png" />
 
-            <link rel="icon" type="image/png" href="/vip.32.png" sizes="16x16 32x32" />
-            <link rel="icon" type="image/png" href="/vip.64.png" sizes="64x64 96x96" />
-            <link rel="icon" type="image/png" href="/vip.128.png" sizes="128x128 144x144" />
-            <link rel="icon" type="image/png" href="/vip.256.png" sizes="192x192 256x256" />
-            <link rel="icon" type="image/png" href="/vip.512.png" sizes="512x512" />
-            <link rel='mask-icon' href='/vip.svg' color="#0000FF" />
+            <link rel="icon" type="image/png" href="/logo.icon.16.png" sizes="16x16" />
+            <link rel="icon" type="image/png" href="/logo.icon.32.png" sizes="32x32" />
+            <link rel="icon" type="image/png" href="/logo.icon.96.png" sizes="96x96" />
+            <link rel="icon" type="image/png" href="/logo.icon.144.png" sizes="144x144" />
+            <link rel="icon" type="image/png" href="/logo.icon.192.png" sizes="192x192" />
+            <link rel="icon" type="image/png" href="/logo.icon.256.png" sizes="256x256" />
+            <link rel="icon" type="image/png" href="/logo.icon.512.png" sizes="512x512" />
+            <link rel='mask-icon' href='/logo.icon.svg' color="#0000FF" />
 
             <meta name="robots" content={robots} key='roboo' />
             <title key="maintitle">{title}</title>
@@ -56,6 +58,8 @@ const Meta = ({
 
             <link rel="canonical" href={canonical} key="cano" />
             <meta property="fb:app_id" content={FB} key="appid" />
+            <link rel="manifest" href="/manifest.json" />
+
         </Head>
     )
 }
