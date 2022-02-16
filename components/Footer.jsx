@@ -36,13 +36,13 @@ const Footer = ({ bottom }) => {
                 paddingTop: theme => theme.spacing(1.5),
                 paddingBottom: theme => theme.spacing(1.5),
                 py: [1, 2, 3],
-                px: [4, 5, 6]
+                px: [2, 2, 5, 6]
             }}
-            columns={{ xs: 12, sm: 14, md: 17 }}
+            columns={14}
         >
-            <Grid item xs={12} sm={6} md={4} mb={[1, 2, 3, 4]}>
+            <Grid item xs={14} lg={3} mb={[1, 0, 0, 0]}>
                 <Grid container alignItems='center'>
-                    <Grid item xs={5} md={12} sx={{ width: '100%', height: 200 }}>
+                    <Grid item xs={5} lg={12} sx={{ width: '100%', height: 200 }}>
                         <div style={{ width: '100%', height: '100%', position: 'relative' }}>
                             <Image
                                 src='/logo.full.svg'
@@ -53,7 +53,7 @@ const Footer = ({ bottom }) => {
                             />
                         </div>
                     </Grid>
-                    <Grid item xs={7} md={12} pr={[2, 2, 0]}>
+                    <Grid item xs={7} lg={12} pr={[2, 2, 0]}>
                         <Typography variant='caption' sx={{ lineHeight: '50%' }} color='footer_title.main'>
                             <b>Vip</b> is a simple application that helps you memorize and store vocabulary,
                             idioms or phrases quickly. Easy registration, secure and ease of use.
@@ -61,24 +61,31 @@ const Footer = ({ bottom }) => {
                     </Grid>
                 </Grid>
             </Grid>
-            {
-                allLinks.map((item, index) => {
-                    return <Grid item xs={6} sm={4} md={3} lg={2} key={`footer-cols-${index}`} mt={4}>
-                        <EachColumn title={item.title} links={item.links} />
-                    </Grid>
-                })
-            }
-            <Grid item xs={12} sm={14} md={17} mt={5}>
+            <Grid item xs={14} lg={11}>
+                <Grid container columns={[12, 16, 15, 10]} spacing={2}>
+                    {
+                        allLinks.map((item, index) => {
+                            return <Grid item xs={6} sm={4} md={3} lg={2} key={`footer-cols-${index}`} mt={4}>
+                                <EachColumn title={item.title} links={item.links} />
+                            </Grid>
+                        })
+                    }
+                </Grid>
+            </Grid>
+            <Grid item xs={14} mt={5}>
                 <Divider />
             </Grid>
-            <Grid item xs={12} sm={14} md={17} mt={3} mb={5}>
+            <Grid item xs={14} mt={3} mb={5}>
                 <Grid
                     container
                     direction={['column-reverse', 'row']}
-                    justifyContent="center"
-                    alignItems="center"
+                    justifyContent="space-between"
+                    alignItems={['center', 'stretch']}
+                    columns={12}
                 >
-                    <Grid item mt={[2, 0]} xs={3} sm={7} md={8} display='flex' justifyContent='flex-start'>
+                    <Grid item mt={[2, 0]} xs={12} sm={6}
+                        display='flex' justifyContent='flex-start' alignItems='center'
+                    >
                         <Grid container spacing={2}>
                             <Grid item>
                                 <Typography variant='body' color='footer_link.main'>
@@ -97,7 +104,9 @@ const Footer = ({ bottom }) => {
                             </Grid>
                         </Grid>
                     </Grid>
-                    <Grid item xs={3} sm={7} md={9} display='flex' justifyContent={['flex-start', 'flex-end']}>
+                    <Grid item xs={12} sm={6}
+                        display='flex' justifyContent={['flex-start', 'flex-end']} alignItems='center'
+                    >
                         <Grid container spacing={2} justifyContent={['flex-start', 'flex-end']}>
                             <Grid item>
                                 <Typography variant='body' color='footer_link.main' sx={{
@@ -150,9 +159,9 @@ const allLinks = [
         title: 'Explore',
         links: [
             { title: 'Landing page', href: '/' },
-            { title: 'My dashboard', href: '/dashboard' },
-            { title: 'Login', href: '/login' },
-            { title: 'Signup', href: '/signup' },
+            { title: 'Dashboard', href: '/dashboard' },
+            { title: 'Log-in', href: '/login' },
+            { title: 'Sign-up', href: '/signup' },
         ]
     },
     {
@@ -167,6 +176,13 @@ const allLinks = [
         links: [
             { title: 'Unsplash', href: 'https://unsplash.com/' },
             { title: 'Icons8', href: 'https://icons8.com/' },
+        ]
+    },
+    {
+        title: 'Developers',
+        links: [
+            { title: 'Materials', href: '/developers#materials' },
+            { title: 'API', href: '/developers#api' },
         ]
     },
     {
