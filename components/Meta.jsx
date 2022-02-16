@@ -1,12 +1,12 @@
 import Head from 'next/head';
-import { FB } from '@config';
+import { FB, DOMAIN } from '@config';
 
 const Meta = ({
     title = 'Dashboard - VIP',
     description = 'A better way to practice your vocabulary, idioms and phrases.',
     image = 'https://res.cloudinary.com/katyperrycbt/image/upload/v1644992547/LEARNING_WHILE_ifxgvn.png',
-    url = 'https://vip.trantrongthuc.com/',
-    canonical = 'https://vip.trantrongthuc.com/',
+    url = ``,
+    canonical = ``,
     publishedTime = undefined,
     modifiedTime = undefined,
     type = 'website',
@@ -41,13 +41,13 @@ const Meta = ({
             <meta property="og:description" content={description} key="discriptionmeta_og" />
             <meta property="og:image" content={image} key="image_og" />
             <meta property="og:image:secure_url" content={image} key="image_secure_og" />
-            <meta property="og:url" content={url} key="url_og" />
+            <meta property="og:url" content={`${DOMAIN}${url}`} key="url_og" />
             <meta property='og:type' content={type} key="type_og" />
 
             <meta property="twitter:title" content={title} key="titlemeta_tt" />
             <meta property="twitter:description" content={description} key="discriptionmeta_tt" />
             <meta property="twitter:image" content={image} key="image_tt" />
-            <meta property="twitter:url" content={url} key="url_twitter" />
+            <meta property="twitter:url" content={`${DOMAIN}${url}`} key="url_twitter" />
 
             {publishedTime && <meta property="article:published_time" content={publishedTime} key="published_time" />}
             {modifiedTime && <meta property="article:modified_time" content={modifiedTime} key="modified_time" />}
@@ -56,7 +56,7 @@ const Meta = ({
             {tag && <meta property="article:tag" content={tag} key="tag_meta" />}
             {publisher && <meta property="article:publisher" content={publisher} key="publisher_meta" />}
 
-            <link rel="canonical" href={canonical} key="cano" />
+            <link rel="canonical" href={`${DOMAIN}${canonical}`} key="cano" />
             <meta property="fb:app_id" content={FB} key="appid" />
             <link rel="manifest" href="/manifest.json" />
 

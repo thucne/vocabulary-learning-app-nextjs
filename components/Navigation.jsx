@@ -105,7 +105,7 @@ function ResponsiveDrawer(props) {
                 justifyContent='space-between'
                 alignItems='center'
             >
-                <Image quality={100} alt='VIP' src={'/logo.full.svg'} layout='fill' objectFit='cover' />
+                <Image quality={100} alt='logo' src={'/logo.full.svg'} layout='fill' objectFit='cover' />
             </Stack>
             {/* </Toolbar> */}
             <Divider />

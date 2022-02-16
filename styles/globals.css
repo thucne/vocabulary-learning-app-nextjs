@@ -49,3 +49,36 @@ a {
   background: #555;
   /* border-radius: 10px; */
 }
+
+@keyframes navtext {
+  0% {
+    left: 0px;
+    top: 56px;
+  }
+  100% {
+    left: 0px;
+    top: 0px;
+  }
+}
+
+@keyframes navtextOut {
+  0% {
+    left: 0px;
+    top: 0px;
+  }
+  100% {
+    left: 0px;
+    top: 56px;
+  }
+}
+
+@keyframes navTextBegin {
+  0% {
+    left: 0px;
+    top: 56px;
+  }
+  100% {
+    left: 0px;
+    top: 56px;
+  }
+}

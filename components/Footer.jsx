@@ -46,7 +46,7 @@ const Footer = ({ bottom }) => {
                         <div style={{ width: '100%', height: '100%', position: 'relative' }}>
                             <Image
                                 src='/logo.full.svg'
-                                alt='VIP'
+                                alt='logo'
                                 layout='fill'
                                 objectFit='contain'
                                 priority={true}
@@ -72,8 +72,13 @@ const Footer = ({ bottom }) => {
                 <Divider />
             </Grid>
             <Grid item xs={12} sm={14} md={17} mt={3} mb={5}>
-                <Grid container direction={['row-reverse', 'row']}>
-                    <Grid item xs={12} sm={7} md={8} display='flex' justifyContent='flex-start'>
+                <Grid
+                    container
+                    direction={['column-reverse', 'row']}
+                    justifyContent="center"
+                    alignItems="center"
+                >
+                    <Grid item mt={[2, 0]} xs={3} sm={7} md={8} display='flex' justifyContent='flex-start'>
                         <Grid container spacing={2}>
                             <Grid item>
                                 <Typography variant='body' color='footer_link.main'>
@@ -92,29 +97,23 @@ const Footer = ({ bottom }) => {
                             </Grid>
                         </Grid>
                     </Grid>
-                    <Grid item xs={12} sm={7} md={9} display='flex' justifyContent={['flex-start', 'flex-end']}
-                        sx={{
-                            '*': {
-                                filter: typeof window !== 'undefined' && (localStorage?.getItem("colorMode") || "light") === 'dark' ? 'contrast(0%) brightness(200%)' : 'contrast(50%) brightness(100%)'
-                            },
-                            '*:hover': {
-                                filter: 'contrast(100%) brightness(100%)'
-                            }
-                        }}
-                    >
+                    <Grid item xs={3} sm={7} md={9} display='flex' justifyContent={['flex-start', 'flex-end']}>
                         <Grid container spacing={2} justifyContent={['flex-start', 'flex-end']}>
                             <Grid item>
-                                <Typography variant='body' color='footer_link.main'>
+                                <Typography variant='body' color='footer_link.main' sx={{
+                                    filter: typeof window !== 'undefined' && (localStorage?.getItem("colorMode") || "light") === 'dark' ? 'contrast(0%) brightness(200%)' : 'contrast(10%) brightness(150%)',
+                                }}>
                                     Join us on
                                 </Typography>
                             </Grid>
-                            <Grid item sx={{
-                                ':hover': {
-                                    filter: 'contrast(100%) brightness(100%)'
-                                }
-                            }}>
+                            <Grid item>
                                 <Link href='https://github.com/katyperrycbt/vip-mui' passHref>
-                                    <MuiLink color='black.main'>
+                                    <MuiLink color='black.main' sx={{
+                                        filter: typeof window !== 'undefined' && (localStorage?.getItem("colorMode") || "light") === 'dark' ? 'contrast(0%) brightness(200%)' : 'contrast(10%) brightness(150%)',
+                                        ':hover': {
+                                            filter: 'contrast(100%) brightness(100%)'
+                                        }
+                                    }}>
                                         <GitHubIcon />
                                     </MuiLink>
                                 </Link>

@@ -1,15 +1,9 @@
-import Login from '@components/Auth/Login'
-import React from 'react'
+import Login from '@components/Auth/Login';
 
-/**
-* @author
-* @function LoginPage
-**/
-
-export default function LoginPage  (props){
-  return(
+export default function LoginPage(props) {
+  return (
     <div>
-        <Login/>
+      <Login />
     </div>
-   )
-  }
+  )
+}
