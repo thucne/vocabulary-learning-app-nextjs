@@ -3,7 +3,7 @@ import { FB } from '@config';
 
 const Meta = ({
     title = 'Dashboard - VIP',
-    description = 'A better way to practice your vocabularies, idioms and phrases.',
+    description = 'A better way to practice your vocabulary, idioms and phrases.',
     image = 'https://res.cloudinary.com/katyperrycbt/image/upload/v1644992547/LEARNING_WHILE_ifxgvn.png',
     url = 'https://vip.trantrongthuc.com/',
     canonical = 'https://vip.trantrongthuc.com/',

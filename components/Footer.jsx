@@ -5,8 +5,12 @@ import { useRouter } from 'next/router';
 import Image from 'next/image';
 
 import {
-    Grid, Typography, Link as MuiLink
+    Grid, Typography, Link as MuiLink,
+    Divider,
+    IconButton
 } from '@mui/material';
+
+import GitHubIcon from '@mui/icons-material/GitHub';
 
 import { Colors, Fonts } from '@styles';
 
@@ -23,6 +27,7 @@ const Footer = ({ bottom }) => {
 
     return (
         <Grid ref={footerRef} container
+            className='noselect'
             sx={{
                 width: '100%',
                 minHeight: 300,
@@ -30,7 +35,8 @@ const Footer = ({ bottom }) => {
                 top: pos,
                 paddingTop: theme => theme.spacing(1.5),
                 paddingBottom: theme => theme.spacing(1.5),
-                p: [1, 2, 3]
+                py: [1, 2, 3],
+                px: [4, 5, 6]
             }}
             columns={{ xs: 12, sm: 14, md: 17 }}
         >
@@ -47,10 +53,10 @@ const Footer = ({ bottom }) => {
                             />
                         </div>
                     </Grid>
-                    <Grid item xs={7} md={12}>
-                        <Typography variant='caption'>
-                            Vip is a simple application that helps you memorize and store vocabulary,
-                            idioms or phrases quickly. Registration is easy, secure and easy to use.
+                    <Grid item xs={7} md={12} pr={[2, 2, 0]}>
+                        <Typography variant='caption' sx={{ lineHeight: '50%' }} color='footer_title.main'>
+                            <b>Vip</b> is a simple application that helps you memorize and store vocabulary,
+                            idioms or phrases quickly. Easy registration, secure and ease of use.
                         </Typography>
                     </Grid>
                 </Grid>
@@ -62,6 +68,61 @@ const Footer = ({ bottom }) => {
                     </Grid>
                 })
             }
+            <Grid item xs={12} sm={14} md={17} mt={5}>
+                <Divider />
+            </Grid>
+            <Grid item xs={12} sm={14} md={17} mt={3} mb={5}>
+                <Grid container direction={['row-reverse', 'row']}>
+                    <Grid item xs={12} sm={7} md={8} display='flex' justifyContent='flex-start'>
+                        <Grid container spacing={2}>
+                            <Grid item>
+                                <Typography variant='body' color='footer_link.main'>
+                                    @{new Date().getFullYear()}, Vip
+                                </Typography>
+                            </Grid>
+                            <Grid item>
+                                <Link href="/terms-of-use" passHref>
+                                    <MuiLink underline='none' color='footer_link.main'>Terms</MuiLink>
+                                </Link>
+                            </Grid>
+                            <Grid item>
+                                <Link href="/privacy" passHref>
+                                    <MuiLink underline='none' color='footer_link.main'>Privacy</MuiLink>
+                                </Link>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                    <Grid item xs={12} sm={7} md={9} display='flex' justifyContent={['flex-start', 'flex-end']}
+                        sx={{
+                            '*': {
+                                filter: typeof window !== 'undefined' && (localStorage?.getItem("colorMode") || "light") === 'dark' ? 'contrast(0%) brightness(200%)' : 'contrast(50%) brightness(100%)'
+                            },
+                            '*:hover': {
+                                filter: 'contrast(100%) brightness(100%)'
+                            }
+                        }}
+                    >
+                        <Grid container spacing={2} justifyContent={['flex-start', 'flex-end']}>
+                            <Grid item>
+                                <Typography variant='body' color='footer_link.main'>
+                                    Join us on
+                                </Typography>
+                            </Grid>
+                            <Grid item sx={{
+                                ':hover': {
+                                    filter: 'contrast(100%) brightness(100%)'
+                                }
+                            }}>
+                                <Link href='https://github.com/katyperrycbt/vip-mui' passHref>
+                                    <MuiLink color='black.main'>
+                                        <GitHubIcon />
+                                    </MuiLink>
+                                </Link>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Grid>
         </Grid>
     );
 };
@@ -77,7 +138,7 @@ const EachColumn = ({ title = '', links = [] }) => {
             links.map((item, index) => {
                 return <Grid item xs={12} key={`footer-title-${index}`} mt={1}>
                     <Link href={item.href} passHref>
-                        <MuiLink underline='hover'>{item.title}</MuiLink>
+                        <MuiLink underline='none' color='footer_link.main'>{item.title}</MuiLink>
                     </Link>
                 </Grid>
             })
@@ -114,8 +175,7 @@ const allLinks = [
         links: [
             { title: 'About us', href: '/about-us' },
             { title: 'Contact us', href: '/contact-us' },
-            { title: 'Privacy policy', href: '/privacy-policy' },
-            { title: 'Terms of use', href: '/terms-of-use' },
+            { title: 'Blog', href: '/blog' },
         ]
     }
 ]

@@ -116,3 +116,4 @@ export const LIGHT_LIME_10 = "#BFFF00";
 export const LIGHT_TEAL_10 = "#00B2EE";
 
 export const FOOTER_TITLE = '#002984';
+export const FOOTER_LINK = '#334b80';
