@@ -34,6 +34,8 @@ import { isAuth } from '@utils';
 import { ColorModeContext } from "@pages/_app";
 import * as t from "@consts";
 
+import Footer from '@components/Footer';
+
 import { useDispatch, useSelector } from "react-redux";
 
 const GutterBottom = styled('div')(({
@@ -60,6 +62,7 @@ function ResponsiveDrawer(props) {
     const colorMode = useContext(ColorModeContext);
 
     const User = useSelector(state => state?.user);
+    const tabName = useSelector(state => state?.tabName);
 
     const trigger = useScrollTrigger({
         disableHysteresis: true,
@@ -292,6 +295,7 @@ function ResponsiveDrawer(props) {
                     {children}
                 </Container>
                 {/* <GutterBottom /> */}
+                <Footer bottom={bottom} />
             </Box>
         </Box>
     );
