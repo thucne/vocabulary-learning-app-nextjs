@@ -12,7 +12,7 @@ const Profile = () => {
         <Layout>
             <Meta
                 title='Not Found - VIP'
-                description='Sorry but the page you are looking for does not exist.'
+                description='Sorry but the page you are looking for does not exist. It might have been removed, renamed, or did not exist in the first place.'
                 image='https://res.cloudinary.com/katyperrycbt/image/upload/v1644987502/Purple_And_Pink_Illustration_Error_404_Facebook_Post_2_tqk9qh.png'
                 url='/404'
                 canonical='/404'

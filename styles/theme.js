@@ -9,7 +9,10 @@ const MyTheme = (mode) => ({
     },
     black: {
         main: mode === "light" ? Colors.BLACK : Colors.WHITE
-    }
+    },
+    white: {
+        main: mode === "light" ? Colors.WHITE : Colors.BLACK
+    },
 });
 
 

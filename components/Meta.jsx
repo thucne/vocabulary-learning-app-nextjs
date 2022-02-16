@@ -4,7 +4,7 @@ import { FB, DOMAIN } from '@config';
 const Meta = ({
     title = 'Dashboard - VIP',
     description = 'A better way to practice your vocabulary, idioms and phrases.',
-    image = 'https://res.cloudinary.com/katyperrycbt/image/upload/v1644992547/LEARNING_WHILE_ifxgvn.png',
+    image = 'https://res.cloudinary.com/katyperrycbt/image/upload/v1645021650/Untitled_design_2_1_tvtyob.png',
     url = ``,
     canonical = ``,
     publishedTime = undefined,

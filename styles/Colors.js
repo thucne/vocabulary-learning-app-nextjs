@@ -115,5 +115,12 @@ export const LIGHT_CYAN_10 = "#E0FFFF";
 export const LIGHT_LIME_10 = "#BFFF00";
 export const LIGHT_TEAL_10 = "#00B2EE";
 
-export const FOOTER_TITLE = '#002984';
-export const FOOTER_LINK = '#334b80';
+export const FOOTER_TITLE = "#002984";
+export const FOOTER_LINK = "#334b80";
+
+export const LOGIN_BG = "#4C6FBF";
+
+// theme logo colors
+export const LOGO_BLUE = '#64b5f6';
+export const LOGO_YELLOW = '#ffd54f';
+export const LOGO_RED = '#9b314d';
