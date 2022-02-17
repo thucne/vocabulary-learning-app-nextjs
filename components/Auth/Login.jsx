@@ -17,6 +17,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { Colors, Fonts } from '@styles';
 import { login } from '@actions';
 import { useDispatch } from "react-redux";
+import { useRouter } from "next/router";
 
 export default function Login() {
   const [form, setForm] = useState({ identifier: '', password: '' });
@@ -24,10 +25,12 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [focuses, setFocuses] = useState({ identifier: false, password: false });
   const [loading, setLoading] = useState(false);
-  
+  const router = useRouter();
+
   const canSubmit = !errors?.identifier && !errors?.password && form?.identifier && form?.password;
 
   const dispatch = useDispatch();
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -39,12 +42,18 @@ export default function Login() {
           identifier: form.identifier,
           password: form.password
         }),
-        onSuccess: (data) => console.log(data),
+        onSuccess: handleSuccessResponse,
         onStarting: () => setLoading(true),
         onFinally: () => setLoading(false),
       });
     }
   };
+
+  const handleSuccessResponse =(data)=>{
+    localStorage.setItem('token', JSON.stringify(data.jwt));
+    localStorage.setItem('user', JSON.stringify(data.user));
+    router.push('/');
+  }
 
   const handleClickShowPassword = () => {
     setShowPassword(prev => !prev);
@@ -157,7 +166,7 @@ export default function Login() {
                         onMouseDown={handleMouseDownPassword}
                         edge="end"
                       >
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                        {showPassword ? <VisibilityOff/> : <Visibility />}
                       </IconButton>
                     </InputAdornment>
                   }

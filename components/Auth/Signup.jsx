@@ -14,23 +14,6 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
 const EMAIL_REGEX = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 
-function Copyright(props) {
-  return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
-      {"Copyright © "}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
 
 const theme = createTheme();
 
@@ -101,7 +84,7 @@ export default function Signup() {
   };
 
   const checkCanSubmit = () =>
-    email && password && username && name ? true : false;
+    email && !errors?.email?.error  && password && !errors?.password?.error && username && errors?.username?.error && name && errors?.name?.error  ? true : false;
 
   return (
     <ThemeProvider theme={theme}>
