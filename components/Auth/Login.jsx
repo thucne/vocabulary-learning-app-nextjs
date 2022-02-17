@@ -25,9 +25,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [focuses, setFocuses] = useState({ identifier: false, password: false });
   const [loading, setLoading] = useState(false);
-  // const router = useRouter();
-
-
+  const router = useRouter();
   const canSubmit = !errors?.identifier && !errors?.password && form?.identifier && form?.password;
 
   const dispatch = useDispatch();
@@ -50,11 +48,11 @@ export default function Login() {
     }
   };
 
-  // const handleSuccessResponse =(data)=>{
-  //   localStorage.setItem('token', JSON.stringify(data.jwt));
-  //   localStorage.setItem('user', JSON.stringify(data.user));
-  //   router.push('/');
-  // }
+  const handleSuccessResponse =(data)=>{
+    localStorage.setItem('vip-token', JSON.stringify(data.jwt));
+    localStorage.setItem('vip-user', JSON.stringify(data.user));
+    router.push('/');
+  }
 
   const handleClickShowPassword = () => {
     setShowPassword(prev => !prev);
@@ -202,7 +200,8 @@ export default function Login() {
               <Grid container>
                 <Grid item xs>
                   <Link href="#" passHref>
-                    <MuiLink variant="body2" color={Colors.WHITE}>
+                    <MuiLink 
+                    variant="body2" color={Colors.WHITE}>
                       Forgot password?
                     </MuiLink>
                   </Link>
