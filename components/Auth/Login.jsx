@@ -25,7 +25,8 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [focuses, setFocuses] = useState({ identifier: false, password: false });
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  // const router = useRouter();
+
 
   const canSubmit = !errors?.identifier && !errors?.password && form?.identifier && form?.password;
 
@@ -49,11 +50,11 @@ export default function Login() {
     }
   };
 
-  const handleSuccessResponse =(data)=>{
-    localStorage.setItem('token', JSON.stringify(data.jwt));
-    localStorage.setItem('user', JSON.stringify(data.user));
-    router.push('/');
-  }
+  // const handleSuccessResponse =(data)=>{
+  //   localStorage.setItem('token', JSON.stringify(data.jwt));
+  //   localStorage.setItem('user', JSON.stringify(data.user));
+  //   router.push('/');
+  // }
 
   const handleClickShowPassword = () => {
     setShowPassword(prev => !prev);
@@ -84,6 +85,7 @@ export default function Login() {
             layout="fill"
             objectFit="cover"
             priority={true}
+            draggable={false}
           />
         </Grid>
         <Grid
@@ -104,6 +106,15 @@ export default function Login() {
               mt: [0, 0, 0, -10]
             }}
           >
+            <Image
+              src='/logo.svg'
+              alt='Logo'
+              width={75}
+              height={75}
+              draggable={false}
+              priority={true}
+              objectFit="contain"
+            />
             <Typography component="h1" variant="h4" color={Colors.WHITE} sx={{ fontWeight: Fonts.FW_600 }}>
               Welcome Back!
             </Typography>
@@ -186,7 +197,7 @@ export default function Login() {
                 loading={loading}
                 startIcon={<SendIcon />}
               >
-                Sign In
+                Log In
               </LoadingButton>
               <Grid container>
                 <Grid item xs>
