@@ -15,6 +15,8 @@ import { Visibility, VisibilityOff, Send as SendIcon } from '@mui/icons-material
 import LoadingButton from '@mui/lab/LoadingButton';
 
 import { Colors, Fonts } from '@styles';
+import { login } from '@actions';
+import { useDispatch } from "react-redux";
 
 export default function Login() {
   const [form, setForm] = useState({ identifier: '', password: '' });
@@ -22,11 +24,37 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [focuses, setFocuses] = useState({ identifier: false, password: false });
   const [loading, setLoading] = useState(false);
-
+  const [mounted, setMounted] = useState(false);
+  
   const canSubmit = !errors?.identifier && !errors?.password && form?.identifier && form?.password;
+
+  useEffect(() => {
+    const checkAdHocFetch = setInterval(() => {
+      if (window?.adhocFetch) {
+        setMounted(true);
+        clearInterval(checkAdHocFetch);
+      }
+    }, 250);
+    return () => clearInterval(checkAdHocFetch);
+  }, [])
+
+  const dispatch = useDispatch();
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (mounted) {
+      adhocFetch({
+        dispatch,
+        action: login({
+          identifier: form.identifier,
+          password: form.password
+        }),
+        onSuccess: (data) => console.log(data),
+        onStarting: () => setLoading(true),
+        onFinally: () => setLoading(false),
+      });
+    }
   };
 
   const handleClickShowPassword = () => {

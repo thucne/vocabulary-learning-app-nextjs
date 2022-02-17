@@ -70,13 +70,15 @@ export default function MyApp(props) {
         <Head>
           <meta name="viewport" content="initial-scale=1, width=device-width" />
         </Head>
-        <ThemeProvider theme={theme}>
-          {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-          <CssBaseline />
-          <ColorModeContext.Provider value={colorMode}>
-            <Component {...pageProps} />
-          </ColorModeContext.Provider>
-        </ThemeProvider>
+        <div style={{ visibility: mounted ? "visible" : "hidden" }}>
+          <ThemeProvider theme={theme}>
+            {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+            <CssBaseline />
+            <ColorModeContext.Provider value={colorMode}>
+              <Component {...pageProps} />
+            </ColorModeContext.Provider>
+          </ThemeProvider>
+        </div>
       </CacheProvider>
     </Provider>
   );
