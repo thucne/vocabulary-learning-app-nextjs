@@ -60,8 +60,7 @@ const Layout = ({ children, login = false, landing = false }) => {
         setOpenMessage(false);
     };
 
-    return <Container maxWidth="100%" style={{
-        padding: 0,
+    return <Container maxWidth={false} disableGutters style={{
         pointerEvents: backdrop?.show ? 'none' : 'auto',
     }}>
         <Meta />

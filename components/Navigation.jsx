@@ -53,6 +53,24 @@ const AniText = styled(Typography)(({
 
 const drawerWidth = 240;
 
+const useIsomorphicLayoutEffect =
+    typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+
+function useWindowSize(appBarRef) {
+    const [sizes, setSizes] = useState([0, 0]);
+
+    useIsomorphicLayoutEffect(() => {
+        function updateSize() {
+            setSizes([appBarRef.current.clientWidth, appBarRef.current.clientHeight]);
+        }
+        window.addEventListener('resize', updateSize);
+        updateSize();
+        return () => window && window.removeEventListener('resize', updateSize);
+    }, [appBarRef]);
+
+    return sizes;
+}
+
 function ResponsiveDrawer(props) {
     const { window, children, landing } = props;
     const dispatch = useDispatch();
@@ -61,7 +79,6 @@ function ResponsiveDrawer(props) {
     const [mobileOpen, setMobileOpen] = useState(false);
     const [bottom, setBottom] = useState(0);
     const [scrolled, setScrolled] = useState(false);
-    const [appBarSizes, setAppBarSizes] = useState([0, 0]);
 
     const myRef = useRef(null);
     const appBarRef = useRef(null);
@@ -70,6 +87,8 @@ function ResponsiveDrawer(props) {
     const User = useSelector(state => state?.user);
     const tabName = useSelector(state => state?.tabName);
     const bgColor = useSelector(state => state?.bgColor);
+
+    const [width, height] = useWindowSize(appBarRef);
 
     const trigger = useScrollTrigger({
         disableHysteresis: true,
@@ -89,22 +108,6 @@ function ResponsiveDrawer(props) {
         const { bottom } = data;
         setBottom(bottom);
     }, []);
-
-    useLayoutEffect(() => {
-        function updateSize() {
-            setAppBarSizes([appBarRef.current.clientWidth, appBarRef.current.clientHeight]);
-        }
-        if (window) {
-            window.addEventListener('resize', updateSize);
-        }
-        if (appBarRef?.current && JSON.stringify(appBarSizes) !== JSON.stringify([
-            appBarRef.current.clientWidth,
-            appBarRef.current.clientHeight
-        ])) {
-            updateSize();
-        }
-        return () => window && window.removeEventListener('resize', updateSize);
-    }, [window, appBarSizes]);
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
@@ -128,7 +131,7 @@ function ResponsiveDrawer(props) {
                 justifyContent='space-between'
                 alignItems='center'
             >
-                <Image quality={100} alt='logo' src={'/logo.full.svg'} layout='fill' objectFit='cover' priority={true} />
+                <Image draggable={false} alt='logo' src={'/logo.full.svg'} layout='fill' objectFit='cover' priority={true} />
             </Stack>
             {/* </Toolbar> */}
             <Divider />
@@ -148,7 +151,7 @@ function ResponsiveDrawer(props) {
     const container = window !== undefined ? () => window().document.body : undefined;
 
     return (
-        <Container maxWidth={landing ? 'xl' : false} sx={{ px: landing ? [0, 3, 7, 15] : 0 }}>
+        <Container maxWidth={false} disableGutters>
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
                 <AppBar
@@ -165,6 +168,7 @@ function ResponsiveDrawer(props) {
                         overflow: 'hidden',
                         boxShadow: !trigger && 'none',
                         backgroundImage: 'none',
+                        borderBottom: landing && '1px solid rgba(0, 0, 0, 0.12)',
                     }}
                 >
                     <Container maxWidth={landing ? 'xl' : false} sx={{ px: landing ? [0, 3, 7, 15] : 0 }}>
@@ -287,6 +291,7 @@ function ResponsiveDrawer(props) {
                                         width={150}
                                         height={50}
                                         objectFit='contain'
+                                        draggable={false}
                                     />
                                 </Grid>
                                 <Grid item>
@@ -353,10 +358,10 @@ function ResponsiveDrawer(props) {
                                 !landing ? `calc(100% - ${drawerWidth}px)` : '100%'
                         },
                         position: 'relative',
-                        mt: `${appBarSizes[1]}px}`
+                        mt: `${height}px`,
                     }}
                 >
-                    <Toolbar />
+                    {!landing && <Toolbar />}
                     <Box sx={{
                         position: 'absolute',
                         width: '100%',
@@ -368,14 +373,14 @@ function ResponsiveDrawer(props) {
                         justifyContent: 'center',
                         display: 'flex'
                     }}
-                        style={{ padding: '0px' }}
-                        maxWidth="100%"
+                        maxWidth={false}
                         ref={myRef}
+                        disableGutters
                     >
                         {children}
                     </Container>
                     {/* <GutterBottom /> */}
-                    <Footer bottom={bottom} />
+                    <Footer bottom={bottom} landing={landing} />
                 </Box>
             </Box>
         </Container>

@@ -14,7 +14,7 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 
 import { Colors, Fonts } from '@styles';
 
-const Footer = ({ bottom }) => {
+const Footer = ({ bottom, landing }) => {
     const [pos, setPos] = useState(0);
     const footerRef = useRef(null);
     const router = useRouter();
@@ -36,7 +36,7 @@ const Footer = ({ bottom }) => {
                 paddingTop: theme => theme.spacing(1.5),
                 paddingBottom: theme => theme.spacing(1.5),
                 py: [1, 2, 3],
-                px: [2, 2, 5, 6]
+                px: landing ? [2, 5, 12, 21] : [2, 2, 5, 6],
             }}
             columns={14}
         >
