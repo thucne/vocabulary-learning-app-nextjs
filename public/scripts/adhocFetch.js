@@ -1,4 +1,4 @@
-window.adhocFetch = (ins) => {
+window.adHocFetch = (ins) => {
   const {
     dispatch,
     action,
@@ -18,7 +18,7 @@ window.adhocFetch = (ins) => {
     showBackdrop = true,
   } = ins;
 
-  if (!dispatch || !action) {
+  if (!dispatch || !action || typeof dispatch !== 'function' || typeof action !== 'function') {
     return new Error("Missing dispatch or action");
   }
 

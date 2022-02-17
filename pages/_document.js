@@ -18,7 +18,7 @@ export default class MyDocument extends Document {
           />
           {/* Inject MUI styles first to match with the prepend: true configuration. */}
           {this.props.emotionStyleTags}
-          <script async src='/scripts/adhocFetch.js'/>
+          <script async src='/scripts/adHocFetch.js'/>
         </Head>
         <body>
           <Main />

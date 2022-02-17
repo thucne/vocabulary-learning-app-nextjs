@@ -24,27 +24,16 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [focuses, setFocuses] = useState({ identifier: false, password: false });
   const [loading, setLoading] = useState(false);
-  const [mounted, setMounted] = useState(false);
   
   const canSubmit = !errors?.identifier && !errors?.password && form?.identifier && form?.password;
-
-  useEffect(() => {
-    const checkAdHocFetch = setInterval(() => {
-      if (window?.adhocFetch) {
-        setMounted(true);
-        clearInterval(checkAdHocFetch);
-      }
-    }, 250);
-    return () => clearInterval(checkAdHocFetch);
-  }, [])
 
   const dispatch = useDispatch();
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (mounted) {
-      adhocFetch({
+    if (window?.adHocFetch) {
+      adHocFetch({
         dispatch,
         action: login({
           identifier: form.identifier,
