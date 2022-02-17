@@ -79,6 +79,7 @@ function ResponsiveDrawer(props) {
     const [mobileOpen, setMobileOpen] = useState(false);
     const [bottom, setBottom] = useState(0);
     const [scrolled, setScrolled] = useState(false);
+    const [mounted, setMounted] = useState(false);
 
     const myRef = useRef(null);
     const appBarRef = useRef(null);
@@ -108,6 +109,10 @@ function ResponsiveDrawer(props) {
         const { bottom } = data;
         setBottom(bottom);
     }, []);
+
+    useEffect(() => {
+        setMounted(true);
+    }, [])
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
@@ -200,82 +205,84 @@ function ResponsiveDrawer(props) {
                                         {scrolled && tabName}
                                     </Typography>
                                 </Grid>
-                                <Grid item>
-                                    <Stack direction='row' justifyContent='center' alignItems='center'>
-                                        <IconButton
-                                            sx={{
-                                                ...SXs.MUI_NAV_ICON_BUTTON,
-                                                color: theme => theme.palette[bgColor].contrastText,
-                                                borderColor: theme => `${theme.palette[bgColor].contrastText}5`,
-                                            }}
-                                            onClick={colorMode.toggleColorMode}
-                                        >
-                                            {theme.palette.mode === "dark" ? (
-                                                <LightModeOutlinedIcon />
-                                            ) : (
-                                                <DarkModeOutlinedIcon />
-                                            )}
-                                        </IconButton>
-                                        {
-                                            User?.name && <IconButton
-                                                sx={{ padding: '4px', mr: 2 }}
-                                                onClick={() => Router.push('/info?tab=me')}
-                                                color="inherit"
-                                            >
-                                                <Avatar alt='avatar' src={User?.Photo} sx={{
-                                                    width: '32px',
-                                                    height: '32px'
-                                                }} />
-                                            </IconButton>
-                                        }
-                                        {
-                                            !isAuth() && <Button
+                                {
+                                    mounted && <Grid item>
+                                        <Stack direction='row' justifyContent='center' alignItems='center'>
+                                            <IconButton
                                                 sx={{
-                                                    ...SXs.MUI_NAV_BUTTON,
+                                                    ...SXs.MUI_NAV_ICON_BUTTON,
                                                     color: theme => theme.palette[bgColor].contrastText,
                                                     borderColor: theme => `${theme.palette[bgColor].contrastText}5`,
                                                 }}
-                                                onClick={() => Router.push('/login')}
-                                                variant="outlined"
-                                                startIcon={<LoginIcon
-                                                />}>
-                                                Log in
-                                            </Button>
-                                        }
-                                        {
-                                            isAuth() && <Button
-                                                onClick={() => logout(() => {
-                                                    Router.push(`/login`);
-                                                })}
-                                                variant="contained"
-                                                sx={{
-                                                    display: ['none', 'flex'],
-                                                    bgcolor: 'upsplashButton.bg',
-                                                    color: 'upsplashButton.main',
-                                                    borderColor: 'upsplashButton.main',
-                                                    ':hover': {
-                                                        borderColor: 'upsplashButton.hover',
-                                                        color: 'upsplashButton.hover',
-                                                        bgcolor: 'upsplashButton.bg',
-                                                    }
-                                                }}
-                                                startIcon={<LogoutIcon />}>
-                                                Log out
-                                            </Button>
-                                        }
-                                        {
-                                            isAuth() && <IconButton
-                                                sx={{ width: '40px', height: '40px', display: ['block', 'none'] }}
-                                                onClick={() => logout(() => {
-                                                    Router.push(`/login`);
-                                                })}
-                                                color="inherit"
+                                                onClick={colorMode.toggleColorMode}
                                             >
-                                                <LogoutIcon />
+                                                {theme.palette.mode === "dark" ? (
+                                                    <LightModeOutlinedIcon />
+                                                ) : (
+                                                    <DarkModeOutlinedIcon />
+                                                )}
                                             </IconButton>
-                                        }
-                                    </Stack>
-                                </Grid>
+                                            {
+                                                User?.name && <IconButton
+                                                    sx={{ padding: '4px', mr: 2 }}
+                                                    onClick={() => Router.push('/info?tab=me')}
+                                                    color="inherit"
+                                                >
+                                                    <Avatar alt='avatar' src={User?.Photo} sx={{
+                                                        width: '32px',
+                                                        height: '32px'
+                                                    }} />
+                                                </IconButton>
+                                            }
+                                            {
+                                                !isAuth() && <Button
+                                                    sx={{
+                                                        ...SXs.MUI_NAV_BUTTON,
+                                                        color: theme => theme.palette[bgColor].contrastText,
+                                                        borderColor: theme => `${theme.palette[bgColor].contrastText}5`,
+                                                    }}
+                                                    onClick={() => Router.push('/login')}
+                                                    variant="outlined"
+                                                    startIcon={<LoginIcon
+                                                    />}>
+                                                    Log in
+                                                </Button>
+                                            }
+                                            {
+                                                isAuth() && <Button
+                                                    onClick={() => logout(() => {
+                                                        Router.push(`/login`);
+                                                    })}
+                                                    variant="contained"
+                                                    sx={{
+                                                        display: ['none', 'flex'],
+                                                        bgcolor: 'upsplashButton.bg',
+                                                        color: 'upsplashButton.main',
+                                                        borderColor: 'upsplashButton.main',
+                                                        ':hover': {
+                                                            borderColor: 'upsplashButton.hover',
+                                                            color: 'upsplashButton.hover',
+                                                            bgcolor: 'upsplashButton.bg',
+                                                        }
+                                                    }}
+                                                    startIcon={<LogoutIcon />}>
+                                                    Log out
+                                                </Button>
+                                            }
+                                            {
+                                                isAuth() && <IconButton
+                                                    sx={{ width: '40px', height: '40px', display: ['block', 'none'] }}
+                                                    onClick={() => logout(() => {
+                                                        Router.push(`/login`);
+                                                    })}
+                                                    color="inherit"
+                                                >
+                                                    <LogoutIcon />
+                                                </IconButton>
+                                            }
+                                        </Stack>
+                                    </Grid>
+                                }
                             </Grid>
                             <Grid
                                 container

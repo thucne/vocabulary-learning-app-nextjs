@@ -59,7 +59,6 @@ const Meta = ({
             <link rel="canonical" href={`${DOMAIN}${canonical}`} key="cano" />
             <meta property="fb:app_id" content={FB} key="appid" />
             <link rel="manifest" href="/manifest.json" />
-
         </Head>
     )
 }

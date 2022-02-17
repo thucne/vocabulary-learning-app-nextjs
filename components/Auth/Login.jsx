@@ -48,7 +48,7 @@ export default function Login() {
     }
   };
 
-  const handleSuccessResponse =(data)=>{
+  const handleSuccessResponse = (data) => {
     localStorage.setItem('vip-token', JSON.stringify(data.jwt));
     localStorage.setItem('vip-user', JSON.stringify(data.user));
     router.push('/');
@@ -78,7 +78,7 @@ export default function Login() {
           display: ['none', 'none', 'none', 'flex'],
         }}>
           <Image
-            src="https://res.cloudinary.com/katyperrycbt/image/upload/v1645029675/1_prsmtw.svg"
+            src="https://res.cloudinary.com/katyperrycbt/image/upload/v1645112857/Manufacture_Production_Modern_Dark_Minimalist_Dashboard_Website_Desktop_Magenta_White_Blue_4_idd9su.svg"
             alt="Login"
             layout="fill"
             objectFit="cover"
@@ -120,7 +120,7 @@ export default function Login() {
               component="form"
               onSubmit={handleSubmit}
               noValidate
-              sx={{ mt: 5, width: 350 }}
+              sx={{ mt: 5, width: 350, maxWidth: "90%" }}
             >
               <TextField
                 margin="normal"
@@ -175,7 +175,7 @@ export default function Login() {
                         onMouseDown={handleMouseDownPassword}
                         edge="end"
                       >
-                        {showPassword ? <VisibilityOff/> : <Visibility />}
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
                     </InputAdornment>
                   }
@@ -200,8 +200,8 @@ export default function Login() {
               <Grid container>
                 <Grid item xs>
                   <Link href="#" passHref>
-                    <MuiLink 
-                    variant="body2" color={Colors.WHITE}>
+                    <MuiLink
+                      variant="body2" color={Colors.WHITE}>
                       Forgot password?
                     </MuiLink>
                   </Link>

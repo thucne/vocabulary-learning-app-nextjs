@@ -26,7 +26,9 @@ const Footer = ({ bottom, landing }) => {
     }, [router, footerRef, bottom]);
 
     return (
-        <Grid ref={footerRef} container
+        <Grid
+            ref={footerRef}
+            container
             className='noselect'
             sx={{
                 width: '100%',
