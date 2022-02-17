@@ -82,3 +82,34 @@ export const handleCommonResponse = (res, options = {}) => {
 export const getRandomNumberInRange = (min, max) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
+
+export const getSizeImage = async (link, callback) => {
+  const data = await toDataURL(link);
+  return new Promise((resolve, reject) => {
+    const newImg = new window.Image();
+    newImg.src = data;
+    newImg.onload = function () {
+      if (callback) {
+        console.log({
+          width: this.width,
+          height: this.height,
+        })
+        callback({
+          width: this.width,
+          height: this.height,
+        });
+        resolve();
+      }
+    };
+  });
+};
+
+export const toDataURL = async (url) => {
+  return fetch(url)
+    .then((response) => {
+      return response.blob();
+    })
+    .then((blob) => {
+      return URL.createObjectURL(blob);
+    });
+};

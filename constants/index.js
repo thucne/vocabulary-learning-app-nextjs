@@ -13,3 +13,5 @@ export const HIDE_LINEAR = "HIDE_LINEAR";
 export const SET_PERCENTAGE = "SET_PERCENTAGE";
 
 export const SET_TAB_NAME = "SET_TAB_NAME";
+
+export const SET_BG = "SET_BG";

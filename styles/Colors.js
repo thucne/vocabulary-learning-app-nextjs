@@ -121,6 +121,26 @@ export const FOOTER_LINK = "#334b80";
 export const LOGIN_BG = "#4C6FBF";
 
 // theme logo colors
-export const LOGO_BLUE = '#64b5f6';
-export const LOGO_YELLOW = '#ffd54f';
-export const LOGO_RED = '#9b314d';
+export const LOGO_BLUE = "#64b5f6";
+export const LOGO_YELLOW = "#ffd54f";
+export const LOGO_RED = "#9b314d";
+
+// mui button
+export const MUI_BUTTON_LIGHT = "#E0E3E7";
+export const MUI_BUTTON_DARK = "rgb(19, 47, 76)";
+export const MUI_BUTTON_INNER = "#007FFF";
+
+// grays
+export const GRAY_1 = "#F5F5F5";
+export const GRAY_2 = "#E0E0E0";
+export const GRAY_3 = "#BDBDBD";
+export const GRAY_4 = "#9E9E9E";
+export const GRAY_5 = "#757575";
+export const GRAY_6 = "#616161";
+export const GRAY_7 = "#424242";
+export const GRAY_8 = "#212121";
+
+
+// backgrounds
+export const BG_MAIN = "#1976d2";
+export const BG_MAIN_DARK = "#2a3eb1";

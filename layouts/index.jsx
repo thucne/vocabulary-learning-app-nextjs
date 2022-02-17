@@ -29,7 +29,7 @@ const StyledProgess = styled(LinearProgress)(({
 }));
 
 
-const Layout = ({ children, login }) => {
+const Layout = ({ children, login = false, landing = false }) => {
     const router = useRouter();
     const [openMessage, setOpenMessage] = useState(false);
 
@@ -60,8 +60,7 @@ const Layout = ({ children, login }) => {
         setOpenMessage(false);
     };
 
-    return <Container maxWidth="100%" style={{
-        padding: 0,
+    return <Container maxWidth={false} disableGutters style={{
         pointerEvents: backdrop?.show ? 'none' : 'auto',
     }}>
         <Meta />
@@ -139,7 +138,7 @@ const Layout = ({ children, login }) => {
             </Snackbar>
         }
         {
-            !login ? <Navigation>
+            !login ? <Navigation landing={landing}>
                 {children}
             </Navigation> : children
         }

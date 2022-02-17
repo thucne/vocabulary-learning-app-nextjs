@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useContext, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useContext, useMemo, useLayoutEffect } from 'react';
 import Router from 'next/router';
 import Image from 'next/image';
 
@@ -27,14 +27,18 @@ import Brightness7Icon from "@mui/icons-material/Brightness7";
 import LogoutIcon from '@mui/icons-material/Logout';
 import LoginIcon from '@mui/icons-material/Login';
 
+import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
+import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
+
 import { Container, Grid, Stack, Avatar, Button } from '@mui/material';
 
-import { Fonts } from '@styles';
+import { Fonts, SXs } from '@styles';
 import { isAuth } from '@utils';
 import { ColorModeContext } from "@pages/_app";
 import * as t from "@consts";
 
 import Footer from '@components/Footer';
+import MenuNavBar from '@components/LandingPage/MenuNavBar';
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -49,20 +53,42 @@ const AniText = styled(Typography)(({
 
 const drawerWidth = 240;
 
+const useIsomorphicLayoutEffect =
+    typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+
+function useWindowSize(appBarRef) {
+    const [sizes, setSizes] = useState([0, 0]);
+
+    useIsomorphicLayoutEffect(() => {
+        function updateSize() {
+            setSizes([appBarRef.current.clientWidth, appBarRef.current.clientHeight]);
+        }
+        window.addEventListener('resize', updateSize);
+        updateSize();
+        return () => window && window.removeEventListener('resize', updateSize);
+    }, [appBarRef]);
+
+    return sizes;
+}
 
 function ResponsiveDrawer(props) {
-    const { window, children } = props;
+    const { window, children, landing } = props;
     const dispatch = useDispatch();
     const theme = useTheme();
 
     const [mobileOpen, setMobileOpen] = useState(false);
     const [bottom, setBottom] = useState(0);
     const [scrolled, setScrolled] = useState(false);
+
     const myRef = useRef(null);
+    const appBarRef = useRef(null);
     const colorMode = useContext(ColorModeContext);
 
     const User = useSelector(state => state?.user);
     const tabName = useSelector(state => state?.tabName);
+    const bgColor = useSelector(state => state?.bgColor);
+
+    const [width, height] = useWindowSize(appBarRef);
 
     const trigger = useScrollTrigger({
         disableHysteresis: true,
@@ -105,7 +131,7 @@ function ResponsiveDrawer(props) {
                 justifyContent='space-between'
                 alignItems='center'
             >
-                <Image quality={100} alt='logo' src={'/logo.full.svg'} layout='fill' objectFit='cover' priority={true} />
+                <Image draggable={false} alt='logo' src={'/logo.full.svg'} layout='fill' objectFit='cover' priority={true} />
             </Stack>
             {/* </Toolbar> */}
             <Divider />
@@ -125,179 +151,239 @@ function ResponsiveDrawer(props) {
     const container = window !== undefined ? () => window().document.body : undefined;
 
     return (
-        <Box sx={{ display: 'flex' }}>
-            <CssBaseline />
-            <AppBar
-                enableColorOnDark
-                position="fixed"
-                sx={{
-                    width: { lg: `calc(100% - ${drawerWidth}px)` },
-                    ml: { lg: `${drawerWidth}px` },
-                    overflow: 'hidden',
-                    boxShadow: !trigger && 'none',
-                    backgroundImage: 'none',
-                }}
-            >
-                <Toolbar sx={{
-                    backgroundImage: 'none',
-                    py: 1
-                }}>
-                    <Grid container justifyContent='space-between' alignItems='center' direction='row'>
-                        <Grid item display='flex' flexDirection='row' justifyContent='center' alignItems='center'>
-                            <IconButton
-                                color="inherit"
-                                aria-label="open drawer"
-                                edge="start"
-                                onClick={handleDrawerToggle}
-                                sx={{ mr: 2, display: { lg: 'none' } }}
+        <Container maxWidth={false} disableGutters>
+            <Box sx={{ display: 'flex' }}>
+                <CssBaseline />
+                <AppBar
+                    enableColorOnDark
+                    ref={appBarRef}
+                    position="fixed"
+                    color={landing ? 'white' : bgColor}
+                    sx={{
+                        width: {
+                            lg:
+                                !landing ? `calc(100% - ${drawerWidth}px)` : '100%'
+                        },
+                        ml: { lg: !landing ? `${drawerWidth}px` : 0 },
+                        overflow: 'hidden',
+                        boxShadow: !trigger && 'none',
+                        backgroundImage: 'none',
+                        borderBottom: landing && '1px solid rgba(0, 0, 0, 0.12)',
+                    }}
+                >
+                    <Container maxWidth={landing ? 'xl' : false} sx={{ px: landing ? [0, 3, 7, 15] : 0 }}>
+                        <Toolbar sx={{
+                            backgroundImage: 'none',
+                            py: 1
+                        }}>
+                            <Grid
+                                container
+                                justifyContent='space-between'
+                                alignItems='center'
+                                direction='row'
+                                display={landing ? 'none' : 'flex'}
                             >
-                                <MenuIcon />
-                            </IconButton>
-                            <Typography sx={{
-                                animation: `${trigger ? 'navtext' : 'navtextOut'} 0.2s linear forwards`,
-                                position: 'relative',
-                            }} variant="h6" noWrap component="div">
-                                {scrolled && tabName}
-                            </Typography>
-                        </Grid>
-                        <Grid item>
-                            <Stack direction='row' justifyContent='center' alignItems='center'>
-                                <IconButton
-                                    sx={{ mr: 1, width: '40px', height: '40px' }}
-                                    onClick={colorMode.toggleColorMode}
-                                    color="inherit"
-                                >
-                                    {theme.palette.mode === "dark" ? (
-                                        <Brightness7Icon />
-                                    ) : (
-                                        <Brightness4Icon />
-                                    )}
-                                </IconButton>
-                                {
-                                    User?.name && <IconButton
-                                        sx={{ padding: '4px', mr: 2 }}
-                                        onClick={() => Router.push('/info?tab=me')}
+                                <Grid item display='flex' flexDirection='row' justifyContent='center' alignItems='center'>
+                                    <IconButton
                                         color="inherit"
+                                        aria-label="open drawer"
+                                        edge="start"
+                                        onClick={handleDrawerToggle}
+                                        sx={{ mr: 2, display: { lg: 'none' } }}
                                     >
-                                        <Avatar alt='avatar' src={User?.Photo} sx={{
-                                            width: '32px',
-                                            height: '32px'
-                                        }} />
+                                        <MenuIcon />
                                     </IconButton>
-                                }
-                                {
-                                    !isAuth() && <Button
-                                        sx={{
-                                            bgcolor: 'upsplashButton.bg',
-                                            color: 'upsplashButton.main',
-                                            borderColor: 'upsplashButton.main',
-                                            ':hover': {
-                                                borderColor: 'upsplashButton.hover',
-                                                color: 'upsplashButton.hover',
-                                                bgcolor: 'upsplashButton.bg',
-                                            }
-                                        }}
-                                        onClick={() => Router.push('/login')} variant="contained" startIcon={<LoginIcon />}>
-                                        Log in
-                                    </Button>
-                                }
-                                {
-                                    isAuth() && <Button
-                                        onClick={() => logout(() => {
-                                            Router.push(`/login`);
-                                        })}
-                                        variant="contained"
-                                        sx={{
-                                            display: ['none', 'flex'],
-                                            bgcolor: 'upsplashButton.bg',
-                                            color: 'upsplashButton.main',
-                                            borderColor: 'upsplashButton.main',
-                                            ':hover': {
-                                                borderColor: 'upsplashButton.hover',
-                                                color: 'upsplashButton.hover',
-                                                bgcolor: 'upsplashButton.bg',
-                                            }
-                                        }}
-                                        startIcon={<LogoutIcon />}>
-                                        Log out
-                                    </Button>
-                                }
-                                {
-                                    isAuth() && <IconButton
-                                        sx={{ width: '40px', height: '40px', display: ['block', 'none'] }}
-                                        onClick={() => logout(() => {
-                                            Router.push(`/login`);
-                                        })}
-                                        color="inherit"
-                                    >
-                                        <LogoutIcon />
-                                    </IconButton>
-                                }
-                            </Stack>
-                        </Grid>
-                    </Grid>
-                </Toolbar>
-            </AppBar>
-            <Box
-                component="nav"
-                sx={{
-                    width: { lg: drawerWidth }, flexShrink: { lg: 0 }
-                }}
-                aria-label="mailbox folders"
-            >
-                {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
-                <Drawer
-                    container={container}
-                    variant="temporary"
-                    open={mobileOpen}
-                    onClose={handleDrawerToggle}
-                    ModalProps={{
-                        keepMounted: true, // Better open performance on mobile.
-                    }}
+                                    <Typography sx={{
+                                        animation: `${trigger ? 'navtext' : 'navtextOut'} 0.2s linear forwards`,
+                                        position: 'relative',
+                                    }} variant="h6" noWrap component="div">
+                                        {scrolled && tabName}
+                                    </Typography>
+                                </Grid>
+                                <Grid item>
+                                    <Stack direction='row' justifyContent='center' alignItems='center'>
+                                        <IconButton
+                                            sx={{
+                                                ...SXs.MUI_NAV_ICON_BUTTON,
+                                                color: theme => theme.palette[bgColor].contrastText,
+                                                borderColor: theme => `${theme.palette[bgColor].contrastText}5`,
+                                            }}
+                                            onClick={colorMode.toggleColorMode}
+                                        >
+                                            {theme.palette.mode === "dark" ? (
+                                                <LightModeOutlinedIcon />
+                                            ) : (
+                                                <DarkModeOutlinedIcon />
+                                            )}
+                                        </IconButton>
+                                        {
+                                            User?.name && <IconButton
+                                                sx={{ padding: '4px', mr: 2 }}
+                                                onClick={() => Router.push('/info?tab=me')}
+                                                color="inherit"
+                                            >
+                                                <Avatar alt='avatar' src={User?.Photo} sx={{
+                                                    width: '32px',
+                                                    height: '32px'
+                                                }} />
+                                            </IconButton>
+                                        }
+                                        {
+                                            !isAuth() && <Button
+                                                sx={{
+                                                    ...SXs.MUI_NAV_BUTTON,
+                                                    color: theme => theme.palette[bgColor].contrastText,
+                                                    borderColor: theme => `${theme.palette[bgColor].contrastText}5`,
+                                                }}
+                                                onClick={() => Router.push('/login')}
+                                                variant="outlined"
+                                                startIcon={<LoginIcon
+                                                />}>
+                                                Log in
+                                            </Button>
+                                        }
+                                        {
+                                            isAuth() && <Button
+                                                onClick={() => logout(() => {
+                                                    Router.push(`/login`);
+                                                })}
+                                                variant="contained"
+                                                sx={{
+                                                    display: ['none', 'flex'],
+                                                    bgcolor: 'upsplashButton.bg',
+                                                    color: 'upsplashButton.main',
+                                                    borderColor: 'upsplashButton.main',
+                                                    ':hover': {
+                                                        borderColor: 'upsplashButton.hover',
+                                                        color: 'upsplashButton.hover',
+                                                        bgcolor: 'upsplashButton.bg',
+                                                    }
+                                                }}
+                                                startIcon={<LogoutIcon />}>
+                                                Log out
+                                            </Button>
+                                        }
+                                        {
+                                            isAuth() && <IconButton
+                                                sx={{ width: '40px', height: '40px', display: ['block', 'none'] }}
+                                                onClick={() => logout(() => {
+                                                    Router.push(`/login`);
+                                                })}
+                                                color="inherit"
+                                            >
+                                                <LogoutIcon />
+                                            </IconButton>
+                                        }
+                                    </Stack>
+                                </Grid>
+                            </Grid>
+                            <Grid
+                                container
+                                justifyContent='space-between'
+                                alignItems='center'
+                                direction='row'
+                                display={landing ? 'flex' : 'none'}
+                            >
+                                <Grid item >
+                                    <Image
+                                        src='/logo.banner.x.svg'
+                                        alt='logo'
+                                        width={150}
+                                        height={50}
+                                        objectFit='contain'
+                                        draggable={false}
+                                    />
+                                </Grid>
+                                <Grid item>
+                                    <Stack direction='row'>
+                                        <IconButton
+                                            sx={SXs.MUI_NAV_ICON_BUTTON}
+                                            onClick={colorMode.toggleColorMode}
+                                            color='mui_button_inner'
+                                        >
+                                            {theme.palette.mode === "dark" ? (
+                                                <DarkModeOutlinedIcon />
+                                            ) : (
+                                                <LightModeOutlinedIcon />
+                                            )}
+                                        </IconButton>
+                                        <MenuNavBar />
+                                    </Stack>
+                                </Grid>
+                            </Grid>
+                        </Toolbar>
+                    </Container>
+                </AppBar>
+                <Box
+                    component="nav"
                     sx={{
-                        display: { xs: 'block', lg: 'none' },
-                        '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }
+                        width: { lg: drawerWidth }, flexShrink: { lg: 0 },
+                        display: landing ? 'none' : 'block',
                     }}
+                    aria-label="mailbox folders"
                 >
-                    {drawer}
-                </Drawer>
-                <Drawer
-                    variant="permanent"
+                    {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
+                    <Drawer
+                        container={container}
+                        variant="temporary"
+                        open={mobileOpen}
+                        onClose={handleDrawerToggle}
+                        ModalProps={{
+                            keepMounted: true, // Better open performance on mobile.
+                        }}
+                        sx={{
+                            display: { xs: 'block', lg: 'none' },
+                            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }
+                        }}
+                    >
+                        {drawer}
+                    </Drawer>
+                    <Drawer
+                        variant="permanent"
+                        sx={{
+                            display: { xs: 'none', lg: 'block' },
+                            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }
+                        }}
+                        open
+                    >
+                        {drawer}
+                    </Drawer>
+                </Box>
+                <Box
+                    component="main"
                     sx={{
-                        display: { xs: 'none', lg: 'block' },
-                        '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }
+                        flexGrow: 1,
+                        width: {
+                            sm:
+                                !landing ? `calc(100% - ${drawerWidth}px)` : '100%'
+                        },
+                        position: 'relative',
+                        mt: `${height}px`,
                     }}
-                    open
                 >
-                    {drawer}
-                </Drawer>
+                    {!landing && <Toolbar />}
+                    <Box sx={{
+                        position: 'absolute',
+                        width: '100%',
+                        height: 409,
+                        zIndex: -1
+                    }} />
+                    <Container sx={{
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        display: 'flex'
+                    }}
+                        maxWidth={false}
+                        ref={myRef}
+                        disableGutters
+                    >
+                        {children}
+                    </Container>
+                    {/* <GutterBottom /> */}
+                    <Footer bottom={bottom} landing={landing} />
+                </Box>
             </Box>
-            <Box
-                component="main"
-                sx={{ flexGrow: 1, width: { sm: `calc(100% - ${drawerWidth}px)` }, position: 'relative' }}
-            >
-                <Toolbar />
-                <Box sx={{
-                    position: 'absolute',
-                    width: '100%',
-                    height: 409,
-                    zIndex: -1
-                }} />
-                <Container sx={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    display: 'flex'
-                }}
-                    style={{ padding: '0px' }}
-                    maxWidth="100%"
-                    ref={myRef}
-                >
-                    {children}
-                </Container>
-                {/* <GutterBottom /> */}
-                <Footer bottom={bottom} />
-            </Box>
-        </Box>
+        </Container>
     );
 }
 
