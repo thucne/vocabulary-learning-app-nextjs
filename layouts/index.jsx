@@ -29,7 +29,7 @@ const StyledProgess = styled(LinearProgress)(({
 }));
 
 
-const Layout = ({ children, login }) => {
+const Layout = ({ children, login = false, landing = false }) => {
     const router = useRouter();
     const [openMessage, setOpenMessage] = useState(false);
 
@@ -139,7 +139,7 @@ const Layout = ({ children, login }) => {
             </Snackbar>
         }
         {
-            !login ? <Navigation>
+            !login ? <Navigation landing={landing}>
                 {children}
             </Navigation> : children
         }
