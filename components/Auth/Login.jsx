@@ -10,12 +10,13 @@ import {
   IconButton, Button, Paper, Tooltip
 } from '@mui/material';
 
-import { Visibility, 
-  VisibilityOff, 
+import {
+  Visibility,
+  VisibilityOff,
   Send as SendIcon,
   Home as HomeIcon,
   ArrowBackIos as ArrowBackIosIcon
- } from '@mui/icons-material';
+} from '@mui/icons-material';
 
 import LoadingButton from '@mui/lab/LoadingButton';
 
@@ -30,6 +31,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [focuses, setFocuses] = useState({ identifier: false, password: false });
   const [loading, setLoading] = useState(false);
+
   const router = useRouter();
   const canSubmit = !errors?.identifier && !errors?.password && form?.identifier && form?.password;
 
@@ -119,9 +121,6 @@ export default function Login() {
               borderRadius: '10px',
               maxWidth: "400px",
               border: ['none', '1px solid rgba(0, 0, 0, 0.12)'],
-              cursor: {
-                lg: 'pointer',
-              },
               position: 'relative',
             }}>
               <Link href="/" passHref>
@@ -149,8 +148,8 @@ export default function Login() {
                 objectFit="contain"
               />
 
-              <Typography component="h1" sx={{ fontSize: Fonts.FS_24, p: "16px 0px 0px" }}>
-                Log in
+              <Typography component="h1" sx={{ fontSize: Fonts.FS_24 }}>
+                Login
               </Typography>
               <Typography component="p" sx={{ fontSize: Fonts.FS_16, p: "8px 0px 0px" }}>
                 Use your Vip Account
@@ -159,7 +158,7 @@ export default function Login() {
                 component="form"
                 onSubmit={handleSubmit}
                 noValidate
-                sx={{ mt: 3 }}
+                sx={{ mt: 2 }}
               >
                 <TextField
                   margin="normal"
@@ -238,7 +237,6 @@ export default function Login() {
                       type="submit"
                       variant="contained"
                       loadingPosition="start"
-                      color="white"
                       sx={{
                         '&.MuiLoadingButton-root': {
                           textTransform: 'none !important',

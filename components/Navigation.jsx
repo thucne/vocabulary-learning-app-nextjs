@@ -34,8 +34,8 @@ import { Container, Grid, Stack, Avatar, Button } from '@mui/material';
 
 import { Fonts, SXs } from '@styles';
 import { isAuth } from '@utils';
+import { logout } from "@actions";
 import { ColorModeContext } from "@pages/_app";
-import * as t from "@consts";
 
 import Footer from '@components/Footer';
 import MenuNavBar from '@components/LandingPage/MenuNavBar';
@@ -314,7 +314,11 @@ function ResponsiveDrawer(props) {
                                                 <LightModeOutlinedIcon />
                                             )}
                                         </IconButton>
-                                        <MenuNavBar />
+                                        {
+                                            mounted && <MenuNavBar isAuth={isAuth()} logout={() => logout(() => {
+                                                Router.push(`/login`);
+                                            })} />
+                                        }
                                     </Stack>
                                 </Grid>
                             </Grid>

@@ -21,13 +21,7 @@ export const login = (data) => async (dispatch) => {
   }
 };
 
-export const signup = data => async (dispatch) => {
-  console.table({
-    name: data.name,
-    email: data.email,
-    password: data.password,
-    username: data.username,
-  })
+export const signup = (data) => async (dispatch) => {
   if (!data?.name || !data?.email || !data?.password || !data?.username)
     return { error: "Please fill all the input fileds" };
   return await axios
@@ -39,7 +33,7 @@ export const signup = data => async (dispatch) => {
     })
     .then((res) => handleCommonResponse(res))
     .catch((err) => handleServerError(err));
-}
+};
 
 export const logout = async (next) => {
   if (typeof window !== "undefined") {
@@ -47,3 +41,31 @@ export const logout = async (next) => {
   }
   next();
 };
+
+export const sendResetPasswordEmail = (email) => async (dispatch) => {
+  if (!email?.length) {
+    return { error: "Please enter email" };
+  } else {
+    return await axios
+      .post(`${API}/api/auth/forgot-password`, {
+        email,
+      })
+      .then((res) => handleCommonResponse(res))
+      .catch((err) => handleServerError(err));
+  }
+};
+
+export const resetPassword = (data) => async (dispatch) => {
+  if (!data?.code || !data?.password || !data?.passwordConfirmation) {
+    return { error: "Please enter all the fields" };
+  } else {
+    return await axios
+      .post(`${API}/api/auth/reset-password`, {
+        code: data.code,
+        password: data.password,
+        passwordConfirmation: data.passwordConfirmation,
+      })
+      .then((res) => handleCommonResponse(res))
+      .catch((err) => handleServerError(err));
+  }
+}

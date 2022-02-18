@@ -220,9 +220,6 @@ export default function Signup() {
               borderRadius: '10px',
               maxWidth: "400px",
               border: ['none', '1px solid rgba(0, 0, 0, 0.12)'],
-              cursor: {
-                lg: 'pointer',
-              },
               position: "relative",
             }}>
 
@@ -258,7 +255,7 @@ export default function Signup() {
                 component="form"
                 onSubmit={handleSubmit}
                 noValidate
-                sx={{ mt: 3 }}
+                sx={{ mt: 2 }}
               >
                 <TextField
                   margin="dense"
