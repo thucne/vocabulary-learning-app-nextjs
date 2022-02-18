@@ -56,7 +56,7 @@ const Footer = ({ bottom, landing }) => {
                         </div>
                     </Grid>
                     <Grid item xs={7} lg={12} >
-                        <Typography variant='caption' sx={{ lineHeight: '50%', fontWeight: Fonts.FW_300}} color='footer_title.main'>
+                        <Typography variant='caption' sx={{ lineHeight: '50%', fontWeight: Fonts.FW_300 }} color='footer_title.main'>
                             <b>Vip</b> is a simple application that helps you memorize and store vocabulary,
                             idioms or phrases quickly. Easy registration, secure and ease of use.
                         </Typography>
