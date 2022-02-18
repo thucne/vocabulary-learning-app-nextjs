@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 
 import Link from 'next/link';
 import Image from 'next/image';
@@ -37,9 +37,11 @@ export default function Login() {
 
   const dispatch = useDispatch();
 
+  const loginRefs = useRef([]);
+
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    e?.preventDefault();
 
     if (window?.adHocFetch) {
       adHocFetch({
@@ -59,6 +61,16 @@ export default function Login() {
     localStorage.setItem('vip-token', JSON.stringify(data.jwt));
     localStorage.setItem('vip-user', JSON.stringify(data.user));
     router.push('/');
+  }
+
+  const handleEnterPress = () => {
+    if (!form?.identifier?.trim()?.length) {
+      loginRefs.current[0].focus();
+    } else if (!form?.password?.trim()?.length) {
+      loginRefs.current[1].focus();
+    } else {
+      handleSubmit();
+    }
   }
 
   const handleClickShowPassword = () => {
@@ -106,8 +118,8 @@ export default function Login() {
             sx={{
               display: "flex",
               flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
+              justifyContent: ["flex-start", "center"],
+              alignItems:  ["center"],
               height: "100%",
             }}
           >
@@ -158,33 +170,37 @@ export default function Login() {
                 component="form"
                 onSubmit={handleSubmit}
                 noValidate
-                sx={{ mt: 2 }}
+                sx={{ mt: 2, maxWidth: "100%" }}
+                onKeyDown={(e) => {
+                  if (e.keyCode === 13) {
+                    handleEnterPress();
+                  }
+                }}
               >
                 <TextField
+                  autoFocus
+                  inputRef={el => loginRefs.current[0] = el}
                   margin="normal"
                   type="text"
                   label="Email or Username"
                   required
                   fullWidth
                   inputProps={inputProps}
-                  readOnly={!focuses.identifier}
                   error={!!errors?.identifier}
                   helperText={errors?.identifier}
                   onChange={(e) => {
                     setForm(prev => ({ ...prev, identifier: e.target.value }));
                   }}
-                  onFocus={() => setFocuses(prev => ({ ...prev, identifier: true }))}
                 />
                 <FormControl
                   margin="normal"
                   required
                   fullWidth
-                  readOnly={!focuses.password}
                   error={!!errors.password}
-                  onFocus={() => setFocuses(prev => ({ ...prev, password: true }))}
                 >
                   <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
                   <OutlinedInput
+                    inputRef={el => loginRefs.current[1] = el}
                     id="outlined-adornment-password"
                     type={showPassword ? 'text' : 'password'}
                     value={form.password}
