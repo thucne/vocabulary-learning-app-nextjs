@@ -119,7 +119,9 @@ export default function Login() {
               borderRadius: '10px',
               maxWidth: "400px",
               border: ['none', '1px solid rgba(0, 0, 0, 0.12)'],
-              cursor: 'pointer',
+              cursor: {
+                lg: 'pointer',
+              },
               position: 'relative',
             }}>
               <Link href="/" passHref>
@@ -208,7 +210,7 @@ export default function Login() {
                   <FormHelperText id="outlined-password-helper-text">{errors?.password}</FormHelperText>
                 </FormControl>
 
-                <Link href="#" passHref>
+                <Link href="/forgot-password" passHref>
                   <MuiLink
                     variant="body2"
                     underline="none"

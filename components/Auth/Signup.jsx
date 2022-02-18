@@ -220,7 +220,9 @@ export default function Signup() {
               borderRadius: '10px',
               maxWidth: "400px",
               border: ['none', '1px solid rgba(0, 0, 0, 0.12)'],
-              cursor: 'pointer',
+              cursor: {
+                lg: 'pointer',
+              },
               position: "relative",
             }}>
 
