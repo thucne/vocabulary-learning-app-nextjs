@@ -1,3 +1,4 @@
+import DashboardPage from "@components/Dashboard";
 import Layout from "@layouts";
 import Meta from "@meta";
 
@@ -10,6 +11,7 @@ const Index = () => {
       url='/dashboard'
       canonical='/dashboard'
     />
+    <DashboardPage/>
   </Layout>;
 };
 
