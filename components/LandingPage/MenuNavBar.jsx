@@ -109,7 +109,7 @@ export default function CustomizedMenus({ isAuth, logout }) {
                 }
                 {
                     !isAuth && <MenuItem disableRipple color='inherit' sx={{ p: 0 }}>
-                        <Link href='/singup' passHref>
+                        <Link href='/signup' passHref>
                             <MuiLink underline='none' sx={menuSX}>
                                 <Stack direction='row' alignItems='center'>
                                     <AppRegistrationIcon sx={{ color: 'inherit !important' }} />
