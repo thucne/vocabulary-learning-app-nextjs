@@ -79,7 +79,6 @@ window.adHocFetch = (ins) => {
           onSuccess(data);
         }
       } else {
-        console.log('then', data);
         dispatch({
           type: 'SHOW_SNACKBAR',
           payload: {
@@ -95,7 +94,6 @@ window.adHocFetch = (ins) => {
       setTimeout(() => dispatch({ type: 'HIDE_LINEAR' }), linearAutoCloseAfter);
     })
     .catch((err) => {
-      console.log('err', err);
       clearInterval(countFunc);
       dispatch({ type: 'SHOW_LINEAR', payload: { percentage: linearEnd } });
       if (err) {
