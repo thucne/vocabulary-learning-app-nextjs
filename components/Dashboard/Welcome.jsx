@@ -45,7 +45,7 @@ export default function Welcome(props) {
                 component="p"
                 sx={{ fontSize: Fonts.FS_15, p: "8px 0px 0px" }}
               >
-                Welcome back, Lucy! We've missed you
+                Welcome back, Lucy! We missed you
               </Typography>
             </Box>
           </Grid>
