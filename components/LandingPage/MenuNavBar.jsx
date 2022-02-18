@@ -11,11 +11,12 @@ import {
 
 import {
     Menu as MenuIcon,
-    Login,
+    Login as LoginIcon,
     AppRegistration as AppRegistrationIcon,
     Article as ArticleIcon,
     Support as SupportIcon,
     Signpost as SignpostIcon,
+    Logout as LogoutIcon
 } from '@mui/icons-material'
 
 import { SXs } from '@styles';
@@ -61,7 +62,7 @@ const StyledMenu = styled((props) => (
     },
 }));
 
-export default function CustomizedMenus() {
+export default function CustomizedMenus({ isAuth, logout }) {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
     const handleClick = (event) => {
@@ -94,26 +95,44 @@ export default function CustomizedMenus() {
                 onClose={handleClose}
             >
 
-                <MenuItem disableRipple color='inherit' sx={{ p: 0 }}>
-                    <Link href='/login' passHref>
-                        <MuiLink underline='none' sx={menuSX}>
-                            <Stack direction='row' alignItems='center'>
-                                <Login sx={{ color: 'inherit !important' }} />
-                                Log in
-                            </Stack>
-                        </MuiLink>
-                    </Link>
-                </MenuItem>
-                <MenuItem disableRipple color='inherit' sx={{ p: 0 }}>
-                    <Link href='/singup' passHref>
-                        <MuiLink underline='none' sx={menuSX}>
-                            <Stack direction='row' alignItems='center'>
-                                <AppRegistrationIcon sx={{ color: 'inherit !important' }} />
-                                Sign up
-                            </Stack>
-                        </MuiLink>
-                    </Link>
-                </MenuItem>
+                {
+                    !isAuth && <MenuItem disableRipple color='inherit' sx={{ p: 0 }}>
+                        <Link href='/login' passHref>
+                            <MuiLink underline='none' sx={menuSX}>
+                                <Stack direction='row' alignItems='center'>
+                                    <LoginIcon sx={{ color: 'inherit !important' }} />
+                                    Log in
+                                </Stack>
+                            </MuiLink>
+                        </Link>
+                    </MenuItem>
+                }
+                {
+                    !isAuth && <MenuItem disableRipple color='inherit' sx={{ p: 0 }}>
+                        <Link href='/signup' passHref>
+                            <MuiLink underline='none' sx={menuSX}>
+                                <Stack direction='row' alignItems='center'>
+                                    <AppRegistrationIcon sx={{ color: 'inherit !important' }} />
+                                    Sign up
+                                </Stack>
+                            </MuiLink>
+                        </Link>
+                    </MenuItem>
+                }
+                {
+                    isAuth && <MenuItem disableRipple color='inherit'
+                        onClick={() => {
+                            if (logout) {
+                                logout();
+                            }
+                        }}
+                    >
+                        <Stack direction='row' alignItems='center'>
+                            <LogoutIcon sx={{ color: 'inherit !important' }} />
+                            Log out
+                        </Stack>
+                    </MenuItem>
+                }
                 <Divider />
                 <MenuItem disableRipple color='inherit' sx={{ p: 0 }}>
                     <Link href='/blogs' passHref>

@@ -58,7 +58,7 @@ export const handleCommonResponse = (res, options = {}) => {
       onError = () => {},
       onSuccess = () => {},
     } = options;
-  
+
     const isRedirect = handleResponse(res) === "true";
     if (isRedirect) {
       if (onRedirect) {
@@ -95,7 +95,7 @@ export const getSizeImage = async (link, callback) => {
         console.log({
           width: this.width,
           height: this.height,
-        })
+        });
         callback({
           width: this.width,
           height: this.height,
@@ -126,6 +126,26 @@ export const validateEmail = (email) => {
 };
 
 export const validatePassword = (password) => {
-  return String(password)
-  .match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/);
-}
+  return String(password).match(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
+  );
+};
+
+export const isValidHttpUrl = (string, canBeEmtyOrNull = false) => {
+  if (
+    canBeEmtyOrNull &&
+    (!string || string === "" || string === null || string === undefined)
+  ) {
+    return true;
+  }
+
+  let url;
+
+  try {
+    url = new URL(string);
+  } catch (_) {
+    return false;
+  }
+
+  return url.protocol === "http:" || url.protocol === "https:";
+};
