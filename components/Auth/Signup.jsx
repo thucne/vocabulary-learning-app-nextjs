@@ -8,13 +8,14 @@ import { useDispatch } from "react-redux";
 import {
   Link as MuiLink, Box, FormControl, FormHelperText,
   InputAdornment, IconButton, InputLabel, OutlinedInput,
-  Typography, Container, TextField, Grid
+  Typography, Container, TextField, Grid, Paper, Button
 } from "@mui/material";
 
 import {
   Visibility,
   VisibilityOff,
   Send as SendIcon,
+  Error as ErrorIcon
 } from "@mui/icons-material";
 
 import { Colors, Fonts } from "@styles";
@@ -208,211 +209,253 @@ export default function Signup() {
             height: "100%",
           }}
         >
-          <Box
-            sx={{
+          <Box sx={{ display: "flex", alignItems: "center", height: "100%" }} className='noselect'>
+            <Paper variant='outlined' sx={{
               display: "flex",
+              alignItems: "center",
               flexDirection: "column",
               justifyContent: "center",
-              alignItems: "center",
-              height: "100%",
-            }}
-          >
-            <Image
-              src="/logo.svg"
-              alt="Logo"
-              width={75}
-              height={75}
-              draggable={false}
-              priority={true}
-              objectFit="contain"
-            />
-            <Typography
-              component="h1"
-              variant="h4"
-              sx={{ fontWeight: Fonts.FW_600 }}
-            >
-              Sign Up
-            </Typography>
-            <Box
-              component="form"
-              onSubmit={handleSubmit}
-              noValidate
-              sx={{ mt: 5, width: 350, maxWidth: "90%" }}
-            >
-              <TextField
-                margin="dense"
-                type="text"
-                label="Name"
-                size="small"
-                required
-                fullWidth
-                error={errors["name"]?.error}
-                helperText={errors["name"]?.msg || 'Name is required'}
-                inputProps={inputProps}
-                value={name}
-                onChange={(e) => {
-                  setName(e.target.value);
-                  checkInputCriteria(e, "name");
-                }}
+              mx: [0, 3, 5, 7],
+              p: "48px 40px 36px",
+              borderRadius: '10px',
+              maxWidth: "400px",
+              border: ['none', '1px solid rgba(0, 0, 0, 0.12)'],
+              cursor: 'pointer',
+              position: "relative",
+            }}>
+
+              <Link href="/" passHref>
+                <Button variant="text"
+                  sx={{
+                    position: 'absolute',
+                    top: "58px",
+                    left: "40px",
+                    ml: '-8px',
+                    '&.MuiButton-text': {
+                      textTransform: 'none !important',
+                    },
+                  }}>
+                  Back to Home
+                </Button>
+              </Link>
+
+              <Image
+                src="/logo.svg"
+                alt="Logo"
+                width={75}
+                height={75}
+                draggable={false}
+                priority={true}
+                objectFit="contain"
               />
 
-              <TextField
-                margin="dense"
-                type="text"
-                label="Username"
-                size="small"
-                required
-                fullWidth
-                error={errors["username"]?.error}
-                helperText={errors["username"]?.msg || 'Username is required'}
-                inputProps={inputProps}
-                value={username}
-                onChange={(e) => {
-                  setUsername(e.target.value);
-                  checkInputCriteria(e, "username");
-                }}
-              />
-
-              <TextField
-                margin="dense"
-                type="text"
-                label="Email Address"
-                size='small'
-                required
-                fullWidth
-                error={errors["email"]?.error}
-                helperText={errors["email"]?.msg || 'Email is required'}
-                inputProps={inputProps}
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  checkInputCriteria(e, "email");
-                }}
-              />
-
-
-              <FormControl
-                margin="dense"
-                size="small"
-                required
-                fullWidth
-                readOnly={!focuses.password}
-                error={errors?.password?.error}
-                onFocus={() =>
-                  setFocuses((prev) => ({ ...prev, password: true }))
-                }
+              <Typography component="h1" sx={{ fontWeight: Fonts.FW_400, fontSize: Fonts.FS_24 }}>
+                Create your Vip Account
+              </Typography>
+              <Box
+                component="form"
+                onSubmit={handleSubmit}
+                noValidate
+                sx={{ mt: 3 }}
               >
-                <InputLabel htmlFor="password-field-vip" >
-                  Password
-                </InputLabel>
-                <OutlinedInput
-                  id="password-field-vip"
-                  type={showPassword ? "text" : "password"}
-                  label="Password"
+                <TextField
+                  margin="dense"
+                  type="text"
+                  label="Name"
+                  size="small"
+                  required
+                  fullWidth
+                  error={errors["name"]?.error}
+                  helperText={errors["name"]?.msg || 'Name is required'}
                   inputProps={inputProps}
-                  value={password}
+                  value={name}
                   onChange={(e) => {
-                    setPassword(e.target.value);
-                    checkInputCriteria(e, "password");
+                    setName(e.target.value);
+                    checkInputCriteria(e, "name");
                   }}
-                  endAdornment={
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={handleClickShowPassword}
-                        onMouseDown={handleMouseDownPassword}
-                        edge="end"
-                      >
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  }
                 />
-                <FormHelperText
-                  id="outlined-password-helper-text-vip-1"
-                >
-                  {errors?.password?.msg || "At least 8 characters, 1 uppercase and 1 number"}
-                </FormHelperText>
-              </FormControl>
 
-
-              <FormControl
-                margin="dense"
-                size="small"
-                required
-                fullWidth
-                readOnly={!focuses.confirmPassword}
-                error={errors?.confirmPassword?.error}
-                onFocus={() =>
-                  setFocuses((prev) => ({ ...prev, password: true }))
-                }
-              >
-                <InputLabel htmlFor="vip-confirm-password">
-                  Confirm Password
-                </InputLabel>
-                <OutlinedInput
-                  id="vip-confirm-password"
-                  type={showConfirmPassword ? "text" : "password"}
-                  label="Confirm Password"
-                  onPaste={preventCopyPaste}
-                  onCopy={preventCopyPaste}
+                <TextField
+                  margin="dense"
+                  type="text"
+                  label="Username"
+                  size="small"
+                  required
+                  fullWidth
+                  error={errors["username"]?.error}
+                  helperText={errors["username"]?.msg || 'Username is required'}
                   inputProps={inputProps}
-                  value={confirmPassword}
+                  value={username}
                   onChange={(e) => {
-                    setConfirmPassword(e.target.value);
-                    checkInputCriteria(e, "confirmPassword");
+                    setUsername(e.target.value);
+                    checkInputCriteria(e, "username");
                   }}
-                  endAdornment={
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={handleClickShowConfirmPassword}
-                        onMouseDown={handleMouseDownPassword}
-                        edge="end"
-                      >
-                        {showConfirmPassword ? (
-                          <VisibilityOff />
-                        ) : (
-                          <Visibility />
-                        )}
-                      </IconButton>
-                    </InputAdornment>
-                  }
                 />
-                <FormHelperText
-                  id="outlined-password-helper-text-vip-2"
-                >
-                  {errors?.confirmPassword?.msg || "Re-enter password"}
-                </FormHelperText>
-              </FormControl>
 
+                <TextField
+                  margin="dense"
+                  type="text"
+                  label="Email Address"
+                  size='small'
+                  required
+                  fullWidth
+                  error={errors["email"]?.error}
+                  helperText={errors["email"]?.msg || 'Email is required'}
+                  inputProps={inputProps}
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    checkInputCriteria(e, "email");
+                  }}
+                />
 
-              <Grid container justifyContent="flex-end">
-                <Grid item>
-                  <Link href="/login" passHref>
-                    <MuiLink variant="body2" >
-                      Already have an account? Log in
-                    </MuiLink>
-                  </Link>
+                <Grid container direction='row' spacing={1} id="vip-confirm-password3">
+                  <Grid item xs={12} sm={6}>
+                    <FormControl
+                      margin="dense"
+                      size="small"
+                      required
+                      fullWidth
+                      readOnly={!focuses.password}
+                      error={errors?.password?.error}
+                      onFocus={() =>
+                        setFocuses((prev) => ({ ...prev, password: true }))
+                      }
+                    >
+                      <InputLabel htmlFor="password-field-vip" >
+                        Password
+                      </InputLabel>
+                      <OutlinedInput
+                        id="password-field-vip"
+                        type={showPassword ? "text" : "password"}
+                        label="Password"
+                        inputProps={inputProps}
+                        value={password}
+                        onChange={(e) => {
+                          setPassword(e.target.value);
+                          checkInputCriteria(e, "password");
+                        }}
+                        endAdornment={
+                          <InputAdornment position="end">
+                            <IconButton
+                              aria-label="toggle password visibility"
+                              onClick={handleClickShowPassword}
+                              onMouseDown={handleMouseDownPassword}
+                              edge="end"
+                            >
+                              {showPassword ? <VisibilityOff /> : <Visibility />}
+                            </IconButton>
+                          </InputAdornment>
+                        }
+                      />
+                      <FormHelperText
+                        id="outlined-password-helper-text-vip-1"
+                        sx={{ display: ['flex', 'none'] }}
+                      >
+                        {errors?.password?.msg || "Use 8 or more characters with a mix of letters, numbers & symbols"}
+                      </FormHelperText>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl
+                      margin="dense"
+                      size="small"
+                      required
+                      fullWidth
+                      readOnly={!focuses.confirmPassword}
+                      error={errors?.confirmPassword?.error}
+                      onFocus={() =>
+                        setFocuses((prev) => ({ ...prev, password: true }))
+                      }
+                    >
+                      <InputLabel htmlFor="vip-confirm-password">
+                        Confirm
+                      </InputLabel>
+                      <OutlinedInput
+                        id="vip-confirm-password"
+                        type={showConfirmPassword ? "text" : "password"}
+                        label="Confirm"
+                        onPaste={preventCopyPaste}
+                        onCopy={preventCopyPaste}
+                        inputProps={inputProps}
+                        value={confirmPassword}
+                        onChange={(e) => {
+                          setConfirmPassword(e.target.value);
+                          checkInputCriteria(e, "confirmPassword");
+                        }}
+                        endAdornment={
+                          <InputAdornment position="end">
+                            <IconButton
+                              aria-label="toggle password visibility"
+                              onClick={handleClickShowConfirmPassword}
+                              onMouseDown={handleMouseDownPassword}
+                              edge="end"
+                            >
+                              {showConfirmPassword ? (
+                                <VisibilityOff />
+                              ) : (
+                                <Visibility />
+                              )}
+                            </IconButton>
+                          </InputAdornment>
+                        }
+                      />
+                      <FormHelperText
+                        id="outlined-password-helper-text-vip-2"
+                        sx={{ display: ['flex', 'none'] }}
+                      >
+                        {errors?.confirmPassword?.msg || "Re-enter password"}
+                      </FormHelperText>
+                    </FormControl>
+                  </Grid>
                 </Grid>
-              </Grid>
 
+                <FormHelperText sx={{
+                  display: ['none', 'flex'],
+                  m: "4px 14px 0px",
+                  color: (errors?.password?.msg?.length > 0 || errors?.confirmPassword?.msg?.length > 0) && 'red'
+                }}>
+                  {errors?.password?.msg ||
+                    errors?.confirmPassword?.msg ||
+                    'Use 8 or more characters with a mix of letters, numbers & symbols'
+                  }
+                </FormHelperText>
 
-              <LoadingButton
-                type="submit"
-                variant="contained"
-                loadingPosition="start"
-                fullWidth
-                sx={{ mt: 3, mb: 2 }}
-                disabled={!checkCanSubmit()}
-                loading={loading}
-                startIcon={<SendIcon />}
-              >
-                Sign up
-              </LoadingButton>
+                <Grid container justifyContent="space-between" mt={2}>
+                  <Grid item>
+                    <Link href="/login" passHref>
+                      <Button variant="text" sx={{
+                        ml: '-8px',
+                        '&.MuiButton-text': {
+                          textTransform: 'none !important',
+                        }
+                      }}>
+                        Log in instead
+                      </Button>
+                    </Link>
+                  </Grid>
+                  <Grid item>
+                    <LoadingButton
+                      type="submit"
+                      variant="contained"
+                      loadingPosition="start"
+                      fullWidth
+                      disabled={!checkCanSubmit()}
+                      loading={loading}
+                      startIcon={<SendIcon />}
+                      sx={{
+                        '&.MuiLoadingButton-root': {
+                          textTransform: 'none !important',
+                        }
+                      }}
+                    >
+                      Sign up
+                    </LoadingButton>
+                  </Grid>
+                </Grid>
 
-
-            </Box>
+              </Box>
+            </Paper>
           </Box>
         </Grid>
       </Grid>

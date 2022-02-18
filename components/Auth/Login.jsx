@@ -7,10 +7,15 @@ import {
   Avatar, TextField, FormControlLabel,
   Link as MuiLink, Grid, Box, Typography, Container,
   FormControl, InputLabel, OutlinedInput, InputAdornment, FormHelperText,
-  IconButton
+  IconButton, Button, Paper, Tooltip
 } from '@mui/material';
 
-import { Visibility, VisibilityOff, Send as SendIcon } from '@mui/icons-material';
+import { Visibility, 
+  VisibilityOff, 
+  Send as SendIcon,
+  Home as HomeIcon,
+  ArrowBackIos as ArrowBackIosIcon
+ } from '@mui/icons-material';
 
 import LoadingButton from '@mui/lab/LoadingButton';
 
@@ -86,10 +91,11 @@ export default function Login() {
             draggable={false}
           />
         </Grid>
+
         <Grid
           item
           xs={12} lg={4}
-          sx={{ width: '100%', height: '100%', backgroundColor: Colors.LOGIN_BG }}
+          sx={{ width: '100%', height: '100%', backgroundColor: ['none', Colors.LOGIN_BG] }}
           display='flex'
           alignItems='center'
           justifyContent='center'
@@ -101,120 +107,152 @@ export default function Login() {
               justifyContent: "center",
               alignItems: "center",
               height: "100%",
-              mt: [0, 0, 0, -10]
             }}
           >
-            <Image
-              src='/logo.svg'
-              alt='Logo'
-              width={75}
-              height={75}
-              draggable={false}
-              priority={true}
-              objectFit="contain"
-            />
-            <Typography component="h1" variant="h4" color={Colors.WHITE} sx={{ fontWeight: Fonts.FW_600 }}>
-              Welcome Back!
-            </Typography>
-            <Box
-              component="form"
-              onSubmit={handleSubmit}
-              noValidate
-              sx={{ mt: 5, width: 350, maxWidth: "90%" }}
-            >
-              <TextField
-                margin="normal"
-                type="text"
-                label="Email or Username"
-                color="white"
-                required
-                fullWidth
-                sx={inputStyles}
-                inputProps={{
-                  autoComplete: 'new-password',
-                  form: {
-                    autoComplete: 'off',
-                  },
-                }}
-                readOnly={!focuses.identifier}
-                error={!!errors?.identifier}
-                helperText={errors?.identifier}
-                onChange={(e) => {
-                  setForm(prev => ({ ...prev, identifier: e.target.value }));
-                }}
-                onFocus={() => setFocuses(prev => ({ ...prev, identifier: true }))}
-              />
-              <FormControl
-                margin="normal"
-                required
-                fullWidth
-                sx={inputStyles}
-                readOnly={!focuses.password}
-                error={!!errors.password}
-                onFocus={() => setFocuses(prev => ({ ...prev, password: true }))}
-              >
-                <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
-                <OutlinedInput
-                  id="outlined-adornment-password"
-                  type={showPassword ? 'text' : 'password'}
-                  value={form.password}
-                  onChange={(e) => {
-                    setForm(prev => ({ ...prev, password: e.target.value }));
-                  }}
-                  inputProps={{
-                    autoComplete: 'new-password',
-                    form: {
-                      autoComplete: 'off',
+            <Paper variant='outlined' sx={{
+              display: "flex",
+              alignItems: "center",
+              flexDirection: "column",
+              justifyContent: "center",
+              mx: [0, 3, 5, 7],
+              p: "48px 40px 36px",
+              borderRadius: '10px',
+              maxWidth: "400px",
+              border: ['none', '1px solid rgba(0, 0, 0, 0.12)'],
+              cursor: 'pointer',
+              position: 'relative',
+            }}>
+              <Link href="/" passHref>
+                <Button variant="text"
+                  sx={{
+                    position: 'absolute',
+                    top: "58px",
+                    left: "40px",
+                    ml: '-8px',
+                    '&.MuiButton-text': {
+                      textTransform: 'none !important',
                     },
-                  }}
-                  endAdornment={
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={handleClickShowPassword}
-                        onMouseDown={handleMouseDownPassword}
-                        edge="end"
-                      >
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  }
-                  label="Password"
-                />
-                <FormHelperText id="outlined-password-helper-text">{errors?.password}</FormHelperText>
-              </FormControl>
+                  }}>
+                  Back to Home
+                </Button>
+              </Link>
 
-              <LoadingButton
-                type="submit"
-                variant="contained"
-                loadingPosition="start"
-                color="white"
-                fullWidth
-                sx={{ mt: 3, mb: 2 }}
-                disabled={!canSubmit}
-                loading={loading}
-                startIcon={<SendIcon />}
+              <Image
+                src='/logo.svg'
+                alt='Logo'
+                width={75}
+                height={75}
+                draggable={false}
+                priority={true}
+                objectFit="contain"
+              />
+
+              <Typography component="h1" sx={{ fontSize: Fonts.FS_24, p: "16px 0px 0px" }}>
+                Log in
+              </Typography>
+              <Typography component="p" sx={{ fontSize: Fonts.FS_16, p: "8px 0px 0px" }}>
+                Use your Vip Account
+              </Typography>
+              <Box
+                component="form"
+                onSubmit={handleSubmit}
+                noValidate
+                sx={{ mt: 3 }}
               >
-                Log In
-              </LoadingButton>
-              <Grid container>
-                <Grid item xs>
-                  <Link href="#" passHref>
-                    <MuiLink
-                      variant="body2" color={Colors.WHITE}>
-                      Forgot password?
-                    </MuiLink>
-                  </Link>
+                <TextField
+                  margin="normal"
+                  type="text"
+                  label="Email or Username"
+                  required
+                  fullWidth
+                  inputProps={inputProps}
+                  readOnly={!focuses.identifier}
+                  error={!!errors?.identifier}
+                  helperText={errors?.identifier}
+                  onChange={(e) => {
+                    setForm(prev => ({ ...prev, identifier: e.target.value }));
+                  }}
+                  onFocus={() => setFocuses(prev => ({ ...prev, identifier: true }))}
+                />
+                <FormControl
+                  margin="normal"
+                  required
+                  fullWidth
+                  readOnly={!focuses.password}
+                  error={!!errors.password}
+                  onFocus={() => setFocuses(prev => ({ ...prev, password: true }))}
+                >
+                  <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+                  <OutlinedInput
+                    id="outlined-adornment-password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={form.password}
+                    onChange={(e) => {
+                      setForm(prev => ({ ...prev, password: e.target.value }));
+                    }}
+                    inputProps={inputProps}
+                    endAdornment={
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={handleClickShowPassword}
+                          onMouseDown={handleMouseDownPassword}
+                          edge="end"
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    }
+                    label="Password"
+                  />
+                  <FormHelperText id="outlined-password-helper-text">{errors?.password}</FormHelperText>
+                </FormControl>
+
+                <Link href="#" passHref>
+                  <MuiLink
+                    variant="body2"
+                    underline="none"
+                  >
+                    Forgot password?
+                  </MuiLink>
+                </Link>
+
+                <Grid container justifyContent='space-between' mb={2} mt={4}>
+                  <Grid item>
+                    <Link href="/signup" passHref>
+                      <Button variant="text"
+                        sx={{
+                          ml: '-8px',
+                          '&.MuiButton-text': {
+                            textTransform: 'none !important',
+                          }
+                        }}>
+                        Create account
+                      </Button>
+                    </Link>
+                  </Grid>
+                  <Grid item>
+                    <LoadingButton
+                      type="submit"
+                      variant="contained"
+                      loadingPosition="start"
+                      color="white"
+                      sx={{
+                        '&.MuiLoadingButton-root': {
+                          textTransform: 'none !important',
+                        }
+                      }}
+                      disabled={!canSubmit}
+                      loading={loading}
+                      startIcon={<SendIcon />}
+                    >
+                      Log in
+                    </LoadingButton>
+                  </Grid>
                 </Grid>
-                <Grid item>
-                  <Link href="/signup" passHref>
-                    <MuiLink variant="body2" color={Colors.WHITE}>
-                      Don&apos;t have an account? Sign up
-                    </MuiLink>
-                  </Link>
-                </Grid>
-              </Grid>
-            </Box>
+
+              </Box>
+            </Paper>
           </Box>
         </Grid>
       </Grid>
@@ -257,4 +295,11 @@ const inputStyles = {
       color: Colors.WHITE,
     }
   }
+}
+
+const inputProps = {
+  autoComplete: 'new-password',
+  form: {
+    autoComplete: 'off',
+  },
 }

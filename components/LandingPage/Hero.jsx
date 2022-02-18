@@ -59,7 +59,7 @@ const Hero = () => {
     return (
         <Container maxWidth={false} disableGutters sx={{ pb: 3, mt: [5, 7, 0] }}>
             <Grid container alignItems='center'>
-                <Grid ref={myRef} item xs={12} md={7} lg={6} pl={[5, 8, 15, 21]} pr={[5, 8]}>
+                <Grid ref={myRef} item xs={12} md={7} lg={6} pl={[3, 8, 15, 21]} pr={[3, 5, 8]}>
                     <Typography variant='h2' component='h1' sx={{
                         fontWeight: Fonts.FW_500,
                         fontSize: 'clamp(2.625rem, 1.2857rem + 3.5714vw, 4rem)',

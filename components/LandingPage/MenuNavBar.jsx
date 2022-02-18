@@ -1,22 +1,22 @@
 import * as React from 'react';
+
+import Link from 'next/link';
+
 import { styled, alpha } from '@mui/material/styles';
-import Button from '@mui/material/Button';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import EditIcon from '@mui/icons-material/Edit';
-import Divider from '@mui/material/Divider';
-import ArchiveIcon from '@mui/icons-material/Archive';
-import FileCopyIcon from '@mui/icons-material/FileCopy';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
-import LoginIcon from '@mui/icons-material/Login';
-import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
-import ArticleIcon from '@mui/icons-material/Article';
-import InfoIcon from '@mui/icons-material/Info';
-import SupportIcon from '@mui/icons-material/Support';
-import SignpostIcon from '@mui/icons-material/Signpost';
+
+import {
+    Menu, MenuItem, Divider, IconButton,
+    Link as MuiLink, Stack, Box
+} from '@mui/material';
+
+import {
+    Menu as MenuIcon,
+    Login,
+    AppRegistration as AppRegistrationIcon,
+    Article as ArticleIcon,
+    Support as SupportIcon,
+    Signpost as SignpostIcon,
+} from '@mui/icons-material'
 
 import { SXs } from '@styles';
 
@@ -93,29 +93,69 @@ export default function CustomizedMenus() {
                 open={open}
                 onClose={handleClose}
             >
-                <MenuItem onClick={handleClose} disableRipple>
-                    <LoginIcon />
-                    Log in
+
+                <MenuItem disableRipple color='inherit' sx={{ p: 0 }}>
+                    <Link href='/login' passHref>
+                        <MuiLink underline='none' sx={menuSX}>
+                            <Stack direction='row' alignItems='center'>
+                                <Login sx={{ color: 'inherit !important' }} />
+                                Log in
+                            </Stack>
+                        </MuiLink>
+                    </Link>
                 </MenuItem>
-                <MenuItem onClick={handleClose} disableRipple>
-                    <AppRegistrationIcon />
-                    Sign up
+                <MenuItem disableRipple color='inherit' sx={{ p: 0 }}>
+                    <Link href='/singup' passHref>
+                        <MuiLink underline='none' sx={menuSX}>
+                            <Stack direction='row' alignItems='center'>
+                                <AppRegistrationIcon sx={{ color: 'inherit !important' }} />
+                                Sign up
+                            </Stack>
+                        </MuiLink>
+                    </Link>
                 </MenuItem>
-                <Divider sx={{ my: 0.5 }} />
-                <MenuItem onClick={handleClose} disableRipple>
-                    <ArticleIcon />
-                    Blog
+                <Divider />
+                <MenuItem disableRipple color='inherit' sx={{ p: 0 }}>
+                    <Link href='/blogs' passHref>
+                        <MuiLink underline='none' sx={menuSX}>
+                            <Stack direction='row' alignItems='center'>
+                                <ArticleIcon sx={{ color: 'inherit !important' }} />
+                                Blogs
+                            </Stack>
+                        </MuiLink>
+                    </Link>
                 </MenuItem>
-                <MenuItem onClick={handleClose} disableRipple>
-                    <SignpostIcon />
-                    Getting started
+                <MenuItem disableRipple color='inherit' sx={{ p: 0 }}>
+                    <Link href='/getting-started' passHref>
+                        <MuiLink underline='none' sx={menuSX}>
+                            <Stack direction='row' alignItems='center'>
+                                <SignpostIcon sx={{ color: 'inherit !important' }} />
+                                Getting started
+                            </Stack>
+                        </MuiLink>
+                    </Link>
                 </MenuItem>
-                <Divider sx={{ my: 0.5 }} />
-                <MenuItem onClick={handleClose} disableRipple>
-                    <SupportIcon />
-                    Support
+                <Divider />
+                <MenuItem disableRipple color='inherit' sx={{ p: 0 }}>
+                    <Link href='/support' passHref>
+                        <MuiLink underline='none' sx={menuSX}>
+                            <Stack direction='row' alignItems='center'>
+                                <SupportIcon sx={{ color: 'inherit !important' }} />
+                                Support
+                            </Stack>
+                        </MuiLink>
+                    </Link>
                 </MenuItem>
             </StyledMenu>
         </div>
     );
+}
+
+
+const menuSX = {
+    // color: theme => theme.palette.footer_title.main,
+    color: theme => 'inherit !important',
+    width: '100%',
+    height: '100%',
+    p: '6px 16px'
 }
