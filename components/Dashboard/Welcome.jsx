@@ -9,11 +9,10 @@ export default function Welcome(props) {
     const [open, setOpen] = useState(true);
 
     return (
-        <Container maxWidth="lg">
+        <Container maxWidth="lg" disableGutters>
             <CreateNewWord open={open} setOpen={setOpen} />
 
-            <Grid container direction="row">
-
+            <Grid container direction="row" mt={[0, 1, 2, 3]}>
                 <Grid item xs={12} sm={6}
                     sx={{
                         display: "flex",
@@ -26,7 +25,7 @@ export default function Welcome(props) {
                             Analytics Dashboard
                         </Typography>
                         <Typography component="p" sx={{ fontSize: Fonts.FS_15, p: "8px 0px 0px" }}>
-                            Welcome back, Lucy! We missed you
+                            Welcome back, Lucy! We missed you 👋
                         </Typography>
                     </Box>
                 </Grid>

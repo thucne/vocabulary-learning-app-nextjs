@@ -5,6 +5,7 @@ import linear from "./linear";
 import backdrop from "./backdrop";
 import tabName from "./tabName";
 import bgColor from "./bgColor";
+import userData from "./userData";
 
 const rootReducer = combineReducers({
   user,
@@ -13,6 +14,7 @@ const rootReducer = combineReducers({
   backdrop,
   tabName,
   bgColor,
+  userData
 });
 
 export default rootReducer;

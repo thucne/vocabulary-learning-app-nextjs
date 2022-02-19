@@ -244,7 +244,9 @@ function ResponsiveDrawer(props) {
                                                     onClick={() => Router.push('/login')}
                                                     variant="outlined"
                                                     startIcon={<LoginIcon
-                                                    />}>
+                                                    />}
+                                                    disableElevation
+                                                >
                                                     Log in
                                                 </Button>
                                             }
@@ -256,16 +258,13 @@ function ResponsiveDrawer(props) {
                                                     variant="contained"
                                                     sx={{
                                                         display: ['none', 'flex'],
-                                                        bgcolor: 'upsplashButton.bg',
-                                                        color: 'upsplashButton.main',
-                                                        borderColor: 'upsplashButton.main',
-                                                        ':hover': {
-                                                            borderColor: 'upsplashButton.hover',
-                                                            color: 'upsplashButton.hover',
-                                                            bgcolor: 'upsplashButton.bg',
-                                                        }
+                                                        ...SXs.MUI_NAV_BUTTON,
+                                                        color: theme => theme.palette[bgColor].contrastText,
+                                                        borderColor: theme => `${theme.palette[bgColor].contrastText}5`,
                                                     }}
-                                                    startIcon={<LogoutIcon />}>
+                                                    startIcon={<LogoutIcon />}
+                                                    disableElevation
+                                                >
                                                     Log out
                                                 </Button>
                                             }
@@ -369,7 +368,7 @@ function ResponsiveDrawer(props) {
                                 !landing ? `calc(100% - ${drawerWidth}px)` : '100%'
                         },
                         position: 'relative',
-                        mt: `${height}px`,
+                        mt: !landing ? 0 : `${height}px`,
                     }}
                 >
                     {!landing && <Toolbar />}

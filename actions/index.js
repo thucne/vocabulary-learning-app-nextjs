@@ -5,6 +5,7 @@ import {
   handleResponse,
   handleServerError,
   handleCommonResponse,
+  getJWT,
 } from "@utils";
 
 export const login = (data) => async (dispatch) => {
@@ -38,6 +39,7 @@ export const signup = (data) => async (dispatch) => {
 export const logout = async (next) => {
   if (typeof window !== "undefined") {
     localStorage.removeItem("vip-user");
+    localStorage.removeItem("vip-token");
   }
   next();
 };
@@ -68,4 +70,22 @@ export const resetPassword = (data) => async (dispatch) => {
       .then((res) => handleCommonResponse(res))
       .catch((err) => handleServerError(err));
   }
+};
+
+export const fetcherJWT = async (url) => {
+  return await axios
+    .get(url, {
+      headers: {
+        Authorization: `Bearer ${getJWT()}`,
+      },
+    })
+    .then((res) => handleCommonResponse(res))
+    .catch((err) => handleServerError(err));
+};
+
+export const fetcher = async (url) => {
+    return await axios
+        .get(url)
+        .then((res) => handleCommonResponse(res))
+        .catch((err) => handleServerError(err));
 }
