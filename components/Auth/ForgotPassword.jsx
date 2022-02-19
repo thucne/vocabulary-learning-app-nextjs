@@ -28,6 +28,8 @@ import { useDispatch } from "react-redux";
 import { validateEmail, validatePassword, isValidHttpUrl } from '@utils';
 import * as t from '@consts';
 
+import LoadingImage from '@components/LoadingImage';
+
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -187,13 +189,13 @@ export default function Login() {
                     height: '100%',
                     display: ['none', 'none', 'none', 'flex'],
                 }}>
-                    <Image
+                    <LoadingImage
                         src="https://res.cloudinary.com/katyperrycbt/image/upload/v1645198210/Every_day_is_a_good_day_to_learn._mbttkp.svg"
                         alt="Forgot password"
                         layout="fill"
                         objectFit="cover"
-                        priority={true}
                         draggable={false}
+                        quality={100}
                     />
                 </Grid>
 

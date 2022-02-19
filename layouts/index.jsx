@@ -82,14 +82,17 @@ const Layout = ({ children, login = false, landing = false }) => {
                     style={{
                         width: '100%',
                         height: '100%',
-                        position: 'relative'
+                        position: 'relative',
+                        borderRadius: '10px',
+                        overflow: 'hidden',
                     }}
                 >
                     <Image
-                        src='https://res.cloudinary.com/katyperrycbt/image/upload/v1642755521/aa_cgipsy.svg'
+                        src='https://res.cloudinary.com/katyperrycbt/image/upload/v1645242792/Pulse-1s-200px_3_ua99yp.svg'
                         layout='fill'
                         alt='loading'
                         priority={true}
+                        draggable={false}
                     />
                 </div>
             </div>

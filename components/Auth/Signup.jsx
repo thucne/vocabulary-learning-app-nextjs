@@ -23,6 +23,8 @@ import { LoadingButton } from "@mui/lab";
 import { signup } from "@actions";
 import { validateEmail, validatePassword } from '@utils';
 
+import LoadingImage from '@components/LoadingImage';
+
 
 export default function Signup() {
     const [name, setName] = useState("");
@@ -195,12 +197,11 @@ export default function Signup() {
                         display: ["none", "none", "none", "flex"],
                     }}
                 >
-                    <Image
+                    <LoadingImage
                         src="https://res.cloudinary.com/katyperrycbt/image/upload/v1645111388/Manufacture_Production_Modern_Dark_Minimalist_Dashboard_Website_Desktop_Magenta_White_Blue_zztgat.svg"
                         alt="Sign up"
                         layout="fill"
                         objectFit="cover"
-                        priority={true}
                         draggable={false}
                         quality={100}
                     />

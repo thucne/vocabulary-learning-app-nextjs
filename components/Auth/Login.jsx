@@ -7,7 +7,7 @@ import {
     Avatar, TextField, FormControlLabel,
     Link as MuiLink, Grid, Box, Typography, Container,
     FormControl, InputLabel, OutlinedInput, InputAdornment, FormHelperText,
-    IconButton, Button, Paper, Tooltip
+    IconButton, Button, Paper, Tooltip, Skeleton
 } from '@mui/material';
 
 import {
@@ -24,6 +24,8 @@ import { Colors, Fonts } from '@styles';
 import { login } from '@actions';
 import { useDispatch } from "react-redux";
 import { useRouter } from "next/router";
+
+import LoadingImage from '@components/LoadingImage';
 
 export default function Login() {
     const [form, setForm] = useState({ identifier: '', password: '' });
@@ -53,6 +55,7 @@ export default function Login() {
                 onSuccess: handleSuccessResponse,
                 onStarting: () => setLoading(true),
                 onFinally: () => setLoading(false),
+                snackbarMessageOnSuccess: "Welcome back!"
             });
         }
     };
@@ -96,13 +99,13 @@ export default function Login() {
                     height: '100%',
                     display: ['none', 'none', 'none', 'flex'],
                 }}>
-                    <Image
+                    <LoadingImage
                         src="https://res.cloudinary.com/katyperrycbt/image/upload/v1645112857/Manufacture_Production_Modern_Dark_Minimalist_Dashboard_Website_Desktop_Magenta_White_Blue_4_idd9su.svg"
                         alt="Login"
                         layout="fill"
                         objectFit="cover"
-                        priority={true}
                         draggable={false}
+                        quality={100}
                     />
                 </Grid>
 
