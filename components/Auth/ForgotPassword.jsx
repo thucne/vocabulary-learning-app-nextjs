@@ -28,6 +28,8 @@ import { useDispatch } from "react-redux";
 import { validateEmail, validatePassword, isValidHttpUrl } from '@utils';
 import * as t from '@consts';
 
+import LoadingImage from '@components/LoadingImage';
+
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -55,9 +57,13 @@ export default function Login() {
 
     const refs = useRef([]);
 
-    const canSubmit = step === 0 ? !errors?.email : (
-        step === 1 ? true : (!errors?.password && !errors?.confirmPassword && !errors?.code)
-    );
+    const canSubmit = step === 0 ?
+        (!errors?.email && email?.trim()?.length > 0) :
+        (
+            step === 1 ? true : (!errors?.password && password?.trim()?.length > 0 &&
+                !errors?.confirmPassword && confirmPassword?.trim()?.length > 0 &&
+                !errors?.code && code?.trim()?.length > 0)
+        );
 
     const handleSuccessResponse = (data) => {
         handleNext();
@@ -183,20 +189,20 @@ export default function Login() {
                     height: '100%',
                     display: ['none', 'none', 'none', 'flex'],
                 }}>
-                    <Image
-                        src="https://res.cloudinary.com/katyperrycbt/image/upload/v1645112857/Manufacture_Production_Modern_Dark_Minimalist_Dashboard_Website_Desktop_Magenta_White_Blue_4_idd9su.svg"
-                        alt="Login"
+                    <LoadingImage
+                        src="https://res.cloudinary.com/katyperrycbt/image/upload/v1645198210/Every_day_is_a_good_day_to_learn._mbttkp.svg"
+                        alt="Forgot password"
                         layout="fill"
                         objectFit="cover"
-                        priority={true}
                         draggable={false}
+                        quality={100}
                     />
                 </Grid>
 
                 <Grid
                     item
                     xs={12} lg={4}
-                    sx={{ width: '100%', height: '100%', backgroundColor: ['none', Colors.LOGIN_BG] }}
+                    sx={{ width: '100%', height: '100%', backgroundColor: ['none', Colors.LOGO_YELLOW] }}
                     display='flex'
                     alignItems='center'
                     justifyContent='center'
@@ -205,7 +211,7 @@ export default function Login() {
                         sx={{
                             display: "flex",
                             flexDirection: "column",
-                            justifyContent: "center",
+                            justifyContent: ["flex-start", "center"],
                             alignItems: "center",
                             height: "100%",
                         }}
@@ -256,7 +262,7 @@ export default function Login() {
                                     step === 0 && 'What is your email?'
                                 }
                                 {
-                                    step === 1 && 'We sent you an email with a link to reset your password.'
+                                    step === 1 && 'We will send you an email with a link to reset your password.'
                                 }
                                 {
                                     step === 2 && 'Enter your new password.'
@@ -272,7 +278,9 @@ export default function Login() {
                                         if (step === 0 || step === 1) {
                                             handleAction();
                                         } else if (step === 2) {
-                                            if (!password?.trim().length) {
+                                            if (!code?.trim()?.length) {
+                                                refs.current[3].focus();
+                                            } else if (!password?.trim().length) {
                                                 refs.current[1].focus();
                                             } else if (!confirmPassword?.trim().length) {
                                                 refs.current[2].focus();
@@ -330,6 +338,7 @@ export default function Login() {
 
                                 {
                                     step === 2 && !code.length > 0 && <TextField
+                                        ref={el => refs.current[3] = el}
                                         margin="normal"
                                         type="text"
                                         label="Reset Link"
@@ -352,7 +361,6 @@ export default function Login() {
 
                                 {
                                     step === 2 && <FormControl
-                                        ref={el => refs.current[1] = el}
                                         margin="normal"
                                         required
                                         fullWidth
@@ -362,6 +370,7 @@ export default function Login() {
                                     >
                                         <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
                                         <OutlinedInput
+                                            ref={el => refs.current[1] = el}
                                             id="outlined-adornment-password"
                                             type={showPassword ? 'text' : 'password'}
                                             value={password}
@@ -395,7 +404,6 @@ export default function Login() {
 
                                 {
                                     step === 2 && <FormControl
-                                        ref={el => refs.current[2] = el}
                                         margin="normal"
                                         required
                                         fullWidth
@@ -405,6 +413,7 @@ export default function Login() {
                                     >
                                         <InputLabel htmlFor="outlined-adornment-password-confirm">Confirm</InputLabel>
                                         <OutlinedInput
+                                            ref={el => refs.current[2] = el}
                                             id="outlined-adornment-password-confirm"
                                             type={showConfirmPassword ? 'text' : 'password'}
                                             value={confirmPassword}
@@ -455,7 +464,7 @@ export default function Login() {
                                 >
                                     {
                                         step === 0 && <Grid item>
-                                            <Link href="/signup" passHref>
+                                            <Link href="/login" passHref>
                                                 <Button variant="text"
                                                     sx={{
                                                         ml: '-8px',
