@@ -7,6 +7,12 @@ export const MUI_NAV_ICON_BUTTON = {
   "& .MuiTouchRipple-root span": {
     borderRadius: "10px",
   },
+  "&.MuiButton-root": {
+    textTransform: "none !important",
+  },
+  "&.MuiLoadingButton-root": {
+    textTransform: "none !important",
+  },
 };
 
 export const MUI_NAV_BUTTON = {
@@ -17,7 +23,13 @@ export const MUI_NAV_BUTTON = {
   "& .MuiTouchRipple-root span": {
     borderRadius: "10px",
   },
-  '&:hover': {
+  "&:hover": {
     borderColor: (theme) => theme.palette.mui_button_inner.main,
-  }
+  },
+  "&.MuiButton-root": {
+    textTransform: "none !important",
+  },
+  "&.MuiLoadingButton-root": {
+    textTransform: "none !important",
+  },
 };
