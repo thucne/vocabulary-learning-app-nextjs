@@ -38,6 +38,7 @@ export const signup = (data) => async (dispatch) => {
 export const logout = async (next) => {
   if (typeof window !== "undefined") {
     localStorage.removeItem("vip-user");
+    localStorage.removeItem("vip-token");
   }
   next();
 };

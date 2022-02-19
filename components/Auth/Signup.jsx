@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 
 import Link from "next/link";
 import Image from "next/image";
+import Router from "next/router";
 
 import { useDispatch } from "react-redux";
 
@@ -501,6 +502,7 @@ export default function Signup() {
                                                         textTransform: 'none !important',
                                                     }
                                                 }}
+                                                onClick={() => Router.push('/login')}
                                             >
                                                 Go to log in
                                             </Button>

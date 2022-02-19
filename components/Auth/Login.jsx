@@ -35,6 +35,8 @@ export default function Login() {
     const [loading, setLoading] = useState(false);
 
     const router = useRouter();
+    const { query: { url } } = router;
+
     const canSubmit = !errors?.identifier && !errors?.password && form?.identifier && form?.password;
 
     const dispatch = useDispatch();
@@ -63,7 +65,7 @@ export default function Login() {
     const handleSuccessResponse = (data) => {
         localStorage.setItem('vip-token', JSON.stringify(data.jwt));
         localStorage.setItem('vip-user', JSON.stringify(data.user));
-        router.push('/');
+        router.push(url || '/');
     }
 
     const handleEnterPress = () => {

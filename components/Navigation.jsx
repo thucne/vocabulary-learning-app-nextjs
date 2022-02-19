@@ -256,14 +256,9 @@ function ResponsiveDrawer(props) {
                                                     variant="contained"
                                                     sx={{
                                                         display: ['none', 'flex'],
-                                                        bgcolor: 'upsplashButton.bg',
-                                                        color: 'upsplashButton.main',
-                                                        borderColor: 'upsplashButton.main',
-                                                        ':hover': {
-                                                            borderColor: 'upsplashButton.hover',
-                                                            color: 'upsplashButton.hover',
-                                                            bgcolor: 'upsplashButton.bg',
-                                                        }
+                                                        ...SXs.MUI_NAV_BUTTON,
+                                                        color: theme => theme.palette[bgColor].contrastText,
+                                                        borderColor: theme => `${theme.palette[bgColor].contrastText}5`,
                                                     }}
                                                     startIcon={<LogoutIcon />}>
                                                     Log out

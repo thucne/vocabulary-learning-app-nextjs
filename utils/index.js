@@ -14,6 +14,18 @@ export const isAuth = () => {
   }
 };
 
+export const getJWT = () => {
+  if (typeof window !== "undefined") {
+    if (localStorage.getItem("vip-token")) {
+      return JSON.parse(localStorage.getItem("vip-token"));
+    } else {
+      return false;
+    }
+  } else {
+    return false;
+  }
+};
+
 export const handleServerError = (error, noRedirect) => {
   if (!error)
     return { error: `Unknown error, please report this case to us! 😥` };
@@ -92,10 +104,6 @@ export const getSizeImage = async (link, callback) => {
     newImg.src = data;
     newImg.onload = function () {
       if (callback) {
-        console.log({
-          width: this.width,
-          height: this.height,
-        });
         callback({
           width: this.width,
           height: this.height,
