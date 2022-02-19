@@ -181,10 +181,12 @@ const allLinks = [
         ]
     },
     {
-        title: 'Developers',
+        title: 'Resources',
         links: [
-            { title: 'Materials', href: '/developers#materials' },
-            { title: 'API', href: '/developers#api' },
+            { title: 'How to build', href: '/for-developers/development-process' },
+            { title: 'Loading.IO', href: 'https://loading.io/' },
+            { title: 'IconS8', href: 'https://icons8.com/' },
+            { title: 'Unsplash', href: 'https://unsplash.com/' },
         ]
     },
     {

@@ -69,7 +69,7 @@ const Private = ({ children, MetaTag }) => {
                 }} variant="rectangular" animation="wave" />
                 <div style={{
                     position: "absolute",
-                    top: "50%",
+                    top: "45%",
                     left: "50%",
                     transform: "translate(-50%, -50%)",
                     width: 150,
@@ -93,7 +93,7 @@ const Private = ({ children, MetaTag }) => {
                 </div>
                 <div style={{
                     position: "absolute",
-                    top: "60%",
+                    top: "55%",
                     left: "50%",
                     transform: "translate(-50%, -50%)",
                     width: 250,

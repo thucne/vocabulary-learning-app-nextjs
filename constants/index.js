@@ -15,3 +15,8 @@ export const SET_PERCENTAGE = "SET_PERCENTAGE";
 export const SET_TAB_NAME = "SET_TAB_NAME";
 
 export const SET_BG = "SET_BG";
+
+// user data
+export const SET_USER_DATA = "SET_USER_DATA";
+export const CLEAR_USER_DATA = "CLEAR_USER_DATA";
+export const UPDATE_USER_DATA = "UPDATE_USER_DATA";

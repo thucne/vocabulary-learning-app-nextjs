@@ -78,7 +78,9 @@ export const handleCommonResponse = (res, options = {}) => {
       }
       return {};
     } else {
+        
       const data = res.data;
+
       if (data?.error) {
         if (onError) {
           onError(data.error);
