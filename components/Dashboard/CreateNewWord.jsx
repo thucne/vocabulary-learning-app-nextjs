@@ -4,7 +4,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import { LoadingButton } from "@mui/lab";
-import {  Send as SendIcon } from "@mui/icons-material";
+import { Send as SendIcon } from "@mui/icons-material";
 import AddIcon from "@mui/icons-material/Add";
 
 import {
@@ -34,6 +34,7 @@ const style = {
  * @function CreateNewWord
  **/
 const vocabTypes = ["vocab", "idiom", "phrase"];
+
 export default function CreateNewWord({ modalRef }) {
   const [open, setOpen] = useState(true);
   const [form, setForm] = useState({
@@ -52,7 +53,6 @@ export default function CreateNewWord({ modalRef }) {
     modalRef.current = handleOpen;
   }, []);
 
-
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("submit", { form });
@@ -66,29 +66,36 @@ export default function CreateNewWord({ modalRef }) {
     setForm((state) => ({ ...state, type: e.target.value }));
   };
 
-  const handleUploadImage =e=>{
-      if (e.target.files && e.target.files[0]) {
-        let reader = new FileReader();
-  
-        reader.onload = function (e) {
-          setForm((state) => ({ ...state, illustration: e.target.result }));
-        };
-        reader.readAsDataURL(e.target.files[0]);
-      }
-  }
+  const handleUploadImage = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      let reader = new FileReader();
+
+      reader.onload = function (e) {
+        setForm((state) => ({ ...state, illustration: e.target.result }));
+      };
+      reader.readAsDataURL(e.target.files[0]);
+    }
+  };
   const canSubmit = () =>
     (form.vip.length &&
-    form.examples.length &&
-    form.meanings.length &&
-    form.pronounce.length &&
-    !errors?.vip.error &&
-    !errors?.examples.error &&
-    !errors?.meanings.error &&
-    !errors?.pronounce.error) ?? false;
+      form.examples.length &&
+      form.meanings.length &&
+      form.pronounce.length &&
+      !errors?.vip.error &&
+      !errors?.examples.error &&
+      !errors?.meanings.error &&
+      !errors?.pronounce.error) ??
+    false;
 
-const checkInputCriteria =(e,name) =>{
-    setErrors(state =>({...state, [name]: e.target.value.length >0 ? {}: {error:true, message:`${name} is required`}}))
-}
+  const checkInputCriteria = (e, name) => {
+    setErrors((state) => ({
+      ...state,
+      [name]:
+        e.target.value.length > 0
+          ? {}
+          : { error: true, message: `${name} is required` },
+    }));
+  };
   return (
     <div>
       <Modal
@@ -115,7 +122,10 @@ const checkInputCriteria =(e,name) =>{
                   id="word"
                   error={errors?.vip?.error}
                   helperText={errors?.vip?.message}
-                  onChange={(e) =>{ handleChangeValue(e, "vip");checkInputCriteria(e,"vip")}}
+                  onChange={(e) => {
+                    handleChangeValue(e, "vip");
+                    checkInputCriteria(e, "vip");
+                  }}
                 />
               </Grid>
               <Grid item xs={6}>
@@ -125,7 +135,10 @@ const checkInputCriteria =(e,name) =>{
                   id="pronounce"
                   error={errors?.pronounce?.error}
                   helperText={errors?.pronounce?.message}
-                  onChange={(e) =>{ handleChangeValue(e, "pronounce");checkInputCriteria(e,"pronounce")}}
+                  onChange={(e) => {
+                    handleChangeValue(e, "pronounce");
+                    checkInputCriteria(e, "pronounce");
+                  }}
                 />
               </Grid>
               <Grid item xs={6}>
@@ -153,7 +166,10 @@ const checkInputCriteria =(e,name) =>{
                   multiline
                   error={errors?.examples?.error}
                   helperText={errors?.examples?.message}
-                  onChange={(e) =>{ handleChangeValue(e, "examples");checkInputCriteria(e,"examples")}}
+                  onChange={(e) => {
+                    handleChangeValue(e, "examples");
+                    checkInputCriteria(e, "examples");
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -163,25 +179,27 @@ const checkInputCriteria =(e,name) =>{
                   multiline
                   error={errors?.meanings?.error}
                   helperText={errors?.meanings?.message}
-                  onChange={(e) =>{ handleChangeValue(e, "meanings");checkInputCriteria(e,"meanings")}}
+                  onChange={(e) => {
+                    handleChangeValue(e, "meanings");
+                    checkInputCriteria(e, "meanings");
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>
-              <label htmlFor="image-upload">
-                <IconButton variant="contained" component="label">
-                    <AddIcon disabled/>
+                <label htmlFor="image-upload">
+                  <IconButton variant="contained" component="label">
+                    <AddIcon disabled />
                     <input
-                    id="image-upload"
-                    hidden
-                    type="file"
-                    onChange={handleUploadImage}
+                      id="image-upload"
+                      hidden
+                      type="file"
+                      onChange={handleUploadImage}
                     />
-                </IconButton>
-            </label>
-           
+                  </IconButton>
+                </label>
               </Grid>
             </Grid>
-        
+
             <LoadingButton
               type="submit"
               variant="contained"
@@ -192,8 +210,8 @@ const checkInputCriteria =(e,name) =>{
                 },
                 mt: 4,
               }}
-                disabled={!canSubmit()}
-                loading={loading}
+              disabled={!canSubmit()}
+              loading={loading}
               startIcon={<SendIcon />}
             >
               Create
