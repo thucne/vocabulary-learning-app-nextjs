@@ -18,13 +18,18 @@ window.adHocFetch = (ins) => {
     showBackdrop = true,
   } = ins;
 
-  if (!dispatch || !action || typeof dispatch !== 'function' || typeof action !== 'function') {
+  if (
+    !dispatch ||
+    !action ||
+    typeof dispatch !== "function" ||
+    typeof action !== "function"
+  ) {
     return new Error("Missing dispatch or action");
   }
 
   if (showBackdrop) {
     dispatch({
-      type: 'SHOW_BACKDROP',
+      type: "SHOW_BACKDROP",
     });
   }
 
@@ -38,7 +43,7 @@ window.adHocFetch = (ins) => {
     if (count >= lateTime) {
       clearInterval(countFunc);
       dispatch({
-        type: 'SHOW_SNACKBAR',
+        type: "SHOW_SNACKBAR",
         payload: {
           message: "Our server is starting... Please wait.",
           type: "info",
@@ -47,14 +52,14 @@ window.adHocFetch = (ins) => {
     }
   }, 100);
 
-  dispatch({ type: 'SHOW_LINEAR', payload: { percentage: linearStart } });
+  dispatch({ type: "SHOW_LINEAR", payload: { percentage: linearStart } });
 
   let linearcounter = linearStart;
 
   // randomly increase the percentage
   const increaseLinear = setInterval(() => {
     linearcounter = linearcounter + getRandomNumberInRange(1, 10);
-    dispatch({ type: 'SHOW_LINEAR', payload: { percentage: linearcounter } });
+    dispatch({ type: "SHOW_LINEAR", payload: { percentage: linearcounter } });
     if (linearcounter >= 70) {
       clearInterval(increaseLinear);
     }
@@ -64,11 +69,11 @@ window.adHocFetch = (ins) => {
     .then((data) => {
       clearInterval(countFunc);
       clearInterval(increaseLinear);
-      dispatch({ type: 'SHOW_LINEAR', payload: { percentage: linearEnd } });
+      dispatch({ type: "SHOW_LINEAR", payload: { percentage: linearEnd } });
 
       if (!data?.error) {
         dispatch({
-          type: 'SHOW_SNACKBAR',
+          type: "SHOW_SNACKBAR",
           payload: {
             message: snackbarMessageOnSuccess || data.message || "",
             type: snackbarTypeOnSuccess,
@@ -80,9 +85,13 @@ window.adHocFetch = (ins) => {
         }
       } else {
         dispatch({
-          type: 'SHOW_SNACKBAR',
+          type: "SHOW_SNACKBAR",
           payload: {
-            message: `${data.error?.message}`,
+            message: `${
+              typeof data?.error === "string"
+                ? data?.error
+                : data.error?.message
+            }`,
             type: snackbarTypeOnError,
             duration: linearAutoCloseAfter || 6000,
           },
@@ -91,14 +100,14 @@ window.adHocFetch = (ins) => {
           onError(data.error);
         }
       }
-      setTimeout(() => dispatch({ type: 'HIDE_LINEAR' }), linearAutoCloseAfter);
+      setTimeout(() => dispatch({ type: "HIDE_LINEAR" }), linearAutoCloseAfter);
     })
     .catch((err) => {
       clearInterval(countFunc);
-      dispatch({ type: 'SHOW_LINEAR', payload: { percentage: linearEnd } });
+      dispatch({ type: "SHOW_LINEAR", payload: { percentage: linearEnd } });
       if (err) {
         dispatch({
-          type: 'SHOW_SNACKBAR',
+          type: "SHOW_SNACKBAR",
           payload: {
             message: snackbarMessageOnError || `${err}`,
             type: snackbarTypeOnError,
@@ -106,7 +115,7 @@ window.adHocFetch = (ins) => {
           },
         });
       }
-      setTimeout(() => dispatch({ type: 'HIDE_LINEAR' }), linearAutoCloseAfter);
+      setTimeout(() => dispatch({ type: "HIDE_LINEAR" }), linearAutoCloseAfter);
       if (onCatch) {
         onCatch(err);
       }
@@ -114,7 +123,7 @@ window.adHocFetch = (ins) => {
     .finally(() => {
       if (showBackdrop) {
         dispatch({
-          type: 'HIDE_BACKDROP',
+          type: "HIDE_BACKDROP",
         });
       }
 
@@ -127,4 +136,3 @@ window.adHocFetch = (ins) => {
 const getRandomNumberInRange = (min, max) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
-

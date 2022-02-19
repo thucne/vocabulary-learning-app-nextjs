@@ -20,7 +20,6 @@ import {
 } from '@mui/icons-material';
 
 import LoadingButton from '@mui/lab/LoadingButton';
-import SwipeableViews from 'react-swipeable-views';
 
 import { Colors, Fonts } from '@styles';
 import { sendResetPasswordEmail, resetPassword } from '@actions';
@@ -107,7 +106,7 @@ export default function Login() {
                     handleNext();
                 },
                 onError: (data) => {
-                    console.log(data);
+                    // console.log(data);
                 },
                 onStarting: () => setLoading(true),
                 onFinally: () => setLoading(false),

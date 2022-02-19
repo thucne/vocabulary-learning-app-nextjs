@@ -73,6 +73,9 @@ export const resetPassword = (data) => async (dispatch) => {
 };
 
 export const fetcherJWT = async (url) => {
+  if (!getJWT()) {
+    return { error: "" };
+  }
   return await axios
     .get(url, {
       headers: {
@@ -84,8 +87,8 @@ export const fetcherJWT = async (url) => {
 };
 
 export const fetcher = async (url) => {
-    return await axios
-        .get(url)
-        .then((res) => handleCommonResponse(res))
-        .catch((err) => handleServerError(err));
-}
+  return await axios
+    .get(url)
+    .then((res) => handleCommonResponse(res))
+    .catch((err) => handleServerError(err));
+};

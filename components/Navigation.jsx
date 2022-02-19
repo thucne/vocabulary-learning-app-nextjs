@@ -130,11 +130,13 @@ function ResponsiveDrawer(props) {
                         : 'brightness(1)',
                     position: 'relative',
                     width: '100%',
-                    height: 150
+                    height: 150,
+                    cursor: 'pointer'
                 }}
                 direction='row'
                 justifyContent='space-between'
                 alignItems='center'
+                onClick={() => Router.push('/')} 
             >
                 <Image draggable={false} alt='logo' src={'/logo.full.svg'} layout='fill' objectFit='cover' priority={true} />
             </Stack>
@@ -290,7 +292,7 @@ function ResponsiveDrawer(props) {
                                 direction='row'
                                 display={landing ? 'flex' : 'none'}
                             >
-                                <Grid item >
+                                <Grid item onClick={() => Router.push('/')} sx={{ cursor: 'pointer' }}>
                                     <Image
                                         src='/logo.banner.x.svg'
                                         alt='logo'

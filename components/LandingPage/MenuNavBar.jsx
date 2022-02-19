@@ -6,7 +6,7 @@ import { styled, alpha } from '@mui/material/styles';
 
 import {
     Menu, MenuItem, Divider, IconButton,
-    Link as MuiLink, Stack, Box
+    Link as MuiLink, Stack, Avatar, Icon, SvgIcon
 } from '@mui/material';
 
 import {
@@ -16,10 +16,15 @@ import {
     Article as ArticleIcon,
     Support as SupportIcon,
     Signpost as SignpostIcon,
-    Logout as LogoutIcon
+    Logout as LogoutIcon,
+    Dashboard as DashboardIcon
 } from '@mui/icons-material'
 
 import { SXs } from '@styles';
+
+import { useSelector } from 'react-redux';
+
+import { stringAvatar } from '@utils';
 
 const StyledMenu = styled((props) => (
     <Menu
@@ -72,6 +77,8 @@ export default function CustomizedMenus({ isAuth, logout }) {
         setAnchorEl(null);
     };
 
+    const user = useSelector(state => state?.userData);
+
     return (
         <div>
             <IconButton
@@ -96,6 +103,29 @@ export default function CustomizedMenus({ isAuth, logout }) {
             >
 
                 {
+                    (user?.name?.length > 0 || user?.photo?.formats?.thumbnail?.url?.length > 0) &&
+                    <MenuItem disableRipple color='inherit' >
+                        <Stack direction='row' alignItems='center'>
+                            <Icon sx={{
+                                color: 'inherit !important', m: '0px 12px 0px 0px',
+                                display: 'flex', alignItems: 'center',
+                                width: 18,
+                                height: 24,
+                            }}>
+                                <Avatar
+                                    src={user?.photo?.formats?.thumbnail?.url}
+                                    {...stringAvatar(`${user?.name || 'No Name'}`)}
+                                    sx={{
+                                        width: 18,
+                                        height: 18,
+                                    }}
+                                />
+                            </Icon>
+                            {user?.name?.split(' ')?.slice(-1)?.join(' ')}
+                        </Stack>
+                    </MenuItem>
+                }
+                {
                     !isAuth && <MenuItem disableRipple color='inherit' sx={{ p: 0 }}>
                         <Link href='/login' passHref>
                             <MuiLink underline='none' sx={menuSX}>
@@ -114,6 +144,18 @@ export default function CustomizedMenus({ isAuth, logout }) {
                                 <Stack direction='row' alignItems='center'>
                                     <AppRegistrationIcon sx={{ color: 'inherit !important' }} />
                                     Sign up
+                                </Stack>
+                            </MuiLink>
+                        </Link>
+                    </MenuItem>
+                }
+                {
+                    isAuth && <MenuItem disableRipple color='inherit' sx={{ p: 0 }}>
+                        <Link href='/dashboard' passHref>
+                            <MuiLink underline='none' sx={menuSX}>
+                                <Stack direction='row' alignItems='center'>
+                                    <DashboardIcon sx={{ color: 'inherit !important' }} />
+                                    Dashboard
                                 </Stack>
                             </MuiLink>
                         </Link>
@@ -166,7 +208,7 @@ export default function CustomizedMenus({ isAuth, logout }) {
                     </Link>
                 </MenuItem>
             </StyledMenu>
-        </div>
+        </div >
     );
 }
 

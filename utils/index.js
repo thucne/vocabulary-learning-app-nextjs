@@ -38,8 +38,10 @@ export const handleServerError = (error, noRedirect) => {
     return { error: "Unauthorized, please login again!" };
   } else if (`${error}` === "Error: Request failed with status code 400") {
     return { error: error.response.data.error };
+  } else if (`${error}` === "Error: Request failed with status code 500") {
+    return { error: `Internal Server Error` };
   } else {
-    return { error: `${error}` };
+    return { error: `Internal Server Error` };
   }
 };
 
@@ -78,7 +80,6 @@ export const handleCommonResponse = (res, options = {}) => {
       }
       return {};
     } else {
-        
       const data = res.data;
 
       if (data?.error) {
@@ -159,3 +160,34 @@ export const isValidHttpUrl = (string, canBeEmtyOrNull = false) => {
 
   return url.protocol === "http:" || url.protocol === "https:";
 };
+
+export function stringAvatar(name) {
+  return {
+    sx: {
+      bgcolor: stringToColor(name),
+      width: 50,
+      height: 50,
+    },
+    children: `${name.split(" ")[0][0]}${name.split(" ")[1][0]}`,
+  };
+}
+
+function stringToColor(string) {
+  let hash = 0;
+  let i;
+
+  /* eslint-disable no-bitwise */
+  for (i = 0; i < string.length; i += 1) {
+    hash = string.charCodeAt(i) + ((hash << 5) - hash);
+  }
+
+  let color = "#";
+
+  for (i = 0; i < 3; i += 1) {
+    const value = (hash >> (i * 8)) & 0xff;
+    color += `00${value.toString(16)}`.substr(-2);
+  }
+  /* eslint-enable no-bitwise */
+
+  return color;
+}

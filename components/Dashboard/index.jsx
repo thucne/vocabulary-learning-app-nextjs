@@ -20,16 +20,16 @@ const fetcher = async (...args) => await fetcherJWT(...args);
 export default function DashboardPage(props) {
     const dispatch = useDispatch();
 
-    const wordList = useSelector(state => state.userData?.wordList);
+    const userData = useSelector(state => state.userData);
 
     // get words
-    useSWR(`${API}/api/vips`, fetcher, {
+    useSWR(`${API}/api/users/me`, fetcher, {
         onSuccess: (data) => dispatch({
-            type: t.UPDATE_USER_DATA, payload: {
-                wordList: data?.data || []
-            }
+            type: t.UPDATE_USER_DATA, payload: data
         }),
     });
+
+    const wordList = userData?.vips;
 
     return (
         <Container maxWidth="lg">
