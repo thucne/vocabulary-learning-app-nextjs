@@ -6,7 +6,7 @@ import AddIcon from "@mui/icons-material/Add";
 import CreateNewWord from "./CreateNewWord";
 
 export default function Welcome(props) {
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(true);
 
     return (
         <Container maxWidth="lg">

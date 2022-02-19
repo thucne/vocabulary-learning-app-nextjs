@@ -149,3 +149,5 @@ export const isValidHttpUrl = (string, canBeEmtyOrNull = false) => {
 
   return url.protocol === "http:" || url.protocol === "https:";
 };
+
+export const convertString2Array =str =>str==="" ? [] : str.split(",").map(item => item.trim());
