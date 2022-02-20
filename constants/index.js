@@ -20,3 +20,5 @@ export const SET_BG = "SET_BG";
 export const SET_USER_DATA = "SET_USER_DATA";
 export const CLEAR_USER_DATA = "CLEAR_USER_DATA";
 export const UPDATE_USER_DATA = "UPDATE_USER_DATA";
+
+export const IMAGE_ALT = 'https://res.cloudinary.com/katyperrycbt/image/upload/v1645343005/sammy-blue-mountains-image_einbhn.svg';

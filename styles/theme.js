@@ -23,6 +23,13 @@ const MyTheme = (mode) => ({
     main: mode === "light" ? Colors.BG_MAIN : Colors.BG_MAIN_DARK,
     contrastText: "#fff",
   },
+  img_bg: {
+    main: mode === "light" ? Colors.IMG_GREY : Colors.IMG_GREY_DARK,
+  },
+  scroll_button: {
+    main: mode === "light" ? "#fff" : "rgba(131, 119, 125, 0.8)",
+    contrastText: mode === "light" ? "#000" : "#fff",
+  },
 });
 
 export default MyTheme;

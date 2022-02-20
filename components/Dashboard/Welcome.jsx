@@ -6,7 +6,7 @@ import AddIcon from "@mui/icons-material/Add";
 import CreateNewWord from "./CreateNewWord";
 
 export default function Welcome(props) {
-    const [open, setOpen] = useState(true);
+    const [open, setOpen] = useState(false);
 
     return (
         <Container maxWidth="lg" disableGutters>
