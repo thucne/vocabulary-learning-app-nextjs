@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
+
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
-import { LoadingButton } from "@mui/lab";
 import { Send as SendIcon, VideoCameraBackOutlined } from "@mui/icons-material";
 import AddIcon from "@mui/icons-material/Add";
-
+import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
+import Divider from "@mui/material/Divider";
+import Switch from "@mui/material/Switch";
 import {
   Grid,
   TextField,
@@ -24,40 +25,45 @@ import {
   Chip,
   ToggleButton,
   ToggleButtonGroup,
+  FormGroup,
+  FormControlLabel,
+  Button,
 } from "@mui/material";
 
 import { Fonts } from "@styles";
 import { convertString2Array } from "@utils";
+import { LoadingButton } from "@mui/lab";
 
 const style = {
   width: "100%",
   bgcolor: "background.paper",
 };
 
-function getStyles(type, vocabTypes, theme) {
-  return {
-    fontWeight:
-      vocabTypes.indexOf(type) === -1
-        ? theme.typography.fontWeightRegular
-        : theme.typography.fontWeightMedium,
-  };
-}
-
 const vipTypes = ["vocab", "idiom", "phrase"];
 const vocabTypes = ["noun", "verb", "adverb", "adjective", "other"];
+
 export default function CreateNewWord({ open, setOpen }) {
   const [form, setForm] = useState({
     vip: "",
     type: vipTypes[0],
-    examples: "",
-    vnMeanings: "",
-    engMeanings: "",
+    examples: [],
+    vnMeanings: [],
+    engMeanings: [],
     pronounce: "",
-    synonyms:"",
-    antonyms:"",
-    clasifyVocab: [...vocabTypes],
-    public: true,
-    tags: "",
+    synonyms: [],
+    antonyms: [],
+    clasifyVocab: [],
+    public: false,
+    tags: [],
+  });
+
+  const [temptInput, setTemptInput] = useState({
+    example: "",
+    vnMeaning: "",
+    engMeaning: "",
+    antonym: "",
+    synonym: "",
+    tag: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -65,37 +71,57 @@ export default function CreateNewWord({ open, setOpen }) {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  useEffect(() => {
-    console.log("asdas", form);
-  });
   const handleSubmit = (e) => {
-    e.preventDefault();
-    var formData = {
-      vip: form.vip,
-      type1: form.type,
-      type2: form.type === "vocab" ? form.clasifyVocab.map(item=>vocabTypes.indexOf(item)) : null,
-      examples: convertString2Array(form.examples),
-      pronouce:form.pronounce,
-      meanings:{
-          english:convertString2Array(form.engMeanings),
-            vietnamese:convertString2Array(form.vnMeanings)
-      },
-      synonyms:convertString2Array(form.synonyms),
-      antonyms:convertString2Array(form.antonyms),
-      tags:form.tags,
-      public: form.public
-    };
-    console.log("submit", { form, formData });
+   e.preventDefault()
+    let formData = new FormData();
+    formData.append("vip", form.vip);
+    formData.append("type1", form.type);
+    formData.append(
+      "type2",
+      form.type == "vocab"
+        ? form.clasifyVocab.map((item, idnex) => vocabTypes.indexOf(item))
+        : [1, 2, 3, 4, 5]
+    );
+    formData.append("examples", form.examples);
+    formData.append("pronounce", form.pronounce);
+    formData.append("meanings", {
+      english: form.engMeanings,
+      vietnamese: form.vnMeanings,
+    });
+    formData.append("synonyms", form.synonyms.join(","));
+    formData.append("antonyms", form.antonyms.join(","));
+    formData.append("tags", form.tags.join(","));
+    formData.append("public", form.public);
+
   };
 
   const handleChangeValue = (e, name) => {
     setForm((state) => ({ ...state, [name]: e.target.value }));
   };
 
-  const handleChangeSelectTypeValue = (e) => {
-    setForm((state) => ({ ...state, type: e.target.value }));
+  const handleChangeTemptInput = (e, name) => {
+    setTemptInput((state) => ({ ...state, [name]: e.target.value }));
   };
 
+  const clearTemptInputField = (name) =>
+    setTemptInput((state) => ({ ...state, [name]: "" }));
+
+  const handleDeleteItem = (field, index) => {
+    setForm((state) => ({
+      ...state,
+      [field]: state[field].filter((item, i) => i !== index),
+    }));
+  };
+
+  const addToFormState = (e, value, formField) => {
+    e.preventDefault();
+    if (temptInput[value]) {
+      setForm((state) => ({
+        ...state,
+        [formField]: [...state[formField], temptInput[value]],
+      }));
+    }
+  };
   const handleUploadImage = (e) => {
     if (e.target.files && e.target.files[0]) {
       let reader = new FileReader();
@@ -111,20 +137,18 @@ export default function CreateNewWord({ open, setOpen }) {
     (form.vip.length &&
       form.examples.length &&
       (form.vnMeanings.length || form.engMeanings) &&
-      form.type.length &&
       form.tags.length &&
       !errors?.vip.error &&
       !errors?.examples?.error &&
       !errors?.meanings?.error &&
-      !errors?.tags?.error &&
-      !errors?.type?.error) ??
+      !errors?.tags?.error) ??
     false;
 
   const checkInputCriteria = (e, name) => {
     switch (name) {
       case "engMeanings":
         var error = {};
-        if (!(e.target.value || form.vnMeanings)) {
+        if (!(e.target.value || form.vnMeanings.length)) {
           error = {
             error: true,
             message: "at least one meaning in Vietnamese or English",
@@ -134,7 +158,7 @@ export default function CreateNewWord({ open, setOpen }) {
         return;
       case "vnMeanings":
         var error = {};
-        if (!(e.target.value || form.engMeanings)) {
+        if (!(e.target.value || form.engMeanings.length)) {
           error = {
             error: true,
             message: "at least one meaning in Vietnamese or English",
@@ -162,16 +186,104 @@ export default function CreateNewWord({ open, setOpen }) {
     }));
   };
 
+  const InputArrayField = ({
+    temptField,
+    formField,
+    error = false,
+    helperText = "Optional",
+    label,
+  }) => (
+    <React.Fragment>
+      <Grid item xs={12}>
+        <Box sx={{ display: "flex", alignItems: "start", width: "100%" }}>
+          <TextField
+            fullWidth
+            label={label}
+            multiline
+            size="small"
+            value={temptInput[temptField]}
+            error={error}
+            helperText={helperText}
+            sx={{ marginRight: "10px" }}
+            onChange={(e) => {
+              handleChangeTemptInput(e, temptField);
+              checkInputCriteria(e, formField);
+            }}
+          />
+
+          <Button
+            variant="contained"
+            sx={{ height: "40px" }}
+            onClick={(e) => {
+              addToFormState(e, temptField, formField);
+              clearTemptInputField(temptField);
+            }}
+          >
+            Add
+          </Button>
+        </Box>
+      </Grid>
+    </React.Fragment>
+  );
+
+  const ListContent = ({ formField, label }) => (
+    <Grid container>
+      {form[formField].length > 0 && (
+        <Grid item xs={12}>
+          <Typography sx={{ fontSize: Fonts.FS_18, ml: 2, my: 3 }}>
+            List of {label}
+          </Typography>
+          <Grid
+            container
+            spacing={2}
+            sx={{ maxHeight: "150px", overflowY: "auto" }}
+          >
+            {form[formField]?.map((syn, index) => (
+              <Grid
+                item
+                xs={12}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                }}
+                key={index}
+              >
+                <Box
+                  sx={{
+                    pl: 5,
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    width: "100%",
+                  }}
+                >
+                  <Typography gutterBottom>{syn}</Typography>
+                  <IconButton
+                    onClick={() => {
+                      handleDeleteItem(formField, index);
+                    }}
+                  >
+                    <RemoveCircleIcon />
+                  </IconButton>
+                </Box>
+              </Grid>
+            ))}
+          </Grid>
+        </Grid>
+      )}
+    </Grid>
+  );
   const gridForm = () => (
     <Box sx={style}>
       <Box component="form" noValidate onSubmit={handleSubmit}>
         <Grid container spacing={2} sx={{ mt: 4 }}>
-          <Grid item xs={6}>
+          <Grid item xs={8} md={6}>
             <TextField
               fullWidth
               label="Word"
               id="word"
               size="small"
+              margin="dense"
               error={errors?.vip?.error}
               helperText={
                 errors?.vip?.message || "A vocabulary, idiom or phrase"
@@ -182,14 +294,16 @@ export default function CreateNewWord({ open, setOpen }) {
               }}
             />
           </Grid>
-          <Grid item xs={6}>
-            <FormControl fullWidth>
-              <InputLabel id="demo-multiple-chip-label">Vip type</InputLabel>
+
+          <Grid item xs={4} md={6}>
+            <FormControl fullWidth margin="dense">
+              <InputLabel id="demo-multiple-chip-label">Type</InputLabel>
               <Select
                 size="small"
+                margin="dense"
                 id="demo-simple-select"
                 value={form.type}
-                label="Vip type"
+                label="Type"
                 onChange={(e) => {
                   handleChangeValue(e, "type");
                 }}
@@ -209,8 +323,10 @@ export default function CreateNewWord({ open, setOpen }) {
               label="Pronounce"
               id="pronounce"
               size="small"
-              error={errors?.pronounce?.error}
-              helperText={errors?.pronounce?.message}
+              margin="dense"
+              multiline
+              //   error={errors?.pronounce?.error}
+              helperText={"Optional"}
               onChange={(e) => {
                 handleChangeValue(e, "pronounce");
                 checkInputCriteria(e, "pronounce");
@@ -218,8 +334,8 @@ export default function CreateNewWord({ open, setOpen }) {
             />
           </Grid>
           {form.type === "vocab" && (
-            <Grid item xs={12} md={6}>
-              <FormControl fullWidth>
+            <Grid item xs={12} md={6} sx={{ mb: [5, 0] }}>
+              <FormControl fullWidth margin="dense">
                 <InputLabel id="demo-multiple-chip-label">
                   Classify vocab
                 </InputLabel>
@@ -229,7 +345,7 @@ export default function CreateNewWord({ open, setOpen }) {
                   multiple
                   value={form.clasifyVocab}
                   onChange={handleVocabTypesChange}
-                  fullWidth
+                  sx={{ height: "40px", mb: 3 }}
                   label="Classify vocab"
                   input={
                     <OutlinedInput
@@ -237,13 +353,6 @@ export default function CreateNewWord({ open, setOpen }) {
                       label="Classify vocab"
                     />
                   }
-                  renderValue={(selected) => (
-                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                      {selected.map((value) => (
-                        <Chip key={value} label={value} />
-                      ))}
-                    </Box>
-                  )}
                 >
                   {vocabTypes.map((name) => (
                     <MenuItem key={name} value={name}>
@@ -254,88 +363,57 @@ export default function CreateNewWord({ open, setOpen }) {
               </FormControl>
             </Grid>
           )}
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Examples"
-              multiline
-              size="small"
-              error={errors?.examples?.error}
-              helperText={errors?.examples?.message || "At least one example"}
-              onChange={(e) => {
-                handleChangeValue(e, "examples");
-                checkInputCriteria(e, "examples");
-              }}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="VN-meanings"
-              multiline
-              size="small"
-              error={errors?.meanings?.error}
-              helperText={
-                errors?.meanings?.message ||
-                "At least one meaning in Vietnamese or English"
-              }
-              onChange={(e) => {
-                handleChangeValue(e, "vnMeanings");
-                checkInputCriteria(e, "vnMeanings");
-              }}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Eng-meanings"
-              multiline
-              size="small"
-              error={errors?.meanings?.error}
-              helperText={
-                errors?.meanings?.message ||
-                "At least one meaning in Vietnamese or English"
-              }
-              onChange={(e) => {
-                handleChangeValue(e, "engMeanings");
-                checkInputCriteria(e, "engMeanings");
-              }}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Antonyms"
-              multiline
-              size="small"
-              onChange={(e) => {
-                handleChangeValue(e, "antonyms");
-              }}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Synonyms"
-              multiline
-              size="small"
-              onChange={(e) => {
-                handleChangeValue(e, "synonyms");
-              }}
-            />
-          </Grid>
 
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Tags"
-              multiline
-              size="Tags"
-              onChange={(e) => {
-                handleChangeValue(e, "tags");
-              }}
-            />
-          </Grid>
+          {ListContent({ formField: "examples", label: "Examples" })}
+          {InputArrayField({
+            temptField: "example",
+            formField: "examples",
+            helperText: "At least one example",
+            label: "Examples",
+            error: errors?.examples?.error,
+          })}
+
+          {ListContent({ formField: "vnMeanings", label: "Vietnamese" })}
+          {InputArrayField({
+            temptField: "vnMeaning",
+            formField: "vnMeanings",
+            helperText: "At least one meaning in Vietnamese or English",
+            label: "Vietnamese",
+            error: errors?.meanings?.error,
+          })}
+
+          {ListContent({ formField: "engMeanings", label: "English" })}
+          {InputArrayField({
+            temptField: "engMeaning",
+            formField: "engMeanings",
+            helperText: "At least one meaning in Vietnamese or English",
+            label: "English",
+            error: errors?.meanings?.error,
+          })}
+
+          {ListContent({ formField: "antonyms", label: "Antonyms" })}
+          {InputArrayField({
+            temptField: "antonym",
+            formField: "antonyms",
+            label: "Antonyms",
+          })}
+
+          {ListContent({ formField: "synonyms", label: "Synonyms" })}
+          {InputArrayField({
+            temptField: "synonym",
+            formField: "synonyms",
+            label: "Synonyms",
+          })}
+
+          {ListContent({ formField: "tags", label: "Tags" })}
+          {InputArrayField({
+            temptField: "tag",
+            formField: "tags",
+            error: errors?.tags?.error,
+            label: "Tags",
+            helperText: "At least one tag",
+          })}
+
           <Grid item xs={12}>
             <label htmlFor="image-upload">
               <IconButton variant="contained" component="label">
@@ -349,11 +427,22 @@ export default function CreateNewWord({ open, setOpen }) {
               </IconButton>
             </label>
 
-            <Button variant={form.public ? "contained" : "outlined"} onClick={()=>{
-                setForm((state)=>({...state,["public"]:!state.public}))
-            }}>
-                Public
-                </Button>
+            <FormGroup margin="dense">
+              <FormControlLabel
+                label="Public"
+                control={
+                  <Switch
+                    checked={form.public}
+                    onChange={(e) =>
+                      setForm((state) => ({
+                        ...state,
+                        ["public"]: e.target.checked,
+                      }))
+                    }
+                  />
+                }
+              />
+            </FormGroup>
           </Grid>
         </Grid>
       </Box>
@@ -374,7 +463,7 @@ export default function CreateNewWord({ open, setOpen }) {
         <DialogTitle id="scroll-dialog-title">
           <Typography
             id="modal-modal-title"
-            component="h2"
+            align="center"
             sx={{ fontSize: [Fonts.FS_20, Fonts.FS_34] }}
           >
             Create your own word!
