@@ -168,7 +168,7 @@ export function stringAvatar(name) {
       width: 50,
       height: 50,
     },
-    children: `${name.split(" ")[0][0]}${name.split(" ")[1][0]}`,
+    children: `${name?.split(" ")?.[0]?.[0]}${name?.split(" ")?.[1]?.[0]}`,
   };
 }
 

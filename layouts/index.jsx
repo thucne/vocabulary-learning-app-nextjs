@@ -24,7 +24,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 
 const StyledProgess = styled(LinearProgress)(({
     '.MuiLinearProgress-bar1Determinate': {
-        backgroundImage: 'linear-gradient(to right, red,orange,yellow,green,blue,indigo,violet) !important'
+        backgroundImage: 'linear-gradient(to right, #64b5f6 0%, #ffd54f 100%) !important'
     }
 }));
 
