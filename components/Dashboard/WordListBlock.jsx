@@ -100,7 +100,7 @@ const WordListBlock = ({ wordList }) => {
                 const b = Math.abs(wordLeft);
                 const whichBigger = Math.max(a, b);
                 const different = Math.round(Math.abs(a - b) * 100 / whichBigger);
-
+                
                 if (different > 10) {
                     gridRef?.current?.scrollTo({
                         left: wordLeft + (wordIndex * width - wordLeft),

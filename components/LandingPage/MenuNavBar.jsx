@@ -79,6 +79,9 @@ export default function CustomizedMenus({ isAuth, logout }) {
 
     const user = useSelector(state => state?.userData);
 
+    // React.useEffect(()=>{
+    //     console.log("user",user)
+    // })
     return (
         <div>
             <IconButton
