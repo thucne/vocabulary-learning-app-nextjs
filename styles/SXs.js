@@ -33,3 +33,15 @@ export const MUI_NAV_BUTTON = {
     textTransform: "none !important",
   },
 };
+
+export const COMMON_BUTTON_STYLES = {
+  "&.MuiButton-root": {
+    textTransform: "none !important",
+  },
+};
+
+export const LOADING_BUTTON_STYLES = {
+  "&.MuiLoadingButton-root": {
+    textTransform: "none !important",
+  },
+};

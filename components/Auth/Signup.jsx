@@ -19,7 +19,7 @@ import {
     Error as ErrorIcon
 } from "@mui/icons-material";
 
-import { Colors, Fonts } from "@styles";
+import { Colors, Fonts, SXs } from "@styles";
 import { LoadingButton } from "@mui/lab";
 import { signup } from "@actions";
 import { validateEmail, validatePassword } from '@utils';
@@ -232,13 +232,11 @@ export default function Signup() {
                             <Link href="/" passHref>
                                 <Button variant="text"
                                     sx={{
+                                        ...SXs.COMMON_BUTTON_STYLES,
                                         position: 'absolute',
                                         top: "58px",
                                         left: "40px",
                                         ml: '-8px',
-                                        '&.MuiButton-text': {
-                                            textTransform: 'none !important',
-                                        },
                                     }}>
                                     Back to Home
                                 </Button>
@@ -461,10 +459,8 @@ export default function Signup() {
                                     <Grid item sx={{ opacity: !signUpSuccessfully ? 1 : 0 }}>
                                         <Link href="/login" passHref>
                                             <Button variant="text" sx={{
-                                                ml: '-8px',
-                                                '&.MuiButton-text': {
-                                                    textTransform: 'none !important',
-                                                }
+                                                ...SXs.COMMON_BUTTON_STYLES,
+                                                ml: '-8px'
                                             }}>
                                                 Log in instead
                                             </Button>
@@ -481,11 +477,7 @@ export default function Signup() {
                                                 disabled={!checkCanSubmit()}
                                                 loading={loading}
                                                 startIcon={<SendIcon />}
-                                                sx={{
-                                                    '&.MuiLoadingButton-root': {
-                                                        textTransform: 'none !important',
-                                                    }
-                                                }}
+                                                sx={SXs.LOADING_BUTTON_STYLES}
                                             >
                                                 Sign up
                                             </LoadingButton>
@@ -497,11 +489,7 @@ export default function Signup() {
                                             <Button
                                                 variant="text"
                                                 fullWidth
-                                                sx={{
-                                                    '&.MuiButton-root': {
-                                                        textTransform: 'none !important',
-                                                    }
-                                                }}
+                                                sx={SXs.COMMON_BUTTON_STYLES}
                                                 onClick={() => Router.push('/login')}
                                             >
                                                 Go to log in

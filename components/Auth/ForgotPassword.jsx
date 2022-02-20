@@ -21,7 +21,7 @@ import {
 
 import LoadingButton from '@mui/lab/LoadingButton';
 
-import { Colors, Fonts } from '@styles';
+import { Colors, Fonts, SXs } from '@styles';
 import { sendResetPasswordEmail, resetPassword } from '@actions';
 import { useDispatch } from "react-redux";
 import { validateEmail, validatePassword, isValidHttpUrl } from '@utils';
@@ -231,13 +231,11 @@ export default function Login() {
                             <Link href="/" passHref>
                                 <Button variant="text"
                                     sx={{
+                                        ...SXs.COMMON_BUTTON_STYLES,
                                         position: 'absolute',
                                         top: "58px",
                                         left: "40px",
                                         ml: '-8px',
-                                        '&.MuiButton-text': {
-                                            textTransform: 'none !important',
-                                        },
                                     }}>
                                     Back to Home
                                 </Button>
@@ -466,10 +464,8 @@ export default function Login() {
                                             <Link href="/login" passHref>
                                                 <Button variant="text"
                                                     sx={{
-                                                        ml: '-8px',
-                                                        '&.MuiButton-text': {
-                                                            textTransform: 'none !important',
-                                                        }
+                                                        ...SXs.COMMON_BUTTON_STYLES,
+                                                        ml: '-8px'
                                                     }}>
                                                     Back to log in
                                                 </Button>
@@ -481,10 +477,8 @@ export default function Login() {
                                             <Button
                                                 variant="text"
                                                 sx={{
+                                                    ...SXs.COMMON_BUTTON_STYLES,
                                                     ml: '-8px',
-                                                    '&.MuiButton-text': {
-                                                        textTransform: 'none !important',
-                                                    }
                                                 }}
                                                 onClick={() => setStep(prev => prev - 1 >= 0 ? prev - 1 : 0)}
                                             >
@@ -498,11 +492,7 @@ export default function Login() {
                                             <LoadingButton
                                                 type="submit"
                                                 variant="contained"
-                                                sx={{
-                                                    '&.MuiLoadingButton-root': {
-                                                        textTransform: 'none !important',
-                                                    }
-                                                }}
+                                                sx={SXs.LOADING_BUTTON_STYLES}
                                                 disabled={!canSubmit}
                                                 loading={loading}
                                             >
