@@ -64,8 +64,14 @@ export default function Login() {
 
     const handleSuccessResponse = (data) => {
         localStorage.setItem('vip-token', JSON.stringify(data.jwt));
-        localStorage.setItem('vip-user', JSON.stringify(data.user));
-        router.push(url || '/');
+        localStorage.setItem('vip-user', JSON.stringify({
+            id: data.user?.id,
+            name: data.user?.name,
+            email: data.user?.email,
+            photo: data.user?.photo?.formats?.thumbnail?.url || data.user?.photo?.url,
+            username: data.user?.username
+        }));
+        router.push(url || '/dashboard');
     }
 
     const handleEnterPress = () => {

@@ -22,14 +22,8 @@ export default function DashboardPage(props) {
 
     const userData = useSelector(state => state.userData);
 
-    // get words
-    useSWR(`${API}/api/users/me`, fetcher, {
-        onSuccess: (data) => dispatch({
-            type: t.UPDATE_USER_DATA, payload: data
-        }),
-    });
-
     const wordList = userData?.vips;
+
 
     return (
         <Container maxWidth="lg">

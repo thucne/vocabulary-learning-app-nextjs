@@ -192,4 +192,5 @@ function stringToColor(string) {
   return color;
 }
 
-export const convertString2Array =str =>str==="" ? [] : str.split(",").map(item => item.trim());
+export const convertString2Array = (str) =>
+  str === "" ? [] : str.split(",").map((item) => item.trim());

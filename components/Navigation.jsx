@@ -33,25 +33,22 @@ import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import { Container, Grid, Stack, Avatar, Button } from '@mui/material';
 
 import { Fonts, SXs } from '@styles';
-import { isAuth } from '@utils';
-import { logout } from "@actions";
+import { isAuth, getJWT } from '@utils';
+import { logout, fetcherJWT } from "@actions";
 import { ColorModeContext } from "@pages/_app";
+import * as t from '@consts';
+import { API } from '@config';
 
 import Footer from '@components/Footer';
 import MenuNavBar from '@components/LandingPage/MenuNavBar';
 
 import { useDispatch, useSelector } from "react-redux";
 
-const GutterBottom = styled('div')(({
-    height: 300
-}))
-
-const AniText = styled(Typography)(({
-    animation: 'navtext 0.5s linear',
-    position: 'relative'
-}));
+import useSWR from 'swr';
 
 const drawerWidth = 240;
+
+const fetcher = async (...args) => await fetcherJWT(...args);
 
 const useIsomorphicLayoutEffect =
     typeof window !== 'undefined' ? useLayoutEffect : useEffect;
@@ -96,6 +93,15 @@ function ResponsiveDrawer(props) {
         threshold: 5,
     });
 
+    // get words
+    useSWR(getJWT() ? `${API}/api/users/me` : null, fetcher, {
+        onSuccess: (data) => dispatch({
+            type: t.UPDATE_USER_DATA, payload: data
+        }),
+        refreshInterval: 5000
+    });
+
+
     useMemo(() => {
         if (trigger) {
             setScrolled(true);
@@ -136,7 +142,7 @@ function ResponsiveDrawer(props) {
                 direction='row'
                 justifyContent='space-between'
                 alignItems='center'
-                onClick={() => Router.push('/')} 
+                onClick={() => Router.push('/')}
             >
                 <Image draggable={false} alt='logo' src={'/logo.full.svg'} layout='fill' objectFit='cover' priority={true} />
             </Stack>
