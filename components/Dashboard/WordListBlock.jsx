@@ -1,19 +1,16 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-
-import Image from 'next/image';
-import Router from 'next/router';
-import Link from 'next/link';
+import React, { useState, useRef, useMemo } from 'react';
 
 import {
-    Container, Grid, Box, Typography, IconButton,
-    Stack
+    Container, Grid,
+    Typography, IconButton, Stack
 } from '@mui/material';
+
 import { useTheme } from "@mui/material/styles";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 import { Fonts, Colors } from '@styles';
-import { stringAvata, useThisToGetSizesFromRef, useThisToGetPositionFromRef, useWindowSize } from '@utils';
+import { useThisToGetSizesFromRef, useThisToGetPositionFromRef, useWindowSize } from '@utils';
 import { IMAGE_ALT } from '@consts';
 
 import LoadingImage from '@components/LoadingImage';
