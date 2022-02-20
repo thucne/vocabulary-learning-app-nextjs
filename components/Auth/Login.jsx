@@ -20,7 +20,7 @@ import {
 
 import LoadingButton from '@mui/lab/LoadingButton';
 
-import { Colors, Fonts } from '@styles';
+import { Colors, Fonts, SXs } from '@styles';
 import { login } from '@actions';
 import { useDispatch } from "react-redux";
 import { useRouter } from "next/router";
@@ -149,13 +149,11 @@ export default function Login() {
                             <Link href="/" passHref>
                                 <Button variant="text"
                                     sx={{
+                                        ...SXs.COMMON_BUTTON_STYLES,
                                         position: 'absolute',
                                         top: "58px",
                                         left: "40px",
                                         ml: '-8px',
-                                        '&.MuiButton-text': {
-                                            textTransform: 'none !important',
-                                        },
                                     }}>
                                     Back to Home
                                 </Button>
@@ -250,10 +248,8 @@ export default function Login() {
                                         <Link href="/signup" passHref>
                                             <Button variant="text"
                                                 sx={{
+                                                    ...SXs.COMMON_BUTTON_STYLES,
                                                     ml: '-8px',
-                                                    '&.MuiButton-text': {
-                                                        textTransform: 'none !important',
-                                                    }
                                                 }}>
                                                 Create account
                                             </Button>
@@ -264,11 +260,7 @@ export default function Login() {
                                             type="submit"
                                             variant="contained"
                                             loadingPosition="start"
-                                            sx={{
-                                                '&.MuiLoadingButton-root': {
-                                                    textTransform: 'none !important',
-                                                }
-                                            }}
+                                            sx={SXs.LOADING_BUTTON_STYLES}
                                             disabled={!canSubmit}
                                             loading={loading}
                                             startIcon={<SendIcon />}
