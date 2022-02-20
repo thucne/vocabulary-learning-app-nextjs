@@ -269,6 +269,11 @@ function ResponsiveDrawer(props) {
                                                         ...SXs.MUI_NAV_BUTTON,
                                                         color: theme => theme.palette[bgColor].contrastText,
                                                         borderColor: theme => `${theme.palette[bgColor].contrastText}5`,
+                                                        backgroundColor: theme => theme.palette[bgColor].main,
+                                                        "&:hover": {
+                                                            backgroundColor: (theme) => theme.palette[bgColor].main,
+                                                            filter: 'brightness(1.1)',
+                                                        },
                                                     }}
                                                     startIcon={<LogoutIcon />}
                                                     disableElevation

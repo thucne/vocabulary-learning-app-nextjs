@@ -144,3 +144,7 @@ export const GRAY_8 = "#212121";
 // backgrounds
 export const BG_MAIN = "#1976d2";
 export const BG_MAIN_DARK = "#2a3eb1";
+
+// Image background
+export const IMG_GREY_DARK = "#263238";
+export const IMG_GREY = "#F6F9FC";
