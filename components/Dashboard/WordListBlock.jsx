@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
 import Image from 'next/image';
 import Router from 'next/router';
@@ -17,6 +17,8 @@ import { stringAvata, useThisToGetSizesFromRef, useThisToGetPositionFromRef, use
 import { IMAGE_ALT } from '@consts';
 
 import LoadingImage from '@components/LoadingImage';
+
+import { debounce } from 'lodash';
 
 const WordListBlock = ({ wordList }) => {
     const theme = useTheme();
@@ -97,8 +99,8 @@ const WordListBlock = ({ wordList }) => {
                 const b = Math.abs(wordLeft);
                 const whichBigger = Math.max(a, b);
                 const different = Math.round(Math.abs(a - b) * 100 / whichBigger);
-
-                if (different > 10) {
+                console.log(superLock)
+                if (different > 10 && !superLock) {
                     gridRef?.current?.scrollTo({
                         left: wordLeft + (wordIndex * width - wordLeft),
                         behavior: 'smooth'
@@ -127,6 +129,18 @@ const WordListBlock = ({ wordList }) => {
     }, [wordRefs, width, left, windowWidth, superLock]);
 
 
+    const debounceScroll = useMemo(() => debounce(() => {
+        setSuperLock(false);
+        console.log('release');
+    }, 500), []);
+
+    const onScroll = () => {
+        if (!superLock) {
+            setSuperLock(true);
+        }
+        debounceScroll();
+    }
+
     return (
         <Container maxWidth="lg" disableGutters>
             <Grid container direction="row" mt={[0, 1, 2, 3]}>
@@ -146,7 +160,7 @@ const WordListBlock = ({ wordList }) => {
                 }}>
                     <IconButton aria-label="left" onClick={async () => {
                         setSuperLock(true);
-                        await new Promise(async(resolve) => {
+                        await new Promise(async (resolve) => {
                             await handleBackAction();
                             resolve();
                         })
@@ -166,7 +180,7 @@ const WordListBlock = ({ wordList }) => {
                 }}>
                     <IconButton aria-label="left" onClick={async () => {
                         setSuperLock(true);
-                        await new Promise(async(resolve) => {
+                        await new Promise(async (resolve) => {
                             await handleForwardAction();
                             resolve();
                         })
@@ -185,6 +199,7 @@ const WordListBlock = ({ wordList }) => {
                         borderRadius: '10px',
                     }}
                     className='hideScrollBar'
+                    onScroll={onScroll}
                 >
                     <Stack direction="row" sx={{ width: stackLength }}>
                         {wordList?.length > 0 && wordList.map((word, index) => (
