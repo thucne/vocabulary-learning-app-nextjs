@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
 import Image from 'next/image';
 import Router from 'next/router';
@@ -18,12 +18,13 @@ import { IMAGE_ALT } from '@consts';
 
 import LoadingImage from '@components/LoadingImage';
 
+import { debounce } from 'lodash';
+
 const WordListBlock = ({ wordList }) => {
     const theme = useTheme();
     const myRef = useRef(null);
     const gridRef = useRef(null);
     const wordRefs = useRef([]);
-    const [superLock, setSuperLock] = useState(false);
 
     const { width } = useThisToGetSizesFromRef(myRef, { revalidate: 100, timeout: 500 });
     const { top, height, right, left } = useThisToGetPositionFromRef(gridRef, { revalidate: 100, timeout: 500 });
@@ -78,7 +79,9 @@ const WordListBlock = ({ wordList }) => {
         }
     }
 
-    useEffect(() => {
+
+    const debounceScroll = useMemo(() => debounce(() => {
+
         const autoScroll = async () => {
             const halfOfScreen = windowWidth / 2;
 
@@ -107,25 +110,12 @@ const WordListBlock = ({ wordList }) => {
             }
 
         };
+        autoScroll();
+    }, 250), [left, width, windowWidth]);
 
-        let lock = true;
-        // scroll the word to the middle of the screen if it's not already in the middle
-        const loop = setInterval(async () => {
-            if (lock && !superLock && wordRefs.current.length > 0) {
-                lock = false;
-                await new Promise(async (resolve) => {
-                    await autoScroll();
-                    resolve();
-                    // setTimeout(() => resolve(), 750);
-                });
-                lock = true;
-            }
-        }, 500);
-
-        return () => clearInterval(loop);
-
-    }, [wordRefs, width, left, windowWidth, superLock]);
-
+    const onScroll = (e) => {
+        debounceScroll();
+    }
 
     return (
         <Container maxWidth="lg" disableGutters>
@@ -144,14 +134,7 @@ const WordListBlock = ({ wordList }) => {
                     backgroundColor: theme.palette.scroll_button.main,
                     borderRadius: '50%',
                 }}>
-                    <IconButton aria-label="left" onClick={async () => {
-                        setSuperLock(true);
-                        await new Promise(async(resolve) => {
-                            await handleBackAction();
-                            resolve();
-                        })
-                        setSuperLock(false);
-                    }}>
+                    <IconButton aria-label="left" onClick={handleBackAction}>
                         <ArrowBackIcon fontSize="large" />
                     </IconButton>
                 </div>
@@ -164,14 +147,7 @@ const WordListBlock = ({ wordList }) => {
                     backgroundColor: theme.palette.scroll_button.main,
                     borderRadius: '50%',
                 }}>
-                    <IconButton aria-label="left" onClick={async () => {
-                        setSuperLock(true);
-                        await new Promise(async(resolve) => {
-                            await handleForwardAction();
-                            resolve();
-                        })
-                        setSuperLock(false);
-                    }}>
+                    <IconButton aria-label="left" onClick={handleForwardAction}>
                         <ArrowForwardIcon fontSize="large" />
                     </IconButton>
                 </div>
@@ -185,6 +161,7 @@ const WordListBlock = ({ wordList }) => {
                         borderRadius: '10px',
                     }}
                     className='hideScrollBar'
+                    onScroll={onScroll}
                 >
                     <Stack direction="row" sx={{ width: stackLength }}>
                         {wordList?.length > 0 && wordList.map((word, index) => (
