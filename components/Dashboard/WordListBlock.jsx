@@ -39,6 +39,9 @@ const WordListBlock = () => {
                 setSizes(data);
             }
         },
+        elementStyle: {
+            // "&:hover": { filter: "brightness(1)" }
+        },
         React,
     }
 
