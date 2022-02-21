@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo, useEffect } from 'react';
 
 import {
     Container, Grid,
@@ -13,12 +13,14 @@ import { Fonts } from '@styles';
 import { IMAGE_ALT } from '@consts';
 
 import LoadingImage from '@components/LoadingImage';
-
+import { useSelector } from 'react-redux';
 import ScrollPaper from 'react-mui-scroll-pages';
 
-const WordListBlock = ({ wordList }) => {
+const WordListBlock = () => {
     const theme = useTheme();
     const [sizes, setSizes] = useState({ width: 0, height: 0 });
+    const [words, setWords] = useState([]);
+    const wordList = useSelector(state => state.userData?.vips?.length > 0 ? state.userData.vips : []);
 
     const config = {
         mui: {
@@ -40,6 +42,12 @@ const WordListBlock = ({ wordList }) => {
         React,
     }
 
+    useEffect(() => {
+        if (JSON.stringify(wordList) !== JSON.stringify(words)) {
+            setWords(wordList);
+        }
+    }, [wordList, words]);
+
     return (
         <Container maxWidth="lg" disableGutters>
             <Grid container direction="row" mt={[0, 1, 2, 3]} sx={{ position: 'relative' }}>
@@ -49,7 +57,7 @@ const WordListBlock = ({ wordList }) => {
                     </Typography>
                 </Grid>
                 <ScrollPaper {...config}>
-                    {wordList?.length > 0 && wordList.map((word, index) => (
+                    {words?.length > 0 && words.map((word, index) => (
                         <EachChild
                             key={`render-word-list-${index}`}
                             word={word}

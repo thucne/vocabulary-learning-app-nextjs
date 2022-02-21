@@ -7,7 +7,7 @@ const userData = (state = {}, action) => {
     case t.CLEAR_USER_DATA:
         return {};
     case t.UPDATE_USER_DATA:
-        return { ...state, ...action.payload };
+        return JSON.stringify(action.payload) !== JSON.stringify(state) ? { ...state, ...action.payload } : state;
     default:
       return { ...state };
   }

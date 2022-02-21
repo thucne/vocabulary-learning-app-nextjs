@@ -98,7 +98,7 @@ function ResponsiveDrawer(props) {
         onSuccess: (data) => dispatch({
             type: t.UPDATE_USER_DATA, payload: data
         }),
-        refreshInterval: 5000
+        refreshInterval: 500
     });
 
 
