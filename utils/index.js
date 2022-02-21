@@ -201,7 +201,7 @@ const useIsomorphicLayoutEffect =
 
 export function useThisToGetSizesFromRef(elRef, options = {}) {
   const [sizes, setSizes] = useState({ width: 0, height: 0 });
-  const { revalidate, timeout } = options;
+  const { revalidate, timeout, falseCondition } = options;
 
   useIsomorphicLayoutEffect(() => {
     function updateSize() {
@@ -216,7 +216,17 @@ export function useThisToGetSizesFromRef(elRef, options = {}) {
     let loop;
 
     if (revalidate && typeof revalidate === "number") {
-      loop = setInterval(() => updateSize(), [revalidate]);
+      loop = setInterval(() => {
+        if (
+          falseCondition({
+            width: elRef?.current?.clientWidth || 0,
+            height: elRef?.current?.clientHeight || 0,
+          })
+        ) {
+          clearInterval(loop);
+        }
+        updateSize();
+      }, [revalidate]);
       if (timeout) {
         setTimeout(() => clearInterval(loop), timeout);
       }

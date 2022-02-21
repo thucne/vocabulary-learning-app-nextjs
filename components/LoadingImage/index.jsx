@@ -17,6 +17,7 @@ const Index = (props) => {
 
     const {
         doneLoading,
+        bgColor,
         ...imgProps
     } = props;
 
@@ -25,7 +26,7 @@ const Index = (props) => {
             <div style={{
                 position: 'relative', width: '100%',
                 height: '100%', opacity: loading ? 0 : 1,
-                backgroundColor: theme.palette.img_bg.main
+                backgroundColor: bgColor || theme.palette.img_bg.main
             }}>
 
                 {/* eslint-disable-next-line jsx-a11y/alt-text */}

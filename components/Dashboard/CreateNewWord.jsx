@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
 import Image from 'next/image';
 
@@ -8,7 +8,7 @@ import {
     DialogContent, DialogContentText, DialogTitle, OutlinedInput,
     Chip, ToggleButton, ToggleButtonGroup, FormGroup,
     FormControlLabel, Button, Switch, Typography,
-    Box, FormHelperText
+    Box, FormHelperText, Paper, FormLabel, Icon
 } from "@mui/material";
 
 import {
@@ -19,10 +19,14 @@ import {
 
 import { LoadingButton } from "@mui/lab";
 
-import { useWindowSize } from '@utils';
+import { useWindowSize, useThisToGetSizesFromRef } from '@utils';
 import { Fonts, SXs } from "@styles";
 
 import { useTheme } from '@mui/material/styles';
+
+import Uploader from '@components/Upload';
+import LoadingImage from '@components/LoadingImage';
+import { IMAGE_ALT } from "@consts";
 
 const style = {
     width: "100%",
@@ -35,6 +39,12 @@ const vocabTypes = ["noun", "verb", "adverb", "adjective", "other"];
 export default function CreateNewWord({ open, setOpen }) {
     const theme = useTheme();
     const windowSize = useWindowSize();
+    const photoRef = useRef(null);
+    const [photo, setPhoto] = useState('');
+    const photoSizes = useThisToGetSizesFromRef(photoRef, {
+        revalidate: 100,
+        falseCondition: (data) => data.width !== 0
+    });
 
     const [form, setForm] = useState({
         vip: "",
@@ -179,98 +189,120 @@ export default function CreateNewWord({ open, setOpen }) {
         }));
     };
 
-    const InputArrayField = ({
+    const inputArrayField = ({
         temptField,
         formField,
         error = false,
         helperText = "Optional",
         label,
+        required
     }) => (
         <React.Fragment>
             <Grid item xs={12}>
-                <Box sx={{ display: "flex", alignItems: "start", width: "100%" }}>
-                    <TextField
-                        fullWidth
-                        label={label}
-                        multiline
-                        size="small"
-                        value={temptInput[temptField]}
-                        error={error}
-                        helperText={helperText}
-                        sx={{ marginRight: "10px" }}
-                        onChange={(e) => {
-                            handleChangeTemptInput(e, temptField);
-                            checkInputCriteria(e, formField);
-                        }}
-                    />
-
-                    <Button
-                        variant="contained"
-                        sx={{ height: "40px" }}
-                        onClick={(e) => {
-                            addToFormState(e, temptField, formField);
-                            clearTemptInputField(temptField);
-                        }}
-                    >
-                        Add
-                    </Button>
-                </Box>
+                <FormControl fullWidth>
+                    <Box sx={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        justifyContent: "flex-start",
+                        width: "100%"
+                    }}>
+                        <TextField
+                            required={required}
+                            fullWidth
+                            label={label}
+                            multiline
+                            size="small"
+                            margin="dense"
+                            value={temptInput[temptField]}
+                            error={error}
+                            sx={{ marginRight: "10px" }}
+                            onChange={(e) => {
+                                handleChangeTemptInput(e, temptField);
+                                checkInputCriteria(e, formField);
+                            }}
+                        />
+                        <Button
+                            variant="outlined"
+                            sx={{ mt: '8px', height: '40px', ...SXs.COMMON_BUTTON_STYLES }}
+                            onClick={(e) => {
+                                addToFormState(e, temptField, formField);
+                                clearTemptInputField(temptField);
+                            }}
+                        >
+                            Add
+                        </Button>
+                    </Box>
+                    <FormHelperText>{helperText}</FormHelperText>
+                </FormControl>
             </Grid>
         </React.Fragment>
     );
 
-    const ListContent = ({ formField, label }) => (
+    const listContent = ({ formField, label }) => (
         <Grid container>
             {form[formField].length > 0 && (
                 <Grid item xs={12}>
-                    <Typography sx={{ fontSize: Fonts.FS_18, ml: 2, my: 3 }}>
-                        List of {label}
+                    <Typography sx={{ fontSize: Fonts.FS_15, fontWeight: Fonts.FW_500 }}>
+                        {label}
                     </Typography>
-                    <Grid
-                        container
-                        spacing={2}
-                        sx={{ maxHeight: "150px", overflowY: "auto" }}
-                    >
-                        {form[formField]?.map((syn, index) => (
-                            <Grid
-                                item
-                                xs={12}
-                                sx={{
+                    <Grid container sx={{
+                        borderRadius: '10px',
+                        overflow: 'hidden',
+                        width: `calc(100% + 8px)`,
+                    }}>
+                        <div style={{
+                            maxHeight: "150px",
+                            overflowY: "auto",
+                            width: `calc(100%)`,
+                        }}>
+                            {form[formField]?.map((syn, index) => (
+                                <Grid item xs={12} sx={{
                                     display: "flex",
                                     alignItems: "center",
-                                }}
-                                key={index}
-                            >
-                                <Box
-                                    sx={{
-                                        pl: 5,
-                                        display: "flex",
-                                        justifyContent: "space-between",
-                                        alignItems: "center",
-                                        width: "100%",
-                                    }}
-                                >
-                                    <Typography gutterBottom>{syn}</Typography>
-                                    <IconButton
-                                        onClick={() => {
-                                            handleDeleteItem(formField, index);
+                                    py: 0.5
+                                }} key={`${index}-${label}`}>
+                                    <Box
+                                        sx={{
+                                            display: "flex",
+                                            justifyContent: "space-between",
+                                            alignItems: "center",
+                                            width: "100%",
                                         }}
                                     >
-                                        <RemoveCircleIcon />
-                                    </IconButton>
-                                </Box>
-                            </Grid>
-                        ))}
+                                        <Typography sx={{
+                                            width: '100%',
+                                            verticalAlign: 'middle',
+                                            textAlign: 'left',
+                                            alignItems: 'center',
+                                            display: 'flex',
+                                            borderRadius: '4px',
+                                            pl: 1
+                                        }}>{syn}</Typography>
+                                        <IconButton
+                                            onClick={() => {
+                                                handleDeleteItem(formField, index);
+                                            }}
+                                            sx={{
+                                                ...SXs.MUI_NAV_ICON_BUTTON,
+                                                borderRadius: '4px'
+                                            }}
+                                        >
+                                            <RemoveCircleIcon />
+                                        </IconButton>
+                                    </Box>
+                                </Grid>
+                            ))}
+                        </div>
                     </Grid>
                 </Grid>
             )}
-        </Grid>
+        </Grid >
     );
 
     const gridForm = () => (
         <Box sx={style}>
             <Box component="form" noValidate onSubmit={handleSubmit}>
-                <Grid container spacing={2}>
+                <Grid container >
                     <Grid item xs={12}>
                         <TextField
                             required
@@ -290,7 +322,7 @@ export default function CreateNewWord({ open, setOpen }) {
                         />
                     </Grid>
 
-                    <Grid item xs={6}>
+                    <Grid item xs={6} pr={0.5}>
                         <FormControl fullWidth margin="dense" required>
                             <InputLabel id="demo-multiple-chip-label">Type</InputLabel>
                             <Select
@@ -309,11 +341,12 @@ export default function CreateNewWord({ open, setOpen }) {
                                     </MenuItem>
                                 ))}
                             </Select>
+                            <FormHelperText>Vocab, idiom or phrase</FormHelperText>
                         </FormControl>
                     </Grid>
 
                     {form.type === "vocab" && (
-                        <Grid item xs={6}>
+                        <Grid item xs={6} pl={0.5}>
                             <FormControl fullWidth margin="dense" size="small" required>
                                 <InputLabel id="demo-multiple-chip-label">
                                     Classify
@@ -360,55 +393,113 @@ export default function CreateNewWord({ open, setOpen }) {
                         />
                     </Grid>
 
-                    {ListContent({ formField: "examples", label: "Examples" })}
-                    {InputArrayField({
+                    {listContent({ formField: "examples", label: "Examples" })}
+                    {inputArrayField({
                         temptField: "example",
                         formField: "examples",
                         helperText: "At least one example",
                         label: "Examples",
                         error: errors?.examples?.error,
+                        required: true,
                     })}
 
-                    {ListContent({ formField: "vnMeanings", label: "Vietnamese" })}
-                    {InputArrayField({
+                    {listContent({ formField: "vnMeanings", label: "Vietnamese" })}
+                    {inputArrayField({
                         temptField: "vnMeaning",
                         formField: "vnMeanings",
-                        helperText: "At least one meaning in Vietnamese or English",
+                        helperText: "At least one Vietnamese or English meaning",
                         label: "Vietnamese",
                         error: errors?.meanings?.error,
+                        required: true,
                     })}
 
-                    {ListContent({ formField: "engMeanings", label: "English" })}
-                    {InputArrayField({
+                    {listContent({ formField: "engMeanings", label: "English" })}
+                    {inputArrayField({
                         temptField: "engMeaning",
                         formField: "engMeanings",
-                        helperText: "At least one meaning in Vietnamese or English",
+                        helperText: "At least one Vietnamese or English meaning",
                         label: "English",
                         error: errors?.meanings?.error,
+                        required: true,
                     })}
 
-                    {ListContent({ formField: "antonyms", label: "Antonyms" })}
-                    {InputArrayField({
+                    {listContent({ formField: "antonyms", label: "Antonyms" })}
+                    {inputArrayField({
                         temptField: "antonym",
                         formField: "antonyms",
                         label: "Antonyms",
                     })}
 
-                    {ListContent({ formField: "synonyms", label: "Synonyms" })}
-                    {InputArrayField({
+                    {listContent({ formField: "synonyms", label: "Synonyms" })}
+                    {inputArrayField({
                         temptField: "synonym",
                         formField: "synonyms",
                         label: "Synonyms",
                     })}
 
-                    {ListContent({ formField: "tags", label: "Tags" })}
-                    {InputArrayField({
+                    {listContent({ formField: "tags", label: "Tags" })}
+                    {inputArrayField({
                         temptField: "tag",
                         formField: "tags",
                         error: errors?.tags?.error,
                         label: "Tags",
                         helperText: "At least one tag",
                     })}
+
+                    <Grid item xs={12} mt={1} ref={photoRef}>
+                        <FormControl fullWidth>
+                            <FormLabel>Illustration</FormLabel>
+                            <Paper variant='outlined' sx={{
+                                position: 'relative',
+                                height: photoSizes?.width,
+                                overflow: 'hidden',
+                                borderRadius: '10px'
+                            }}>
+                                <Uploader
+                                    styles={{
+                                        sx: {
+                                            position: 'absolute',
+                                            top: 0,
+                                            left: 0,
+                                            zIndex: 2,
+                                            width: '100%',
+                                            height: '100%',
+                                            cursor: 'pointer',
+                                            '&:hover': {
+                                                filter: (photo) && 'brightness(0.5)',
+                                            },
+                                            display: 'flex',
+                                            flexDirection: 'row',
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                        },
+                                        container: true
+                                    }}
+                                    stylesImage={{
+                                        style: {
+                                            position: 'absolute',
+                                            top: 0,
+                                            left: 0,
+                                            width: '100%',
+                                            height: '100%',
+                                        }
+                                    }}
+                                    stylesImage2={{
+                                        style: {
+                                            width: '100%',
+                                            height: '100%',
+                                            position: 'relative'
+                                        }
+                                    }}
+                                    setData={setPhoto}
+                                    data={photo}
+                                    CustomIcon={UploadIconIllustration}
+                                    clickWhole
+                                    showIconUpload={photo?.length === 0}
+                                />
+                            </Paper>
+                        </FormControl>
+                    </Grid>
 
                     <Grid item xs={12}>
                         <label htmlFor="image-upload">
@@ -494,4 +585,18 @@ export default function CreateNewWord({ open, setOpen }) {
             </Dialog>
         </div>
     );
+}
+
+
+const UploadIconIllustration = () => {
+    return <LoadingImage
+        src={IMAGE_ALT}
+        alt="Illustration"
+        objectFit='contain'
+        priority={true}
+        draggable={false}
+        width={200}
+        height={200}
+        bgColor="transparent"
+    />
 }

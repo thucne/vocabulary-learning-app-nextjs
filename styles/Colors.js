@@ -140,6 +140,14 @@ export const GRAY_6 = "#616161";
 export const GRAY_7 = "#424242";
 export const GRAY_8 = "#212121";
 
+// grey drag drop
+export const GREY_200 = '#eeeeee';
+export const GREY_300 = '#e0e0e0';
+export const GREY_400 = '#bdbdbd';
+export const GREY_500 = '#9e9e9e';
+export const GREY_600 = '#757575';
+export const GREY_700 = '#616161';
+export const GREY_800 = '#424242';
 
 // backgrounds
 export const BG_MAIN = "#1976d2";
