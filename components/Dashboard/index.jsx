@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 
 import {
     Container,
-    Divider
+    Divider,
 } from '@mui/material';
 
 import Welcome from './Welcome';
@@ -30,6 +30,8 @@ export default function DashboardPage(props) {
             <Welcome />
             <Divider sx={{ width: '100%', my: 2 }} />
             <WordListBlock wordList={wordList} />
+            <Divider sx={{ width: '100%', my: 2 }} />
         </Container>
     )
 }
+

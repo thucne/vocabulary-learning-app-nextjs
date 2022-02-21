@@ -9,178 +9,60 @@ import { useTheme } from "@mui/material/styles";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
-import { Fonts, Colors } from '@styles';
-import { useThisToGetSizesFromRef, useThisToGetPositionFromRef, useWindowSize } from '@utils';
+import { Fonts } from '@styles';
 import { IMAGE_ALT } from '@consts';
 
 import LoadingImage from '@components/LoadingImage';
 
-import { debounce } from 'lodash';
+import ScrollPaper from 'react-mui-scroll-pages';
 
 const WordListBlock = ({ wordList }) => {
     const theme = useTheme();
-    const myRef = useRef(null);
-    const gridRef = useRef(null);
-    const wordRefs = useRef([]);
+    const [sizes, setSizes] = useState({ width: 0, height: 0 });
 
-    const { width } = useThisToGetSizesFromRef(myRef, { revalidate: 100, timeout: 500 });
-    const { top, height, right, left } = useThisToGetPositionFromRef(gridRef, { revalidate: 100, timeout: 500 });
-    const { width: windowWidth, height: windowHeight } = useWindowSize();
-
-    const numberOfWords = wordList?.length || 0;
-
-    const stackLength = width * numberOfWords;
-
-    const handleBackAction = async () => {
-        // find which word is in the middle of the screen
-        const halfOfScreen = windowWidth / 2;
-
-        const wordIndex = wordRefs.current.findIndex(wordRef => {
-            const { left: wordLeft } = wordRef.getBoundingClientRect();
-            return (wordLeft < halfOfScreen && wordLeft > 0) ||
-                (wordLeft + width > halfOfScreen && wordLeft + width < windowWidth);
-        });
-
-        // scroll left
-        if (wordIndex > 0) {
-            const wordRef = wordRefs.current[wordIndex - 1];
-            const { left: wordLeft } = wordRef.getBoundingClientRect();
-
-            gridRef.current.scrollTo({
-                left: wordLeft + wordIndex * width - left,
-                behavior: 'smooth'
-            });
-        }
-    }
-
-
-    const handleForwardAction = async () => {
-        // find which word is in the middle of the screen
-        const halfOfScreen = windowWidth / 2;
-
-        const wordIndex = wordRefs.current.findIndex(wordRef => {
-            const { left: wordLeft } = wordRef.getBoundingClientRect();
-            return (wordLeft < halfOfScreen && wordLeft > 0) ||
-                (wordLeft + width > halfOfScreen && wordLeft + width < windowWidth);
-        });
-
-        // scroll left
-        if (wordIndex < wordRefs.current?.length - 1) {
-            const wordRef = wordRefs.current[wordIndex + 1];
-            const { left: wordLeft } = wordRef.getBoundingClientRect();
-
-            gridRef.current.scrollTo({
-                left: wordLeft + wordIndex * width - left,
-                behavior: 'smooth'
-            });
-        }
-    }
-
-
-    const debounceScroll = useMemo(() => debounce(() => {
-
-        const autoScroll = async () => {
-            const halfOfScreen = windowWidth / 2;
-
-            const wordIndex = wordRefs?.current?.findIndex(wordRef => {
-                const { left: wordLeft } = wordRef?.getBoundingClientRect();
-                return (wordLeft < halfOfScreen && wordLeft > 0) ||
-                    (wordLeft + width > halfOfScreen && wordLeft + width < windowWidth);
-            });
-
-            const wordRef = wordRefs?.current?.[wordIndex];
-
-            if (wordRef) {
-                const { left: wordLeft } = wordRef?.getBoundingClientRect();
-
-                const a = Math.abs(wordIndex * width - left);
-                const b = Math.abs(wordLeft);
-                const whichBigger = Math.max(a, b);
-                const different = Math.round(Math.abs(a - b) * 100 / whichBigger);
-                
-                if (different > 10) {
-                    gridRef?.current?.scrollTo({
-                        left: wordLeft + (wordIndex * width - wordLeft),
-                        behavior: 'smooth'
-                    });
-                }
+    const config = {
+        mui: {
+            Grid,
+            Container,
+            IconButton,
+            Stack,
+            ArrowBackIcon,
+            ArrowForwardIcon,
+        },
+        buttonStyle: {
+            backgroundColor: theme.palette.scroll_button.main,
+        },
+        getElementSizes: (data) => {
+            if (JSON.stringify(sizes) !== JSON.stringify(data)) {
+                setSizes(data);
             }
-
-        };
-        autoScroll();
-    }, 250), [left, width, windowWidth]);
-
-    const onScroll = (e) => {
-        debounceScroll();
+        },
+        React,
     }
 
     return (
         <Container maxWidth="lg" disableGutters>
-            <Grid container direction="row" mt={[0, 1, 2, 3]}>
+            <Grid container direction="row" mt={[0, 1, 2, 3]} sx={{ position: 'relative' }}>
                 <Grid item xs={12}>
                     <Typography variant="h5" component="h2" gutterBottom sx={{ fontWeight: Fonts.FW_500 }}>
                         Word List
                     </Typography>
                 </Grid>
-                <div style={{
-                    position: 'absolute',
-                    top: Math.round(top + height / 2),
-                    left: `calc(${left}px + ${theme.spacing(3)})`,
-                    transform: 'translate(-50%, -50%)',
-                    zIndex: 100,
-                    backgroundColor: theme.palette.scroll_button.main,
-                    borderRadius: '50%',
-                }}>
-                    <IconButton aria-label="left" onClick={handleBackAction}>
-                        <ArrowBackIcon fontSize="large" />
-                    </IconButton>
-                </div>
-                <div style={{
-                    position: 'absolute',
-                    top: Math.round(top + height / 2),
-                    left: `calc(${right}px - ${theme.spacing(3)})`,
-                    transform: 'translate(-50%, -50%)',
-                    zIndex: 100,
-                    backgroundColor: theme.palette.scroll_button.main,
-                    borderRadius: '50%',
-                }}>
-                    <IconButton aria-label="left" onClick={handleForwardAction}>
-                        <ArrowForwardIcon fontSize="large" />
-                    </IconButton>
-                </div>
-                <Grid
-                    ref={gridRef}
-                    item xs={12}
-                    sx={{
-                        mt: 1,
-                        width: [width],
-                        overflow: 'auto',
-                        borderRadius: '10px',
-                    }}
-                    className='hideScrollBar'
-                    onScroll={onScroll}
-                >
-                    <Stack direction="row" sx={{ width: stackLength }}>
-                        {wordList?.length > 0 && wordList.map((word, index) => (
-                            <EachWord
-                                key={`render-word-list-${index}`}
-                                word={word}
-                                width={width}
-                                wordRefs={wordRefs}
-                                index={index}
-                            />
-                        ))}
-                    </Stack>
-                    <Grid container direction='row'>
-                        <Grid ref={myRef} item xs={12} sm={6} md={4} lg={3}></Grid>
-                    </Grid>
-                </Grid>
+                <ScrollPaper {...config}>
+                    {wordList?.length > 0 && wordList.map((word, index) => (
+                        <EachChild
+                            key={`render-word-list-${index}`}
+                            word={word}
+                            width={sizes.width}
+                        />
+                    ))}
+                </ScrollPaper>
             </Grid>
         </Container >
     );
 };
 
-const EachWord = ({ word, width, wordRefs, index }) => {
+const EachChild = ({ word, width }) => {
     const theme = useTheme();
     const [loading, setLoading] = useState(true);
 
@@ -188,18 +70,7 @@ const EachWord = ({ word, width, wordRefs, index }) => {
         word?.illustration?.url ||
         IMAGE_ALT;
 
-    return <Grid
-        ref={el => wordRefs.current[index] = el}
-        container direction='column' alignItems='center' wrap='nowrap'
-        sx={{
-            p: 1,
-            width,
-            height: 'auto',
-            '&:hover': {
-                filter: 'brightness(50%)'
-            }
-        }}
-    >
+    return <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
         <div style={{
             position: "relative",
             width: `calc(${width}px - ${theme.spacing(3)})`,
@@ -244,7 +115,7 @@ const EachWord = ({ word, width, wordRefs, index }) => {
                 </Typography>
             </Grid>
         }
-    </Grid>
+    </div>
 }
 
 export default WordListBlock;
