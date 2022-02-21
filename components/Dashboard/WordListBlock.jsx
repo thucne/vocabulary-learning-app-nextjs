@@ -9,11 +9,12 @@ import { useTheme } from "@mui/material/styles";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
-import { Fonts } from '@styles';
+import { Fonts, SXs } from '@styles';
 import { IMAGE_ALT } from '@consts';
 
 import LoadingImage from '@components/LoadingImage';
 import { useSelector } from 'react-redux';
+
 import ScrollPaper from 'react-mui-scroll-pages';
 
 const WordListBlock = () => {
@@ -31,8 +32,12 @@ const WordListBlock = () => {
             ArrowBackIcon,
             ArrowForwardIcon,
         },
-        buttonStyle: {
-            backgroundColor: theme.palette.scroll_button.main,
+        buttonIconStyle: {
+            // backgroundColor: theme.palette.scroll_button.main,
+            ...SXs.MUI_NAV_ICON_BUTTON
+        },
+        iconStyle:{
+            fontSize: Fonts.FS_20,
         },
         getElementSizes: (data) => {
             if (JSON.stringify(sizes) !== JSON.stringify(data)) {
@@ -41,6 +46,9 @@ const WordListBlock = () => {
         },
         elementStyle: {
             // "&:hover": { filter: "brightness(1)" }
+        },
+        containerStyle: {
+            maxWidth: '100%',
         },
         React,
     }
@@ -59,15 +67,17 @@ const WordListBlock = () => {
                         Word List
                     </Typography>
                 </Grid>
-                <ScrollPaper {...config}>
-                    {words?.length > 0 && words.map((word, index) => (
-                        <EachChild
-                            key={`render-word-list-${index}`}
-                            word={word}
-                            width={sizes.width}
-                        />
-                    ))}
-                </ScrollPaper>
+                <Grid item xs={12} sx={{ px: 2 }}>
+                    <ScrollPaper {...config}>
+                        {words?.length > 0 && words.map((word, index) => (
+                            <EachChild
+                                key={`render-word-list-${index}`}
+                                word={word}
+                                width={sizes.width}
+                            />
+                        ))}
+                    </ScrollPaper>
+                </Grid>
             </Grid>
         </Container >
     );

@@ -454,6 +454,7 @@ export default function CreateNewWord({ open, setOpen }) {
                 aria-describedby="modal-modal-description"
                 scroll="paper"
                 maxWidth="xs"
+                fullScreen={windowSize?.width < theme.breakpoints.values.sm ? true : false}
                 onSubmit={handleSubmit}
             >
                 <DialogTitle id="scroll-dialog-title" sx={{

@@ -2055,10 +2055,10 @@ react-is@^17.0.2:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-17.0.2.tgz#e691d4a8e9c789365655539ab372762b0efb54f0"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
-react-mui-scroll-pages@^1.1.7:
-  version "1.1.7"
-  resolved "https://registry.yarnpkg.com/react-mui-scroll-pages/-/react-mui-scroll-pages-1.1.7.tgz#22bba9c2f0f81fc1ef7e4a606a48366b53df01dc"
-  integrity sha512-w+SDHaVeXk5fq6NlClcoxFvTxy4cgcMS2hjk5QvI3LNKtCrFZwtpgH9NyDFpLFbbjvkgvlizfQIuorIlfUzTtQ==
+react-mui-scroll-pages@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/react-mui-scroll-pages/-/react-mui-scroll-pages-1.2.0.tgz#3537ebf53d669dc1b88ed2ebcef5e9eb1a684085"
+  integrity sha512-5GGEwgTty17/4pWpLwwk5FE8rDAxOcm1YUbiQb99bSgaivhMlBIdOnrNyvHC0zR5vG/Xjip3pO6/laBF5VurJQ==
   dependencies:
     "@babel/preset-react" "^7.16.7"
     core-js "^3.21.1"
