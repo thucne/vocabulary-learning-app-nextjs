@@ -49,7 +49,12 @@ import ListInputs from "./FormComponents/ListInputs";
 
 import { IMAGE_ALT, VIP_TYPES } from "@consts";
 import { fetcherJWT } from "@actions";
-import { useWindowSize, useThisToGetSizesFromRef, getJWT } from "@utils";
+import {
+  useWindowSize,
+  useThisToGetSizesFromRef,
+  getJWT,
+  useDebounce,
+} from "@utils";
 import { Fonts, SXs } from "@styles";
 import { API } from "@config";
 
@@ -84,13 +89,15 @@ export default function CreateNewWord({ open, setOpen }) {
   const theme = useTheme();
   const windowSize = useWindowSize();
 
+  const pronounceRef = useRef(null);
+  const [shouldFetchPronouce, setShouldFetchPronouce] = useState(false);
+
   const photoRef = useRef(null);
   const [photo, setPhoto] = useState(null);
-
   const [vocabTypes, setVocabTypes] = useState([]);
 
   const [form, setForm] = useState(initForm);
-  const pronounceRef = useRef(null);
+
   const [temptInput, setTemptInput] = useState(initTempInputs);
 
   const [loading, setLoading] = useState(false);
@@ -176,6 +183,45 @@ export default function CreateNewWord({ open, setOpen }) {
     console.table(temp);
   };
 
+  useDebounce(form.vip, () => handleFetchPronouce(), 2000);
+
+  const handleFetchPronouce = async () => {
+      if(!form.vip){
+        setErrors((state) => ({
+            ...state,
+            pronounce: {},
+          }));
+          setForm((form) => ({ ...form, pronounce: "", audio: "" }));
+          return;
+      }
+    if (shouldFetchPronouce) {
+      try {
+        const res = await fetch(
+          `https://api.dictionaryapi.dev/api/v2/entries/en/${form.vip}`
+        );
+        const data = await res.json();
+
+        if (!data.message) {
+          const { text, audio } = data[0].phonetics.find((item) => item.audio);
+          setForm((form) => ({ ...form, pronounce: text, audio: audio }));
+
+          pronounceRef.current.focus();
+        } else {
+          setErrors((state) => ({
+            ...state,
+            pronounce: { error: true, message: "Phonetics not found" },
+          }));
+          setForm((form) => ({ ...form, pronounce: "", audio: "" }));
+        }
+      } catch (e) {
+        setErrors((state) => ({
+          ...state,
+          pronounce: { error: true, message: "Phonetics not found" },
+        }));
+        setForm((form) => ({ ...form, pronounce: "", audio: "" }));
+      }
+    }
+  };
   const handleChangeValue = (e, name) => {
     setForm((state) => ({ ...state, [name]: e.target.value }));
   };
@@ -190,9 +236,18 @@ export default function CreateNewWord({ open, setOpen }) {
   const handleDeleteItem = (field, index) => {
     setForm((state) => ({
       ...state,
-      pronouce: { error: true, message: "Phonetic not found" },
+      [field]: state[field].filter((item, i) => i !== index),
     }));
-    setForm({ ...form, pronounce: "", audio: "" });
+  };
+
+  const addToFormState = (e, value, formField) => {
+    e.preventDefault();
+    if (temptInput[value]) {
+      setForm((state) => ({
+        ...state,
+        [formField]: [...state[formField], temptInput[value]],
+      }));
+    }
   };
 
   const canSubmit = () =>
@@ -245,8 +300,16 @@ export default function CreateNewWord({ open, setOpen }) {
               : { error: true, message: "This is required field" },
         }));
     }
-    setErrors((state) => ({ ...state, ["meanings"]: error }));
-    return;
+  };
+
+  const handleVocabTypesChange = (e) => {
+    const {
+      target: { value },
+    } = e;
+    setForm((state) => ({
+      ...state,
+      ["clasifyVocab"]: typeof value === "string" ? value.split(",") : value,
+    }));
   };
 
   const listInputProps = {
@@ -276,6 +339,7 @@ export default function CreateNewWord({ open, setOpen }) {
               onChange={(e) => {
                 handleChangeValue(e, "vip");
                 checkInputCriteria(e, "vip");
+                setShouldFetchPronouce(true)
               }}
             />
           </Grid>
@@ -335,12 +399,14 @@ export default function CreateNewWord({ open, setOpen }) {
             <TextField
               fullWidth
               label="Pronounce"
+              inputRef={pronounceRef}
               id="pronounce"
+              value={form.pronounce}
               size="small"
               margin="dense"
               multiline
-              //   error={errors?.pronounce?.error}
-              helperText={"Optional"}
+              error={errors?.pronounce?.error}
+              helperText={errors?.pronounce?.message || "Optional"}
               onChange={(e) => {
                 handleChangeValue(e, "pronounce");
                 checkInputCriteria(e, "pronounce");
