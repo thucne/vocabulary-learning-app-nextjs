@@ -36,7 +36,7 @@ export default function WordCard({ open, setOpen, vip }) {
   const theme = useTheme();
   
   const handleClose = () => {
-    setOpen((state) => ({ ...state, reviseWordModal: false }));
+    setOpen(false);
   };
 
   return (
@@ -55,7 +55,7 @@ export default function WordCard({ open, setOpen, vip }) {
           sx={{ height: "100vh", width: "100vw", overflowX: "hidden" }}
         >
           <Box>
-            <Image width={200} height={200} src={dummyImage} />
+            <Image width={200} height={200} src={dummyImage} alt="something" />
             <Box sx={{ ...style.flexCenter, flexDirection: "column" }}>
               <Box sx={style.flexCenter}>
                 <IconButton>

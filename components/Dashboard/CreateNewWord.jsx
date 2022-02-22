@@ -55,7 +55,7 @@ const initTempInputs = {
     tag: "",
 }
 
-export default function CreateNewWord({ open, setOpen }) {
+export default function CreateNewWord({ open = false, setOpen }) {
     const theme = useTheme();
     const windowSize = useWindowSize();
 
