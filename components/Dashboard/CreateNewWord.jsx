@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useMemo, useCallback } from "react";
 
 import Image from 'next/image';
 
@@ -29,6 +29,7 @@ import { Fonts, SXs } from "@styles";
 import { API } from '@config';
 
 import useSWR from 'swr';
+import { debounce } from "lodash";
 
 const fetcher = async (...args) => await fetcherJWT(...args);
 
@@ -109,47 +110,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
         return () => clearInterval(loop);
     }, [photo]);
 
-    useDebounce(form.vip, () => handleFetchPronouce(), 2000);
-
-    const handleFetchPronouce = async () => {
-        if (!form.vip) {
-            setErrors((state) => ({
-                ...state,
-                pronounce: "",
-            }));
-            setForm((form) => ({ ...form, pronounce: "", audio: "" }));
-            return;
-        }
-        if (shouldFetchPronouce) {
-            try {
-                const res = await fetch(
-                    `https://api.dictionaryapi.dev/api/v2/entries/en/${form.vip}`
-                );
-                const data = await res.json();
-
-                if (!data.message) {
-                    const { text, audio } = data[0].phonetics.find((item) => item.audio && item.text);
-                    
-                    setForm((form) => ({ ...form, pronounce: text, audio: audio }));
-                    setErrors((state) => ({ ...state, pronounce: "" }));
-
-                    pronounceRef.current.focus();
-                } else {
-                    setErrors((state) => ({
-                        ...state,
-                        pronounce: "Phonetics not found",
-                    }));
-                    setForm((form) => ({ ...form, pronounce: "", audio: "" }));
-                }
-            } catch (e) {
-                setErrors((state) => ({
-                    ...state,
-                    pronounce: "Phonetics not found",
-                }));
-                setForm((form) => ({ ...form, pronounce: "", audio: "" }));
-            }
-        }
-    };
+    // useDebounce(form.vip, () => handleFetchPronouce(), 2000);
 
     const photoSizes = useThisToGetSizesFromRef(
         photoRef,
@@ -181,6 +142,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
             antonyms: form.antonyms.join(","),
             tags: form.tags.join(","),
             public: form.public,
+            audio: form.audio,
         }
 
         formData.append("data", JSON.stringify(data));
@@ -191,7 +153,58 @@ export default function CreateNewWord({ open = false, setOpen }) {
             temp[pair[0]] = pair[1];
         }
 
-        console.table(temp);
+        console.table(data);
+    };
+
+
+    const handleFetchPronouce = async (value) => {
+        if (!value) {
+            setForm((form) => ({ ...form, pronounce: "", audio: "" }));
+            return;
+        }
+        try {
+            const res = await fetch(
+                `https://api.dictionaryapi.dev/api/v2/entries/en/${value}`,
+            );
+            const data = await res.json();
+
+            const firstData = data?.[0];
+
+            if (!data.message && firstData?.word === value) {
+                const allPronounces = firstData?.phonetics
+                    .filter((item) => item?.audio && item?.text)
+                    .sort((a, b) => {
+                        // sort by order of -us, -uk, -au in audio
+                        const aOrder = a?.audio?.includes("-us") ? 0 : a?.audio?.includes("-uk") ? 1 : 2;
+                        const bOrder = b?.audio?.includes("-us") ? 0 : b?.audio?.includes("-uk") ? 1 : 2;
+                        return (aOrder - bOrder) > 0 ? 1 : (aOrder - bOrder) < 0 ? -1 : 0;
+                    }) || [];
+
+                const { text, audio } = allPronounces[0] || {};
+                const allTypes = firstData?.meanings?.map(item => item?.partOfSpeech) || [];
+                
+                const altPronounce = firstData?.phonetic;
+
+                setForm((form) => ({
+                    ...form,
+                    pronounce: text || altPronounce,
+                    audio: audio,
+                    clasifyVocab: allTypes
+                }));
+
+            } else {
+                setForm((form) => ({ ...form, pronounce: "", audio: "" }));
+            }
+        } catch (e) {
+            console.log(e);
+            setForm((form) => ({ ...form, pronounce: "", audio: "" }));
+        }
+    };
+
+    const debounceFunction = useMemo(() => debounce((value) => handleFetchPronouce(value), 500), []);
+
+    const debounceFetchPronouce = (value) => {
+        debounceFunction(value);
     };
 
     const handleChangeValue = (e, name) => {
@@ -289,7 +302,8 @@ export default function CreateNewWord({ open = false, setOpen }) {
                             onChange={(e) => {
                                 handleChangeValue(e, "vip");
                                 checkInputCriteria(e, "vip");
-                                setShouldFetchPronouce(true);
+                                // setShouldFetchPronouce(true);
+                                debounceFetchPronouce(e.target.value);
                             }}
                         />
                     </Grid>

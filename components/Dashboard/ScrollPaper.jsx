@@ -131,7 +131,6 @@ const ScrollPages = (props) => {
     }
 
     const debounceScroll = useMemo(() => debounce(() => {
-
         const autoScroll = async () => {
             const halfOfScreen = windowWidth / 2;
 
