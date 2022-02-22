@@ -4,19 +4,14 @@ import Image from 'next/image';
 
 import {
     Grid, TextField, InputLabel, Select, MenuItem,
-    FormControl, IconButton, Dialog, DialogActions,
-    DialogContent, DialogContentText, DialogTitle, OutlinedInput,
-    Chip, ToggleButton, ToggleButtonGroup, FormGroup,
-    FormControlLabel, Button, Switch, Typography,
-    Box, FormHelperText, Paper, FormLabel, Icon,
+    FormControl, Dialog, DialogActions,
+    DialogContent, DialogTitle, OutlinedInput,
+    ToggleButton, ToggleButtonGroup,
+    Typography, Box, FormHelperText, Paper, FormLabel,
 } from "@mui/material";
 
 import {
-    RemoveCircle as RemoveCircleIcon,
-    Add as AddIcon,
     Send as SendIcon,
-    Public as PublicIcon,
-    PublicOff as PublicOffIcon
 } from '@mui/icons-material';
 
 import { LoadingButton } from "@mui/lab";
@@ -66,17 +61,15 @@ export default function CreateNewWord({ open, setOpen }) {
 
     const photoRef = useRef(null);
     const [photo, setPhoto] = useState(null);
+    const [isOver10MB, setIsOver10MB] = useState(false);
 
     const [vocabTypes, setVocabTypes] = useState([]);
 
     const [form, setForm] = useState(initForm);
-
     const [temptInput, setTemptInput] = useState(initTempInputs);
 
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
-
-    const handleOpen = () => setOpen(true);
 
     const handleClose = () => {
         // reset all
@@ -99,8 +92,7 @@ export default function CreateNewWord({ open, setOpen }) {
             }));
 
             setVocabTypes(types);
-        },
-        refreshInterval: 500
+        }
     });
 
     useEffect(() => {
@@ -114,38 +106,43 @@ export default function CreateNewWord({ open, setOpen }) {
         return () => clearInterval(loop);
     }, [photo]);
 
-    const photoSizes = useThisToGetSizesFromRef(photoRef, {
-        revalidate: 100,
-        falseCondition: (data) => data.width !== 0
-    });
+    const photoSizes = useThisToGetSizesFromRef(
+        photoRef,
+        {
+            revalidate: 250,
+            falseCondition: (data) => data.width !== 0
+        }
+    );
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
         let formData = new FormData();
 
-        formData.append("vip", form.vip);
-        formData.append("type1", form.type);
-        formData.append(
-            "type2",
-            form.type == "vocab"
-                ? form.clasifyVocab.map((item) => vocabTypes.indexOf(item => item.value === item))
-                : vocabTypes?.map(item => item.id)
-        );
-        formData.append("examples", form.examples);
-        formData.append("pronounce", form.pronounce);
-        formData.append("meanings", {
-            english: form.engMeanings,
-            vietnamese: form.vnMeanings,
-        });
-        formData.append("synonyms", form.synonyms.join(","));
-        formData.append("antonyms", form.antonyms.join(","));
-        formData.append("tags", form.tags.join(","));
-        formData.append("public", form.public);
-        formData.append("illustration", photo?.get('illustration'));
+        // prepare object
+        const data = {
+            vip: form.vip,
+            type1: form.type,
+            type2: form.type === "vocab"
+                ? form.clasifyVocab.map((item) => {
+                    const findItem = vocabTypes.find(each => each.value === item);
+                    return vocabTypes.indexOf(findItem)
+                })
+                : null,
+            examples: form.examples,
+            pronounce: form.pronounce,
+            meanings: { english: form.engMeanings, vietnamese: form.vnMeanings },
+            synonyms: form.synonyms.join(","),
+            antonyms: form.antonyms.join(","),
+            tags: form.tags.join(","),
+            public: form.public,
+        }
+
+        formData.append("data", JSON.stringify(data));
+        formData.append("files.illustration", photo?.get('illustration'));
 
         let temp = {};
-        for (var pair of formData.entries()) {
+        for (let pair of formData.entries()) {
             temp[pair[0]] = pair[1];
         }
 
@@ -181,52 +178,40 @@ export default function CreateNewWord({ open, setOpen }) {
     };
 
     const canSubmit = () =>
-        (form.vip.length &&
-            form.examples.length &&
-            (form.vnMeanings.length || form.engMeanings) &&
-            form.tags.length &&
-            !errors?.vip.error &&
-            !errors?.examples?.error &&
-            !errors?.meanings?.error &&
-            !errors?.tags?.error) ??
-        false;
+        (
+            form.vip?.length
+            && form.examples?.length
+            && (form.vnMeanings?.length  || form.engMeanings?.length)
+            && form.tags?.length
+            && !errors?.vip.error?.length
+            && !errors?.examples?.length
+            && !errors?.meanings?.length
+            && !errors?.tags?.length
+            && !isOver10MB
+        ) ?? false;
 
     const checkInputCriteria = (e, name) => {
+        let error = {};
         switch (name) {
-            case "engMeanings":
-                var error = {};
-                if (!e.target.value && !form.vnMeanings.length && !form.engMeanings.length) {
-                    error = {
-                        error: true,
-                        message: "at least one meaning in Vietnamese or English",
-                    };
-                }
-                setErrors((state) => ({ ...state, ["meanings"]: error }));
-                return;
-            case "vnMeanings":
-                var error = {};
-                if (!e.target.value && !form.vnMeanings.length && !form.engMeanings.length) {
-                    error = {
-                        error: true,
-                        message: "at least one meaning in Vietnamese or English",
-                    };
-                }
+            case "engMeanings", "vnMeanings":
+                error = (!e.target.value?.length && !form.vnMeanings.length && !form.engMeanings.length)
+                    ? "At least one meaning in Vietnamese (or English)"
+                    : "";
                 setErrors((state) => ({ ...state, ["meanings"]: error }));
                 return;
             default:
+                error = e.target.value?.length
+                    ? ""
+                    : "This field is required";
                 setErrors((state) => ({
                     ...state,
-                    [name]: (e.target.value || form?.[name]?.length)
-                        ? {}
-                        : { error: true, message: "This is required field" },
+                    [name]: error,
                 }));
         }
     };
 
     const handleVocabTypesChange = (e) => {
-        const {
-            target: { value },
-        } = e;
+        const { target: { value } } = e;
         setForm((state) => ({
             ...state,
             ["clasifyVocab"]: typeof value === "string" ? value.split(",") : value,
@@ -254,10 +239,8 @@ export default function CreateNewWord({ open, setOpen }) {
                             id="word"
                             size="small"
                             margin="dense"
-                            error={errors?.vip?.error}
-                            helperText={
-                                errors?.vip?.message || "A vocabulary, idiom or phrase"
-                            }
+                            error={errors?.vip?.length > 0}
+                            helperText={errors?.vip || "A vocabulary, idiom or phrase"}
                             onChange={(e) => {
                                 handleChangeValue(e, "vip");
                                 checkInputCriteria(e, "vip");
@@ -308,8 +291,8 @@ export default function CreateNewWord({ open, setOpen }) {
                                         />
                                     }
                                 >
-                                    {vocabTypes?.map(item => item.value)?.map((name) => (
-                                        <MenuItem key={name} value={name}>
+                                    {vocabTypes?.map(item => item.value)?.map((name, index) => (
+                                        <MenuItem key={`${name}-type2-${index}`} value={name}>
                                             {name}
                                         </MenuItem>
                                     ))}
@@ -355,7 +338,7 @@ export default function CreateNewWord({ open, setOpen }) {
                     <ListInputs {...elementsInputProps(errors, listInputProps).tags} />
 
                     <Grid item xs={12} mt={1} ref={photoRef}>
-                        <FormControl fullWidth>
+                        <FormControl fullWidth error={isOver10MB}>
                             <FormLabel>Illustration</FormLabel>
                             <Paper variant='outlined' sx={{
                                 position: 'relative',
@@ -364,7 +347,7 @@ export default function CreateNewWord({ open, setOpen }) {
                                 borderRadius: '10px'
                             }}>
                                 <Uploader
-                                    styles={{
+                                    containerProps={{
                                         sx: {
                                             position: 'absolute',
                                             top: 0,
@@ -373,9 +356,6 @@ export default function CreateNewWord({ open, setOpen }) {
                                             width: '100%',
                                             height: '100%',
                                             cursor: 'pointer',
-                                            '&:hover': {
-                                                filter: (photo?.get('photo')) && 'brightness(0.5)',
-                                            },
                                             display: 'flex',
                                             flexDirection: 'row',
                                             justifyContent: 'center',
@@ -406,12 +386,17 @@ export default function CreateNewWord({ open, setOpen }) {
                                     }}
                                     data={Boolean(photo?.get('photo')) ? photo?.get('photo') : null}
                                     CustomIcon={UploadIconIllustration}
-                                    clickWhole
                                     showIconUpload={Boolean(photo?.get('photo')) ? false : true}
+                                    getFileSize={(data) => setIsOver10MB(Math.ceil(data / 1024 / 1024) > 10)}
                                     isFormik
+                                    clickWhole
                                 />
                             </Paper>
-                            <FormHelperText>Should be in square shape. Smaller 10MB in size</FormHelperText>
+                            <FormHelperText>
+                                {isOver10MB
+                                    ? 'File size is over 10MB'
+                                    : 'Should be in square shape. MUST smaller 10MB in size.'}
+                            </FormHelperText>
                         </FormControl>
                     </Grid>
                 </Grid>
@@ -512,25 +497,25 @@ const elementsInputProps = (errors, others) => ({
         formField: "examples",
         helperText: "At least one example",
         label: "Examples",
-        error: errors?.examples?.error,
+        error: errors?.examples,
         required: true,
         ...others
     },
     vietnamese: {
         temptField: "vnMeaning",
         formField: "vnMeanings",
-        helperText: "At least one Vietnamese or English meaning",
+        helperText: "At least one meaning in total (English + Vietnamese)",
         label: "Vietnamese",
-        error: errors?.meanings?.error,
+        error: errors?.meanings,
         required: true,
         ...others
     },
     english: {
         temptField: "engMeaning",
         formField: "engMeanings",
-        helperText: "At least one Vietnamese or English meaning",
+        helperText: "At least one meaning in total (English + Vietnamese)",
         label: "English",
-        error: errors?.meanings?.error,
+        error: errors?.meanings,
         required: true,
         ...others
     },
@@ -549,7 +534,7 @@ const elementsInputProps = (errors, others) => ({
     tags: {
         temptField: "tag",
         formField: "tags",
-        error: errors?.tags?.error,
+        error: errors?.tags,
         label: "Tags",
         helperText: "At least one tag",
         ...others

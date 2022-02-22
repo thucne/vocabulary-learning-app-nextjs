@@ -12,6 +12,9 @@ import clsx from 'clsx';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import DeleteIcon from '@mui/icons-material/Delete';
 
+import { useDispatch } from 'react-redux';
+import * as t from '@consts';
+
 const GridDragAndDrop = styled(Grid)(({ theme }) => ({
     position: 'absolute',
     top: 0,
@@ -36,14 +39,15 @@ const Input = styled('input')({
 });
 
 const UploadComponent = ({
-    setData, setFileName, setSize, styles, CustomIcon,
+    setData, setFileName, setSize, containerProps, CustomIcon,
     showDelete, stylesImage, stylesImage2,
     clickWhole, showIconUpload, data,
-    isFormik
+    isFormik, getFileSize
 }) => {
     const [dragging, setDragging] = useState(false);
     const [loadingImage, setLoadingImage] = useState(false);
     const [photo, setPhoto] = useState('');
+    const dispatch = useDispatch();
     const upLoadRef = useRef(null);
 
     useEffect(() => {
@@ -81,6 +85,9 @@ const UploadComponent = ({
                     } else {
                         setData(e.target.result);
                     }
+                }
+                if (getFileSize) {
+                    getFileSize(file?.size);
                 }
             };
             reader.readAsDataURL(e.target.files[0]);
@@ -121,6 +128,9 @@ const UploadComponent = ({
                                     setData(e.target.result);
                                 }
                             }
+                            if (getFileSize) {
+                                getFileSize(file?.size);
+                            }
                         };
                         reader.readAsDataURL(file);
                     } else {
@@ -153,6 +163,9 @@ const UploadComponent = ({
                                 setData(e.target.result);
                             }
                         }
+                        if (getFileSize) {
+                            getFileSize(ev.dataTransfer.files[i]?.size);
+                        }
                     };
                     reader.readAsDataURL(ev.dataTransfer.files[i]);
                 } else {
@@ -179,7 +192,7 @@ const UploadComponent = ({
         ev.preventDefault();
     }
 
-    return <Grid {...styles} onClick={() => {
+    return <Grid {...containerProps} onClick={() => {
         if (clickWhole && upLoadRef?.current) {
             upLoadRef.current.click();
         }

@@ -10,7 +10,7 @@ import { SXs } from '@styles';
 const ListInput = ({
     temptField,
     formField,
-    error = false,
+    error = "",
     helperText,
     label,
     required,
@@ -22,7 +22,7 @@ const ListInput = ({
 }) => (
     <React.Fragment>
         <Grid item xs={12}>
-            <FormControl fullWidth>
+            <FormControl fullWidth error={error?.length > 0} required={required}>
                 <Box sx={{
                     display: "flex",
                     alignItems: "flex-start",
@@ -31,12 +31,11 @@ const ListInput = ({
                 }}>
                     <TextField
                         fullWidth
-                        required={required}
                         label={label}
                         size="small"
                         margin="dense"
+                        error={error?.length > 0}
                         value={temptInput[temptField]}
-                        error={error}
                         sx={{ marginRight: "10px" }}
                         onChange={(e) => {
                             handleChangeTemptInput(e, temptField);
@@ -55,7 +54,7 @@ const ListInput = ({
                     </Button>
                 </Box>
                 <FormHelperText>
-                    {helperText || (required ? "Required field" : "Optional")}
+                    {error || helperText || (required ? "Required field" : "Optional")}
                 </FormHelperText>
             </FormControl>
         </Grid>
