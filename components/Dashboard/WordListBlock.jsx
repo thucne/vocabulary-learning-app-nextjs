@@ -15,7 +15,7 @@ import { IMAGE_ALT } from '@consts';
 import LoadingImage from '@components/LoadingImage';
 import { useSelector } from 'react-redux';
 
-import ScrollPaper from 'react-mui-scroll-pages';
+import ScrollPaper from '@katyperrycbt/react-mui-scroll-view';
 
 const WordListBlock = () => {
     const theme = useTheme();

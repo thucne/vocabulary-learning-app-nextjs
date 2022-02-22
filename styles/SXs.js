@@ -45,3 +45,9 @@ export const LOADING_BUTTON_STYLES = {
     textTransform: "none !important",
   },
 };
+
+export const TOGGLE_BUTTON_STYLES = {
+  "&.MuiToggleButton-root": {
+    textTransform: "none !important",
+  },
+};
