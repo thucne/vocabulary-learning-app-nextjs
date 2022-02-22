@@ -1,46 +1,98 @@
-import React, { useState } from "react";
-import { Container, Grid, Box, Typography, IconButton } from "@mui/material";
+import React, { useEffect, useState } from "react";
+
+import {
+  Container,
+  Grid,
+  Box,
+  Typography,
+  IconButton,
+  Button,
+} from "@mui/material";
 import { Colors, Fonts } from "@styles";
 import CachedIcon from "@mui/icons-material/Cached";
 import AddIcon from "@mui/icons-material/Add";
+
 import CreateNewWord from "./CreateNewWord";
+import { useSelector } from "react-redux";
+import WordCard from "./WordCard";
 
 export default function Welcome(props) {
-    const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState({
+    newWordModal: false,
+    reviseWordModal: false,
+  });
 
-    return (
-        <Container maxWidth="lg" disableGutters>
-            <CreateNewWord open={open} setOpen={setOpen} />
+  const { newWordModal, reviseWordModal } = open;
+  const user = useSelector((state) => state?.user);
 
-            <Grid container direction="row" mt={[0, 1, 2, 3]}>
-                <Grid item xs={12} sm={6}
-                    sx={{
-                        display: "flex",
-                        justifyContent: "star",
-                        alignItems: "center",
-                    }}
-                >
-                    <Box sx={{ width: "100%" }} >
-                        <Typography component="h1" sx={{ fontSize: Fonts.FS_24, p: "16px 0px 0px", fontWeight: Fonts.FW_500 }}>
-                            Analytics Dashboard
-                        </Typography>
-                        <Typography component="p" sx={{ fontSize: Fonts.FS_15, p: "8px 0px 0px" }}>
-                            Welcome back, Lucy! We missed you 👋
-                        </Typography>
-                    </Box>
-                </Grid>
 
-                <Grid item xs={12} sm={6} sx={{ display: "flex", justifyContent: "end", alignItems: "center", }}>
-                    <Box sx={{ width: "100%", display: "flex", justifyContent: ["flex-start", "flex-end"], padding: "10px 0", }}>
-                        <IconButton>
-                            <CachedIcon sx={{ color: Colors.LOGO_BLUE }} />
-                        </IconButton>
-                        <IconButton onClick={() => setOpen(true)}>
-                            <AddIcon sx={{ color: Colors.LOGO_BLUE }} />
-                        </IconButton>
-                    </Box>
-                </Grid>
-            </Grid>
-        </Container>
-    );
+
+  return (
+    <Container maxWidth="lg" disableGutters>
+   
+      <Grid container direction="row" mt={[0, 1, 2, 3]}>
+        <Grid
+          item
+          xs={12}
+          sm={6}
+          sx={{
+            display: "flex",
+            justifyContent: "flex-start",
+            alignItems: "center",
+          }}
+        >
+          <Box sx={{ width: "100%" }}>
+            <Typography
+              component="h1"
+              sx={{
+                fontSize: Fonts.FS_24,
+                p: "16px 0px 0px",
+                fontWeight: Fonts.FW_500,
+              }}
+            >
+              Welcome back, Lucy! We missed you 👋
+            </Typography>
+            <Typography
+              component="p"
+              sx={{ fontSize: Fonts.FS_15, p: "8px 0px 0px" }}
+            >
+              It look like you haven&#96;t been revised your words today.{" "}
+              <Button 
+              onClick={() => setOpen({ ...open, reviseWordModal: true })}
+              >Let&#96;s check it out!</Button>
+            </Typography>
+          </Box>
+        </Grid>
+
+        <Grid
+          item
+          xs={12}
+          sm={6}
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            alignItems: "center",
+          }}
+        >
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              justifyContent: ["flex-start", "flex-end"],
+              padding: "10px 0",
+            }}
+          >
+            <IconButton>
+              <CachedIcon sx={{ color: Colors.LOGO_BLUE }} />
+            </IconButton>
+            <IconButton onClick={() => setOpen({ ...open, newWordModal: true })}>
+              <AddIcon sx={{ color: Colors.LOGO_BLUE }} />
+            </IconButton>
+          </Box>
+        </Grid>
+      </Grid>
+      <CreateNewWord open={newWordModal} setOpen={setOpen} />
+      <WordCard open={reviseWordModal} setOpen={setOpen}/>
+    </Container>
+  );
 }

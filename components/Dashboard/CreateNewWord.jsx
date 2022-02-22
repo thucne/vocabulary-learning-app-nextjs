@@ -24,7 +24,7 @@ import ListInputs from './FormComponents/ListInputs';
 
 import { IMAGE_ALT, VIP_TYPES } from "@consts";
 import { fetcherJWT } from "@actions";
-import { useWindowSize, useThisToGetSizesFromRef, getJWT } from '@utils';
+import { useWindowSize, useThisToGetSizesFromRef, getJWT, useDebounce } from '@utils';
 import { Fonts, SXs } from "@styles";
 import { API } from '@config';
 
@@ -71,6 +71,9 @@ export default function CreateNewWord({ open, setOpen }) {
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
+    const pronounceRef = useRef(null);
+    const [shouldFetchPronouce, setShouldFetchPronouce] = useState(false);
+
     const handleClose = () => {
         // reset all
         setTemptInput(initTempInputs);
@@ -105,6 +108,48 @@ export default function CreateNewWord({ open, setOpen }) {
 
         return () => clearInterval(loop);
     }, [photo]);
+
+    useDebounce(form.vip, () => handleFetchPronouce(), 2000);
+
+    const handleFetchPronouce = async () => {
+        if (!form.vip) {
+            setErrors((state) => ({
+                ...state,
+                pronounce: "",
+            }));
+            setForm((form) => ({ ...form, pronounce: "", audio: "" }));
+            return;
+        }
+        if (shouldFetchPronouce) {
+            try {
+                const res = await fetch(
+                    `https://api.dictionaryapi.dev/api/v2/entries/en/${form.vip}`
+                );
+                const data = await res.json();
+
+                if (!data.message) {
+                    const { text, audio } = data[0].phonetics.find((item) => item.audio && item.text);
+                    
+                    setForm((form) => ({ ...form, pronounce: text, audio: audio }));
+                    setErrors((state) => ({ ...state, pronounce: "" }));
+
+                    pronounceRef.current.focus();
+                } else {
+                    setErrors((state) => ({
+                        ...state,
+                        pronounce: "Phonetics not found",
+                    }));
+                    setForm((form) => ({ ...form, pronounce: "", audio: "" }));
+                }
+            } catch (e) {
+                setErrors((state) => ({
+                    ...state,
+                    pronounce: "Phonetics not found",
+                }));
+                setForm((form) => ({ ...form, pronounce: "", audio: "" }));
+            }
+        }
+    };
 
     const photoSizes = useThisToGetSizesFromRef(
         photoRef,
@@ -181,7 +226,7 @@ export default function CreateNewWord({ open, setOpen }) {
         (
             form.vip?.length
             && form.examples?.length
-            && (form.vnMeanings?.length  || form.engMeanings?.length)
+            && (form.vnMeanings?.length || form.engMeanings?.length)
             && form.tags?.length
             && !errors?.vip.error?.length
             && !errors?.examples?.length
@@ -244,6 +289,7 @@ export default function CreateNewWord({ open, setOpen }) {
                             onChange={(e) => {
                                 handleChangeValue(e, "vip");
                                 checkInputCriteria(e, "vip");
+                                setShouldFetchPronouce(true);
                             }}
                         />
                     </Grid>
@@ -305,13 +351,15 @@ export default function CreateNewWord({ open, setOpen }) {
                     <Grid item xs={12}>
                         <TextField
                             fullWidth
+                            inputRef={pronounceRef}
                             label="Pronounce"
                             id="pronounce"
                             size="small"
                             margin="dense"
                             multiline
-                            //   error={errors?.pronounce?.error}
-                            helperText={"Optional"}
+                            error={errors?.pronounce?.length > 0}
+                            helperText={errors?.pronounce || "Optional"}
+                            value={form.pronounce}
                             onChange={(e) => {
                                 handleChangeValue(e, "pronounce");
                                 checkInputCriteria(e, "pronounce");
