@@ -8,82 +8,129 @@ import {
     DialogContent, DialogContentText, DialogTitle, OutlinedInput,
     Chip, ToggleButton, ToggleButtonGroup, FormGroup,
     FormControlLabel, Button, Switch, Typography,
-    Box, FormHelperText, Paper, FormLabel, Icon
+    Box, FormHelperText, Paper, FormLabel, Icon,
 } from "@mui/material";
 
 import {
     RemoveCircle as RemoveCircleIcon,
     Add as AddIcon,
-    Send as SendIcon
+    Send as SendIcon,
+    Public as PublicIcon,
+    PublicOff as PublicOffIcon
 } from '@mui/icons-material';
 
 import { LoadingButton } from "@mui/lab";
-
-import { useWindowSize, useThisToGetSizesFromRef } from '@utils';
-import { Fonts, SXs } from "@styles";
-
 import { useTheme } from '@mui/material/styles';
 
 import Uploader from '@components/Upload';
 import LoadingImage from '@components/LoadingImage';
-import { IMAGE_ALT } from "@consts";
+import ListArrayInputs from './FormComponents/ListArrayInputs';
+import ListInputs from './FormComponents/ListInputs';
 
-const style = {
-    width: "100%",
-    bgcolor: "background.paper",
-};
+import { IMAGE_ALT, VIP_TYPES } from "@consts";
+import { fetcherJWT } from "@actions";
+import { useWindowSize, useThisToGetSizesFromRef, getJWT } from '@utils';
+import { Fonts, SXs } from "@styles";
+import { API } from '@config';
 
-const vipTypes = ["vocab", "idiom", "phrase"];
-const vocabTypes = ["noun", "verb", "adverb", "adjective", "other"];
+import useSWR from 'swr';
+
+const fetcher = async (...args) => await fetcherJWT(...args);
+
+const initForm = {
+    vip: "",
+    type: VIP_TYPES[0],
+    examples: [],
+    vnMeanings: [],
+    engMeanings: [],
+    pronounce: "",
+    synonyms: [],
+    antonyms: [],
+    clasifyVocab: [],
+    public: true,
+    tags: [],
+}
+
+const initTempInputs = {
+    example: "",
+    vnMeaning: "",
+    engMeaning: "",
+    antonym: "",
+    synonym: "",
+    tag: "",
+}
 
 export default function CreateNewWord({ open, setOpen }) {
     const theme = useTheme();
     const windowSize = useWindowSize();
+
     const photoRef = useRef(null);
-    const [photo, setPhoto] = useState('');
+    const [photo, setPhoto] = useState(null);
+
+    const [vocabTypes, setVocabTypes] = useState([]);
+
+    const [form, setForm] = useState(initForm);
+
+    const [temptInput, setTemptInput] = useState(initTempInputs);
+
+    const [loading, setLoading] = useState(false);
+    const [errors, setErrors] = useState({});
+
+    const handleOpen = () => setOpen(true);
+
+    const handleClose = () => {
+        // reset all
+        setTemptInput(initTempInputs);
+        setForm(initForm);
+        setPhoto(null);
+        setErrors({});
+        setLoading(false);
+
+        setOpen(false);
+    };
+
+    // get types
+    useSWR(getJWT() ? `${API}/api/type2s` : null, fetcher, {
+        onSuccess: (data) => {
+            const raw = data?.data;
+            const types = raw?.sort((a, b) => a?.id - b?.id).map(item => ({
+                value: item?.attributes?.name,
+                id: item?.id
+            }));
+
+            setVocabTypes(types);
+        },
+        refreshInterval: 500
+    });
+
+    useEffect(() => {
+        const loop = setInterval(() => {
+            if (!photo && window) {
+                setPhoto(new FormData());
+                clearInterval(loop);
+            }
+        }, 100);
+
+        return () => clearInterval(loop);
+    }, [photo]);
+
     const photoSizes = useThisToGetSizesFromRef(photoRef, {
         revalidate: 100,
         falseCondition: (data) => data.width !== 0
     });
 
-    const [form, setForm] = useState({
-        vip: "",
-        type: vipTypes[0],
-        examples: [],
-        vnMeanings: [],
-        engMeanings: [],
-        pronounce: "",
-        synonyms: [],
-        antonyms: [],
-        clasifyVocab: [],
-        public: false,
-        tags: [],
-    });
-
-    const [temptInput, setTemptInput] = useState({
-        example: "",
-        vnMeaning: "",
-        engMeaning: "",
-        antonym: "",
-        synonym: "",
-        tag: "",
-    });
-
-    const [loading, setLoading] = useState(false);
-    const [errors, setErrors] = useState({});
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
-
     const handleSubmit = (e) => {
-        e.preventDefault()
+        e.preventDefault();
+
         let formData = new FormData();
+
         formData.append("vip", form.vip);
         formData.append("type1", form.type);
         formData.append(
             "type2",
             form.type == "vocab"
-                ? form.clasifyVocab.map((item, idnex) => vocabTypes.indexOf(item))
-                : [1, 2, 3, 4, 5]
+                ? form.clasifyVocab.map((item) => vocabTypes.indexOf(item => item.value === item))
+                : vocabTypes?.map(item => item.id)
         );
         formData.append("examples", form.examples);
         formData.append("pronounce", form.pronounce);
@@ -95,7 +142,14 @@ export default function CreateNewWord({ open, setOpen }) {
         formData.append("antonyms", form.antonyms.join(","));
         formData.append("tags", form.tags.join(","));
         formData.append("public", form.public);
+        formData.append("illustration", photo?.get('illustration'));
 
+        let temp = {};
+        for (var pair of formData.entries()) {
+            temp[pair[0]] = pair[1];
+        }
+
+        console.table(temp);
     };
 
     const handleChangeValue = (e, name) => {
@@ -125,16 +179,6 @@ export default function CreateNewWord({ open, setOpen }) {
             }));
         }
     };
-    const handleUploadImage = (e) => {
-        if (e.target.files && e.target.files[0]) {
-            let reader = new FileReader();
-
-            reader.onload = function (e) {
-                setForm((state) => ({ ...state, illustration: e.target.result }));
-            };
-            reader.readAsDataURL(e.target.files[0]);
-        }
-    };
 
     const canSubmit = () =>
         (form.vip.length &&
@@ -151,7 +195,7 @@ export default function CreateNewWord({ open, setOpen }) {
         switch (name) {
             case "engMeanings":
                 var error = {};
-                if (!(e.target.value || form.vnMeanings.length)) {
+                if (!e.target.value && !form.vnMeanings.length && !form.engMeanings.length) {
                     error = {
                         error: true,
                         message: "at least one meaning in Vietnamese or English",
@@ -161,7 +205,7 @@ export default function CreateNewWord({ open, setOpen }) {
                 return;
             case "vnMeanings":
                 var error = {};
-                if (!(e.target.value || form.engMeanings.length)) {
+                if (!e.target.value && !form.vnMeanings.length && !form.engMeanings.length) {
                     error = {
                         error: true,
                         message: "at least one meaning in Vietnamese or English",
@@ -172,7 +216,7 @@ export default function CreateNewWord({ open, setOpen }) {
             default:
                 setErrors((state) => ({
                     ...state,
-                    [name]: e.target.value
+                    [name]: (e.target.value || form?.[name]?.length)
                         ? {}
                         : { error: true, message: "This is required field" },
                 }));
@@ -189,120 +233,19 @@ export default function CreateNewWord({ open, setOpen }) {
         }));
     };
 
-    const inputArrayField = ({
-        temptField,
-        formField,
-        error = false,
-        helperText = "Optional",
-        label,
-        required
-    }) => (
-        <React.Fragment>
-            <Grid item xs={12}>
-                <FormControl fullWidth>
-                    <Box sx={{
-                        display: "flex",
-                        alignItems: "flex-start",
-                        justifyContent: "flex-start",
-                        width: "100%"
-                    }}>
-                        <TextField
-                            required={required}
-                            fullWidth
-                            label={label}
-                            multiline
-                            size="small"
-                            margin="dense"
-                            value={temptInput[temptField]}
-                            error={error}
-                            sx={{ marginRight: "10px" }}
-                            onChange={(e) => {
-                                handleChangeTemptInput(e, temptField);
-                                checkInputCriteria(e, formField);
-                            }}
-                        />
-                        <Button
-                            variant="outlined"
-                            sx={{ mt: '8px', height: '40px', ...SXs.COMMON_BUTTON_STYLES }}
-                            onClick={(e) => {
-                                addToFormState(e, temptField, formField);
-                                clearTemptInputField(temptField);
-                            }}
-                        >
-                            Add
-                        </Button>
-                    </Box>
-                    <FormHelperText>{helperText}</FormHelperText>
-                </FormControl>
-            </Grid>
-        </React.Fragment>
-    );
-
-    const listContent = ({ formField, label }) => (
-        <Grid container>
-            {form[formField].length > 0 && (
-                <Grid item xs={12}>
-                    <Typography sx={{ fontSize: Fonts.FS_15, fontWeight: Fonts.FW_500 }}>
-                        {label}
-                    </Typography>
-                    <Grid container sx={{
-                        borderRadius: '10px',
-                        overflow: 'hidden',
-                        width: `calc(100% + 8px)`,
-                    }}>
-                        <div style={{
-                            maxHeight: "150px",
-                            overflowY: "auto",
-                            width: `calc(100%)`,
-                        }}>
-                            {form[formField]?.map((syn, index) => (
-                                <Grid item xs={12} sx={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    py: 0.5
-                                }} key={`${index}-${label}`}>
-                                    <Box
-                                        sx={{
-                                            display: "flex",
-                                            justifyContent: "space-between",
-                                            alignItems: "center",
-                                            width: "100%",
-                                        }}
-                                    >
-                                        <Typography sx={{
-                                            width: '100%',
-                                            verticalAlign: 'middle',
-                                            textAlign: 'left',
-                                            alignItems: 'center',
-                                            display: 'flex',
-                                            borderRadius: '4px',
-                                            pl: 1
-                                        }}>{syn}</Typography>
-                                        <IconButton
-                                            onClick={() => {
-                                                handleDeleteItem(formField, index);
-                                            }}
-                                            sx={{
-                                                ...SXs.MUI_NAV_ICON_BUTTON,
-                                                borderRadius: '4px'
-                                            }}
-                                        >
-                                            <RemoveCircleIcon />
-                                        </IconButton>
-                                    </Box>
-                                </Grid>
-                            ))}
-                        </div>
-                    </Grid>
-                </Grid>
-            )}
-        </Grid >
-    );
+    const listInputProps = {
+        temptInput,
+        handleChangeTemptInput,
+        checkInputCriteria,
+        clearTemptInputField,
+        addToFormState
+    }
 
     const gridForm = () => (
-        <Box sx={style}>
+        <Box sx={{ width: "100%", bgcolor: "background.paper" }}>
             <Box component="form" noValidate onSubmit={handleSubmit}>
-                <Grid container >
+                <Grid container>
+
                     <Grid item xs={12}>
                         <TextField
                             required
@@ -335,7 +278,7 @@ export default function CreateNewWord({ open, setOpen }) {
                                     handleChangeValue(e, "type");
                                 }}
                             >
-                                {vipTypes.map((type, index) => (
+                                {VIP_TYPES.map((type, index) => (
                                     <MenuItem key={`${type}-${index}`} value={type}>
                                         {type}
                                     </MenuItem>
@@ -365,7 +308,7 @@ export default function CreateNewWord({ open, setOpen }) {
                                         />
                                     }
                                 >
-                                    {vocabTypes.map((name) => (
+                                    {vocabTypes?.map(item => item.value)?.map((name) => (
                                         <MenuItem key={name} value={name}>
                                             {name}
                                         </MenuItem>
@@ -393,58 +336,23 @@ export default function CreateNewWord({ open, setOpen }) {
                         />
                     </Grid>
 
-                    {listContent({ formField: "examples", label: "Examples" })}
-                    {inputArrayField({
-                        temptField: "example",
-                        formField: "examples",
-                        helperText: "At least one example",
-                        label: "Examples",
-                        error: errors?.examples?.error,
-                        required: true,
-                    })}
+                    <ListArrayInputs {...elementsListProps(form, handleDeleteItem).examples} />
+                    <ListInputs {...elementsInputProps(errors, listInputProps).examples} />
 
-                    {listContent({ formField: "vnMeanings", label: "Vietnamese" })}
-                    {inputArrayField({
-                        temptField: "vnMeaning",
-                        formField: "vnMeanings",
-                        helperText: "At least one Vietnamese or English meaning",
-                        label: "Vietnamese",
-                        error: errors?.meanings?.error,
-                        required: true,
-                    })}
+                    <ListArrayInputs {...elementsListProps(form, handleDeleteItem).vietnamese} />
+                    <ListInputs {...elementsInputProps(errors, listInputProps).vietnamese} />
 
-                    {listContent({ formField: "engMeanings", label: "English" })}
-                    {inputArrayField({
-                        temptField: "engMeaning",
-                        formField: "engMeanings",
-                        helperText: "At least one Vietnamese or English meaning",
-                        label: "English",
-                        error: errors?.meanings?.error,
-                        required: true,
-                    })}
+                    <ListArrayInputs {...elementsListProps(form, handleDeleteItem).english} />
+                    <ListInputs {...elementsInputProps(errors, listInputProps).english} />
 
-                    {listContent({ formField: "antonyms", label: "Antonyms" })}
-                    {inputArrayField({
-                        temptField: "antonym",
-                        formField: "antonyms",
-                        label: "Antonyms",
-                    })}
+                    <ListArrayInputs {...elementsListProps(form, handleDeleteItem).antonyms} />
+                    <ListInputs {...elementsInputProps(errors, listInputProps).antonyms} />
 
-                    {listContent({ formField: "synonyms", label: "Synonyms" })}
-                    {inputArrayField({
-                        temptField: "synonym",
-                        formField: "synonyms",
-                        label: "Synonyms",
-                    })}
+                    <ListArrayInputs {...elementsListProps(form, handleDeleteItem).synonyms} />
+                    <ListInputs {...elementsInputProps(errors, listInputProps).synonyms} />
 
-                    {listContent({ formField: "tags", label: "Tags" })}
-                    {inputArrayField({
-                        temptField: "tag",
-                        formField: "tags",
-                        error: errors?.tags?.error,
-                        label: "Tags",
-                        helperText: "At least one tag",
-                    })}
+                    <ListArrayInputs {...elementsListProps(form, handleDeleteItem).tags} />
+                    <ListInputs {...elementsInputProps(errors, listInputProps).tags} />
 
                     <Grid item xs={12} mt={1} ref={photoRef}>
                         <FormControl fullWidth>
@@ -466,7 +374,7 @@ export default function CreateNewWord({ open, setOpen }) {
                                             height: '100%',
                                             cursor: 'pointer',
                                             '&:hover': {
-                                                filter: (photo) && 'brightness(0.5)',
+                                                filter: (photo?.get('photo')) && 'brightness(0.5)',
                                             },
                                             display: 'flex',
                                             flexDirection: 'row',
@@ -491,45 +399,20 @@ export default function CreateNewWord({ open, setOpen }) {
                                             position: 'relative'
                                         }
                                     }}
-                                    setData={setPhoto}
-                                    data={photo}
+                                    setData={(data, base64) => {
+                                        photo?.set('illustration', data);
+                                        photo?.set('photo', base64);
+                                        setPhoto(photo);
+                                    }}
+                                    data={Boolean(photo?.get('photo')) ? photo?.get('photo') : null}
                                     CustomIcon={UploadIconIllustration}
                                     clickWhole
-                                    showIconUpload={photo?.length === 0}
+                                    showIconUpload={Boolean(photo?.get('photo')) ? false : true}
+                                    isFormik
                                 />
                             </Paper>
+                            <FormHelperText>Should be in square shape. Smaller 10MB in size</FormHelperText>
                         </FormControl>
-                    </Grid>
-
-                    <Grid item xs={12}>
-                        <label htmlFor="image-upload">
-                            <IconButton variant="contained" component="label">
-                                <AddIcon disabled />
-                                <input
-                                    id="image-upload"
-                                    hidden
-                                    type="file"
-                                    onChange={handleUploadImage}
-                                />
-                            </IconButton>
-                        </label>
-
-                        <FormGroup margin="dense">
-                            <FormControlLabel
-                                label="Public"
-                                control={
-                                    <Switch
-                                        checked={form.public}
-                                        onChange={(e) =>
-                                            setForm((state) => ({
-                                                ...state,
-                                                ["public"]: e.target.checked,
-                                            }))
-                                        }
-                                    />
-                                }
-                            />
-                        </FormGroup>
                     </Grid>
                 </Grid>
             </Box>
@@ -566,27 +449,49 @@ export default function CreateNewWord({ open, setOpen }) {
                         New Word
                     </Typography>
                 </DialogTitle>
+
                 <DialogContent dividers>{gridForm()}</DialogContent>
-                <DialogActions>
-                    <LoadingButton sx={SXs.LOADING_BUTTON_STYLES} onClick={handleClose}>Cancel</LoadingButton>
-                    <LoadingButton
-                        type="submit"
-                        variant="contained"
-                        loadingPosition="start"
-                        sx={SXs.LOADING_BUTTON_STYLES}
-                        disabled={!canSubmit()}
-                        loading={loading}
-                        onClick={handleSubmit}
-                        startIcon={<SendIcon />}
-                    >
-                        Create
-                    </LoadingButton>
+
+                <DialogActions sx={{
+                    justifyContent: 'space-between',
+                }}>
+                    <div>
+                        <ToggleButtonGroup
+                            size="small"
+                            color="primary"
+                            value={form?.public?.toString()}
+                            exclusive
+                            onChange={(e) =>
+                                setForm((state) => ({
+                                    ...state,
+                                    ["public"]: e.target.value === "true",
+                                }))
+                            }
+                        >
+                            <ToggleButton value="false" sx={SXs.TOGGLE_BUTTON_STYLES}>Private</ToggleButton>
+                            <ToggleButton value="true" sx={SXs.TOGGLE_BUTTON_STYLES}>Public</ToggleButton>
+                        </ToggleButtonGroup>
+                    </div>
+                    <div>
+                        <LoadingButton sx={SXs.LOADING_BUTTON_STYLES} onClick={handleClose}>Cancel</LoadingButton>
+                        <LoadingButton
+                            type="submit"
+                            variant="contained"
+                            loadingPosition="start"
+                            sx={SXs.LOADING_BUTTON_STYLES}
+                            disabled={!canSubmit()}
+                            loading={loading}
+                            onClick={handleSubmit}
+                            startIcon={<SendIcon />}
+                        >
+                            Create
+                        </LoadingButton>
+                    </div>
                 </DialogActions>
             </Dialog>
         </div>
     );
 }
-
 
 const UploadIconIllustration = () => {
     return <LoadingImage
@@ -600,3 +505,86 @@ const UploadIconIllustration = () => {
         bgColor="transparent"
     />
 }
+
+const elementsInputProps = (errors, others) => ({
+    examples: {
+        temptField: "example",
+        formField: "examples",
+        helperText: "At least one example",
+        label: "Examples",
+        error: errors?.examples?.error,
+        required: true,
+        ...others
+    },
+    vietnamese: {
+        temptField: "vnMeaning",
+        formField: "vnMeanings",
+        helperText: "At least one Vietnamese or English meaning",
+        label: "Vietnamese",
+        error: errors?.meanings?.error,
+        required: true,
+        ...others
+    },
+    english: {
+        temptField: "engMeaning",
+        formField: "engMeanings",
+        helperText: "At least one Vietnamese or English meaning",
+        label: "English",
+        error: errors?.meanings?.error,
+        required: true,
+        ...others
+    },
+    antonyms: {
+        temptField: "antonym",
+        formField: "antonyms",
+        label: "Antonyms",
+        ...others
+    },
+    synonyms: {
+        temptField: "synonym",
+        formField: "synonyms",
+        label: "Synonyms",
+        ...others
+    },
+    tags: {
+        temptField: "tag",
+        formField: "tags",
+        error: errors?.tags?.error,
+        label: "Tags",
+        helperText: "At least one tag",
+        ...others
+    }
+});
+
+const elementsListProps = (form, handleDeleteItem) => ({
+    examples: {
+        formField: "examples",
+        label: "Examples",
+        form, handleDeleteItem
+    },
+    vietnamese: {
+        formField: "vnMeanings",
+        label: "Vietnamese",
+        form, handleDeleteItem
+    },
+    english: {
+        formField: "engMeanings",
+        label: "English",
+        form, handleDeleteItem
+    },
+    antonyms: {
+        formField: "antonyms",
+        label: "Antonyms",
+        form, handleDeleteItem
+    },
+    synonyms: {
+        formField: "synonyms",
+        label: "Synonyms",
+        form, handleDeleteItem
+    },
+    tags: {
+        formField: "tags",
+        label: "Tags",
+        form, handleDeleteItem
+    }
+})

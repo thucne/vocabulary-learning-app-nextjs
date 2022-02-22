@@ -39,6 +39,7 @@ const UploadComponent = ({
     setData, setFileName, setSize, styles, CustomIcon,
     showDelete, stylesImage, stylesImage2,
     clickWhole, showIconUpload, data,
+    isFormik
 }) => {
     const [dragging, setDragging] = useState(false);
     const [loadingImage, setLoadingImage] = useState(false);
@@ -46,7 +47,9 @@ const UploadComponent = ({
     const upLoadRef = useRef(null);
 
     useEffect(() => {
-        if (data) setPhoto(data);
+        if (data) {
+            setPhoto(data);
+        };
     }, [data]);
 
     const handleChange = (e) => {
@@ -58,7 +61,7 @@ const UploadComponent = ({
         if (e.target.files && e.target.files[0]) {
             let reader = new FileReader();
             const fileName = e.target.files[0].name;
-
+            const file = e.target.files[0];
             reader.onload = async (e) => {
                 setPhoto(e.target.result);
                 setLoadingImage(true);
@@ -73,7 +76,11 @@ const UploadComponent = ({
                     }
                 }
                 if (setData) {
-                    setData(e.target.result);
+                    if (isFormik) {
+                        setData(file, e.target.result);
+                    } else {
+                        setData(e.target.result);
+                    }
                 }
             };
             reader.readAsDataURL(e.target.files[0]);
@@ -108,7 +115,11 @@ const UploadComponent = ({
                                 }
                             }
                             if (setData) {
-                                setData(e.target.result);
+                                if (isFormik) {
+                                    setData(file, e.target.result);
+                                } else {
+                                    setData(e.target.result);
+                                }
                             }
                         };
                         reader.readAsDataURL(file);
@@ -136,7 +147,11 @@ const UploadComponent = ({
                             }
                         }
                         if (setData) {
-                            setData(e.target.result);
+                            if (isFormik) {
+                                setData(ev.dataTransfer.files[i], e.target.result);
+                            } else {
+                                setData(e.target.result);
+                            }
                         }
                     };
                     reader.readAsDataURL(ev.dataTransfer.files[i]);
@@ -183,7 +198,7 @@ const UploadComponent = ({
         >
         </GridDragAndDrop>
         {
-            photo &&
+            photo?.length > 0 &&
             <div style={{
                 borderRadius: '50%',
                 overflow: 'hidden',
@@ -217,7 +232,7 @@ const UploadComponent = ({
                             <DeleteIcon />
                         </IconButton>
                     }
-                    <div style={{width: '100%', height: '100%', position: 'relative'}}>
+                    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
                         <Image
                             src={photo}
                             alt='Photo'
@@ -248,7 +263,7 @@ const UploadComponent = ({
                     color="primary" aria-label="upload picture" component="span"
                 >
                     {
-                        !photo && showIconUpload && (
+                        !photo?.length > 0 && showIconUpload && (
                             CustomIcon ? <CustomIcon style={{
                                 width: 100, height: 100, backgroundColor: Colors.GREY_400,
                                 borderRadius: '50%', padding: 10, color: 'white',
