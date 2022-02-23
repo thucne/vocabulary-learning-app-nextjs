@@ -24,7 +24,10 @@ import ListInputs from './FormComponents/ListInputs';
 
 import { IMAGE_ALT, VIP_TYPES } from "@consts";
 import { fetcherJWT } from "@actions";
-import { useWindowSize, useThisToGetSizesFromRef, getJWT, useDebounce } from '@utils';
+import {
+    useWindowSize, useThisToGetSizesFromRef,
+    getJWT, groupBy, handleDictionaryData
+} from '@utils';
 import { Fonts, SXs } from "@styles";
 import { API } from '@config';
 
@@ -54,6 +57,16 @@ const initTempInputs = {
     antonym: "",
     synonym: "",
     tag: "",
+}
+
+const resetSome = {
+    pronounce: "",
+    audio: "",
+    clasifyVocab: [],
+    examples: [],
+    engMeanings: [],
+    synonyms: [],
+    tags: [],
 }
 
 export default function CreateNewWord({ open = false, setOpen }) {
@@ -94,7 +107,6 @@ export default function CreateNewWord({ open = false, setOpen }) {
                 value: item?.attributes?.name,
                 id: item?.id
             }));
-
             setVocabTypes(types);
         }
     });
@@ -156,10 +168,9 @@ export default function CreateNewWord({ open = false, setOpen }) {
         console.table(data);
     };
 
-
-    const handleFetchPronouce = async (value) => {
+    const handleFetchPronouce = useCallback(async (value) => {
         if (!value) {
-            setForm((form) => ({ ...form, pronounce: "", audio: "" }));
+            setForm((form) => ({ ...form, ...resetSome }));
             return;
         }
         try {
@@ -171,37 +182,21 @@ export default function CreateNewWord({ open = false, setOpen }) {
             const firstData = data?.[0];
 
             if (!data.message && firstData?.word === value) {
-                const allPronounces = firstData?.phonetics
-                    .filter((item) => item?.audio && item?.text)
-                    .sort((a, b) => {
-                        // sort by order of -us, -uk, -au in audio
-                        const aOrder = a?.audio?.includes("-us") ? 0 : a?.audio?.includes("-uk") ? 1 : 2;
-                        const bOrder = b?.audio?.includes("-us") ? 0 : b?.audio?.includes("-uk") ? 1 : 2;
-                        return (aOrder - bOrder) > 0 ? 1 : (aOrder - bOrder) < 0 ? -1 : 0;
-                    }) || [];
 
-                const { text, audio } = allPronounces[0] || {};
-                const allTypes = firstData?.meanings?.map(item => item?.partOfSpeech) || [];
-                
-                const altPronounce = firstData?.phonetic;
+                const processedData = handleDictionaryData(firstData, vocabTypes);
 
-                setForm((form) => ({
-                    ...form,
-                    pronounce: text || altPronounce,
-                    audio: audio,
-                    clasifyVocab: allTypes
-                }));
+                setForm((form) => ({ ...form, ...processedData }));
 
             } else {
-                setForm((form) => ({ ...form, pronounce: "", audio: "" }));
+                setForm((form) => ({ ...form, ...resetSome }));
             }
         } catch (e) {
             console.log(e);
-            setForm((form) => ({ ...form, pronounce: "", audio: "" }));
+            setForm((form) => ({ ...form, ...resetSome }));
         }
-    };
+    }, [vocabTypes]);
 
-    const debounceFunction = useMemo(() => debounce((value) => handleFetchPronouce(value), 500), []);
+    const debounceFunction = useMemo(() => debounce((value) => handleFetchPronouce(value), 500), [handleFetchPronouce]);
 
     const debounceFetchPronouce = (value) => {
         debounceFunction(value);
@@ -221,7 +216,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
     const handleDeleteItem = (field, index) => {
         setForm((state) => ({
             ...state,
-            [field]: state[field].filter((item, i) => i !== index),
+            [field]: state[field].filter((item, i) => index !== -10 ? i !== index : false),
         }));
     };
 
@@ -285,7 +280,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
     }
 
     const gridForm = () => (
-        <Box sx={{ width: "100%", bgcolor: "background.paper" }}>
+        <Box sx={{ width: "100%" }}>
             <Box component="form" noValidate onSubmit={handleSubmit}>
                 <Grid container>
 
@@ -299,6 +294,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
                             margin="dense"
                             error={errors?.vip?.length > 0}
                             helperText={errors?.vip || "A vocabulary, idiom or phrase"}
+                            value={form.vip}
                             onChange={(e) => {
                                 handleChangeValue(e, "vip");
                                 checkInputCriteria(e, "vip");
@@ -520,7 +516,10 @@ export default function CreateNewWord({ open = false, setOpen }) {
                         </ToggleButtonGroup>
                     </div>
                     <div>
-                        <LoadingButton sx={SXs.LOADING_BUTTON_STYLES} onClick={handleClose}>Cancel</LoadingButton>
+                        <LoadingButton sx={{
+                            ...SXs.LOADING_BUTTON_STYLES,
+                            mr: 1
+                        }} onClick={handleClose}>Cancel</LoadingButton>
                         <LoadingButton
                             type="submit"
                             variant="contained"
