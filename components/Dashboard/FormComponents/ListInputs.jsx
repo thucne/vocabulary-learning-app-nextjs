@@ -22,7 +22,7 @@ const ListInput = ({
 }) => (
     <React.Fragment>
         <Grid item xs={12}>
-            <FormControl fullWidth error={error?.length > 0} required={required}>
+            <FormControl fullWidth error={error?.length > 0}>
                 <Box sx={{
                     display: "flex",
                     alignItems: "flex-start",
@@ -31,6 +31,7 @@ const ListInput = ({
                 }}>
                     <TextField
                         fullWidth
+                        required={required}
                         label={label}
                         size="small"
                         margin="dense"

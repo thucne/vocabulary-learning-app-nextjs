@@ -461,7 +461,7 @@ export const handleDictionaryData = (firstData, vocabTypes) => {
   return {
     pronounce: text || altPronounce,
     audio: audio,
-    clasifyVocab: allTypes,
+    clasifyVocab: [...new Set(allTypes)],
     examples: highPriorityExamples,
     engMeanings: highPriorityMeanings,
     synonyms: allSynonyms,

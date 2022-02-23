@@ -8,10 +8,12 @@ import {
     DialogContent, DialogTitle, OutlinedInput,
     ToggleButton, ToggleButtonGroup,
     Typography, Box, FormHelperText, Paper, FormLabel,
+    CircularProgress, SvgIcon, Tooltip, Stack
 } from "@mui/material";
 
 import {
     Send as SendIcon,
+    AutoAwesome as AutoAwesomeIcon,
 } from '@mui/icons-material';
 
 import { LoadingButton } from "@mui/lab";
@@ -48,6 +50,7 @@ const initForm = {
     clasifyVocab: [],
     public: true,
     tags: [],
+    auto: false
 }
 
 const initTempInputs = {
@@ -67,6 +70,7 @@ const resetSome = {
     engMeanings: [],
     synonyms: [],
     tags: [],
+    auto: false
 }
 
 export default function CreateNewWord({ open = false, setOpen }) {
@@ -165,7 +169,9 @@ export default function CreateNewWord({ open = false, setOpen }) {
             temp[pair[0]] = pair[1];
         }
 
-        console.table(data);
+        console.log(form.clasifyVocab)
+
+        console.log(data);
     };
 
     const handleFetchPronouce = useCallback(async (value) => {
@@ -185,7 +191,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
 
                 const processedData = handleDictionaryData(firstData, vocabTypes);
 
-                setForm((form) => ({ ...form, ...processedData }));
+                setForm((form) => ({ ...form, ...processedData, auto: true }));
 
             } else {
                 setForm((form) => ({ ...form, ...resetSome }));
@@ -196,10 +202,14 @@ export default function CreateNewWord({ open = false, setOpen }) {
         }
     }, [vocabTypes]);
 
-    const debounceFunction = useMemo(() => debounce((value) => handleFetchPronouce(value), 500), [handleFetchPronouce]);
+    const debounceFunction = useMemo(() => debounce((e) => {
+        handleChangeValue(e, "vip");
+        checkInputCriteria(e, "vip");
+        handleFetchPronouce(e.target.value);
+    }, 1000), [handleFetchPronouce, checkInputCriteria]);
 
-    const debounceFetchPronouce = (value) => {
-        debounceFunction(value);
+    const debounceFetchPronouce = (e) => {
+        debounceFunction(e);
     };
 
     const handleChangeValue = (e, name) => {
@@ -243,7 +253,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
             && !isOver10MB
         ) ?? false;
 
-    const checkInputCriteria = (e, name) => {
+    const checkInputCriteria = useCallback((e, name) => {
         let error = {};
         switch (name) {
             case "engMeanings", "vnMeanings":
@@ -261,7 +271,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
                     [name]: error,
                 }));
         }
-    };
+    }, [form.vnMeanings, form.engMeanings]);
 
     const handleVocabTypesChange = (e) => {
         const { target: { value } } = e;
@@ -294,12 +304,9 @@ export default function CreateNewWord({ open = false, setOpen }) {
                             margin="dense"
                             error={errors?.vip?.length > 0}
                             helperText={errors?.vip || "A vocabulary, idiom or phrase"}
-                            value={form.vip}
-                            onChange={(e) => {
-                                handleChangeValue(e, "vip");
-                                checkInputCriteria(e, "vip");
-                                // setShouldFetchPronouce(true);
-                                debounceFetchPronouce(e.target.value);
+                            onChange={debounceFetchPronouce}
+                            InputLabelProps={{
+                                shrink: true
                             }}
                         />
                     </Grid>
@@ -330,8 +337,13 @@ export default function CreateNewWord({ open = false, setOpen }) {
                     {form.type === "vocab" && (
                         <Grid item xs={6} pl={0.5}>
                             <FormControl fullWidth margin="dense" size="small" required>
-                                <InputLabel id="demo-multiple-chip-label">
-                                    Classify
+                                <InputLabel id="demo-multiple-chip-label"
+                                    sx={form.auto ? {
+                                        ...SXs.AUTO_FILLED_TEXT_COLOR,
+                                        display: "flex",
+                                    } : {}}
+                                >
+                                    <SpecialLabel label="Classify" auto={form.auto} />
                                 </InputLabel>
                                 <Select
                                     labelId="demo-multiple-chip-label"
@@ -339,11 +351,11 @@ export default function CreateNewWord({ open = false, setOpen }) {
                                     multiple
                                     value={form.clasifyVocab}
                                     onChange={handleVocabTypesChange}
-                                    label="Classify"
+                                    label={<SpecialLabel label="Classify" auto={form.auto} />}
                                     input={
                                         <OutlinedInput
                                             id="select-multiple-chip"
-                                            label="Classify"
+                                            label={<SpecialLabel label="Classify" auto={form.auto} />}
                                         />
                                     }
                                 >
@@ -362,11 +374,14 @@ export default function CreateNewWord({ open = false, setOpen }) {
                         <TextField
                             fullWidth
                             inputRef={pronounceRef}
-                            label="Pronounce"
+                            label={<SpecialLabel label="Pronounce" auto={form.auto} />}
                             id="pronounce"
                             size="small"
                             margin="dense"
                             multiline
+                            InputLabelProps={{
+                                sx: form.auto ? SXs.AUTO_FILLED_TEXT_COLOR : {}
+                            }}
                             error={errors?.pronounce?.length > 0}
                             helperText={errors?.pronounce || "Optional"}
                             value={form.pronounce}
@@ -552,6 +567,28 @@ const UploadIconIllustration = () => {
     />
 }
 
+const SpecialLabel = ({ auto, label }) => {
+    return !auto ? `${label}` : (<Tooltip title="Auto-filled" sx={{ display: 'flex' }}>
+        <Stack direction='row' alignItems='center' sx={{ display: 'flex' }}>
+            {label}
+            <SvgIcon fontSize='inherit' sx={{ verticalAlign: 'middle', ml: 0.5 }}>
+                <defs>
+                    <linearGradient id="Gradient1">
+                        <stop offset="0%" stopColor="#ffd54f" />
+                        <stop offset="100%" stopColor="#64b5f6" />
+                    </linearGradient>
+                </defs>
+                <AutoAwesomeIcon sx={{
+                    '&.MuiSvgIcon-root': {
+                        '*': { fill: `url(#Gradient1) #fff` }
+                    },
+                }} color='inherit' >
+                </AutoAwesomeIcon>
+            </SvgIcon>
+        </Stack>
+    </Tooltip>)
+}
+
 const elementsInputProps = (errors, others) => ({
     examples: {
         temptField: "example",
@@ -598,6 +635,7 @@ const elementsInputProps = (errors, others) => ({
         error: errors?.tags,
         label: "Tags",
         helperText: "At least one tag",
+        required: true,
         ...others
     }
 });
