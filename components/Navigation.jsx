@@ -102,7 +102,6 @@ function ResponsiveDrawer(props) {
     });
 
 
-
     // get words
     useSWR(getJWT() ? `${API}/api/users/me` : null, fetcher, {
         onSuccess: (data) => dispatch({
