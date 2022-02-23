@@ -1,12 +1,14 @@
 import { useRef, useEffect, useState } from 'react';
 
 import {
-    Grid, Typography, Box, IconButton,
-    Divider, Paper
+    Grid, Typography, Box,
+    IconButton, Paper, Chip,
+    Badge, Tooltip, Stack
 } from '@mui/material';
 
 import {
     RemoveCircle as RemoveCircleIcon,
+    DeleteForever as DeleteForeverIcon,
 } from '@mui/icons-material';
 
 import { Fonts, SXs } from '@styles';
@@ -31,9 +33,30 @@ const ListContent = ({ form, formField, label, handleDeleteItem }) => {
         <Grid container>
             {form?.[formField]?.length > 0 && (
                 <Grid item xs={12}>
-                    <Typography sx={{ fontSize: Fonts.FS_15, fontWeight: Fonts.FW_500 }}>
-                        {label}
-                    </Typography>
+                    <Stack direction='row' justifyContent='space-between' sx={{ width: `calc(100% + 9px)` }}>
+                        <Typography sx={{
+                            fontSize: Fonts.FS_15,
+                            fontWeight: Fonts.FW_500,
+                            mb: 1,
+                        }}>
+                            {label} ({form?.[formField]?.length})
+                        </Typography>
+                        <Tooltip title="Delete All">
+                            <IconButton
+                                onClick={() => handleDeleteItem(formField, -10)}
+                                sx={{
+                                    ...SXs.MUI_NAV_ICON_BUTTON,
+                                    borderRadius: '4px',
+                                    width: 20,
+                                    height: 20,
+                                    fontSize: 'inherit',
+                                    color: 'red'
+                                }}
+                            >
+                                <DeleteForeverIcon fontSize='inherit' />
+                            </IconButton>
+                        </Tooltip>
+                    </Stack>
 
                     <Grid container sx={styles(overflow).container}>
                         <Paper elevation={0} sx={{ borderRadius: '4px', overflow: 'hidden', width: '100%' }}>
@@ -45,12 +68,20 @@ const ListContent = ({ form, formField, label, handleDeleteItem }) => {
                                                 {eachItem}
                                             </Typography>
 
-                                            <IconButton
-                                                onClick={() => handleDeleteItem(formField, index)}
-                                                sx={{ ...SXs.MUI_NAV_ICON_BUTTON, borderRadius: '4px' }}
-                                            >
-                                                <RemoveCircleIcon />
-                                            </IconButton>
+                                            <Tooltip title="Delete">
+                                                <IconButton
+                                                    onClick={() => handleDeleteItem(formField, index)}
+                                                    sx={{
+                                                        ...SXs.MUI_NAV_ICON_BUTTON,
+                                                        borderRadius: '4px',
+                                                        width: 20,
+                                                        height: 20,
+                                                        fontSize: 'inherit',
+                                                    }}
+                                                >
+                                                    <RemoveCircleIcon fontSize='inherit' />
+                                                </IconButton>
+                                            </Tooltip>
                                         </Box>
                                     </Grid>
                                 ))}
@@ -93,7 +124,8 @@ const styles = (overflow) => ({
         alignItems: 'center',
         display: 'flex',
         borderRadius: '4px',
-        px: 1
+        px: 1,
+        fontSize: Fonts.FS_10,
     }
 })
 
