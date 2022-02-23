@@ -92,3 +92,17 @@ export const fetcher = async (url) => {
     .then((res) => handleCommonResponse(res))
     .catch((err) => handleServerError(err));
 };
+
+export const createVIP = (data) => async (dispatch) => {
+  if (!data || !getJWT()) {
+    return { error: "Empty body or jwt." };
+  }
+  return await axios
+    .post(`${API}/api/vips`, data, {
+      headers: {
+        Authorization: `Bearer ${getJWT()}`,
+      },
+    })
+    .then((res) => handleCommonResponse(res))
+    .catch((err) => handleServerError(err));
+};

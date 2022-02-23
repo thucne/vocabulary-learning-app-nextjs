@@ -19,13 +19,15 @@ import {
 import { LoadingButton } from "@mui/lab";
 import { useTheme } from '@mui/material/styles';
 
+import { useDispatch } from "react-redux";
+
 import Uploader from '@components/Upload';
 import LoadingImage from '@components/LoadingImage';
 import ListArrayInputs from './FormComponents/ListArrayInputs';
 import ListInputs from './FormComponents/ListInputs';
 
 import { IMAGE_ALT, VIP_TYPES } from "@consts";
-import { fetcherJWT } from "@actions";
+import { fetcherJWT, createVIP } from "@actions";
 import {
     useWindowSize, useThisToGetSizesFromRef,
     getJWT, groupBy, handleDictionaryData
@@ -76,6 +78,7 @@ const resetSome = {
 export default function CreateNewWord({ open = false, setOpen }) {
     const theme = useTheme();
     const windowSize = useWindowSize();
+    const dispatch = useDispatch();
 
     const photoRef = useRef(null);
     const [photo, setPhoto] = useState(null);
@@ -92,13 +95,22 @@ export default function CreateNewWord({ open = false, setOpen }) {
     const pronounceRef = useRef(null);
     const [shouldFetchPronouce, setShouldFetchPronouce] = useState(false);
 
-    const handleClose = () => {
-        // reset all
+    const [fetchingAPI, setFetchingAPI] = useState(false);
+
+    const resetWhole = () => {
         setTemptInput(initTempInputs);
         setForm(initForm);
         setPhoto(null);
         setErrors({});
         setLoading(false);
+        setIsOver10MB(false);
+        setVocabTypes([]);
+        setFetchingAPI(false);
+    }
+
+    const handleClose = () => {
+        // reset all
+        resetWhole();
 
         setOpen(false);
     };
@@ -169,36 +181,46 @@ export default function CreateNewWord({ open = false, setOpen }) {
             temp[pair[0]] = pair[1];
         }
 
-        console.log(form.clasifyVocab)
-
-        console.log(data);
+        if (window?.adHocFetch) {
+            adHocFetch({
+                dispatch,
+                action: createVIP(formData),
+                onSuccess: (data) => resetWhole(),
+                onError: (error) => console.log(error),
+                onStarting: () => setLoading(true),
+                onFinally: () => setLoading(false),
+                snackbarMessageOnSuccess: "Added!"
+            })
+        }
     };
 
     const handleFetchPronouce = useCallback(async (value) => {
         if (!value) {
             setForm((form) => ({ ...form, ...resetSome }));
+            setFetchingAPI(false);
             return;
         }
         try {
+            setFetchingAPI(true);
             const res = await fetch(
                 `https://api.dictionaryapi.dev/api/v2/entries/en/${value}`,
             );
             const data = await res.json();
 
+            setFetchingAPI(false);
+
             const firstData = data?.[0];
 
             if (!data.message && firstData?.word === value) {
-
                 const processedData = handleDictionaryData(firstData, vocabTypes);
-
                 setForm((form) => ({ ...form, ...processedData, auto: true }));
-
             } else {
                 setForm((form) => ({ ...form, ...resetSome }));
             }
         } catch (e) {
             console.log(e);
             setForm((form) => ({ ...form, ...resetSome }));
+            setFetchingAPI(false);
         }
     }, [vocabTypes]);
 
@@ -250,7 +272,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
             && !errors?.examples?.length
             && !errors?.meanings?.length
             && !errors?.tags?.length
-            && !isOver10MB
+            && !(Math.ceil(isOver10MB / 1024 / 1024) > 10)
         ) ?? false;
 
     const checkInputCriteria = useCallback((e, name) => {
@@ -290,10 +312,16 @@ export default function CreateNewWord({ open = false, setOpen }) {
     }
 
     const gridForm = () => (
-        <Box sx={{ width: "100%" }}>
+        <Box
+            sx={{
+                width: "100%",
+                pointerEvents: loading ? 'none' : 'auto',
+                opacity: loading ? '0.2' : '1'
+            }}
+            className={loading ? 'noselect' : ''}
+        >
             <Box component="form" noValidate onSubmit={handleSubmit}>
                 <Grid container>
-
                     <Grid item xs={12}>
                         <TextField
                             required
@@ -380,7 +408,8 @@ export default function CreateNewWord({ open = false, setOpen }) {
                             margin="dense"
                             multiline
                             InputLabelProps={{
-                                sx: form.auto ? SXs.AUTO_FILLED_TEXT_COLOR : {}
+                                sx: form.auto ? SXs.AUTO_FILLED_TEXT_COLOR : {},
+                                shrink: form.pronounce?.length > 0
                             }}
                             error={errors?.pronounce?.length > 0}
                             helperText={errors?.pronounce || "Optional"}
@@ -395,23 +424,23 @@ export default function CreateNewWord({ open = false, setOpen }) {
                     <ListArrayInputs {...elementsListProps(form, handleDeleteItem).examples} />
                     <ListInputs {...elementsInputProps(errors, listInputProps).examples} />
 
-                    <ListArrayInputs {...elementsListProps(form, handleDeleteItem).vietnamese} />
-                    <ListInputs {...elementsInputProps(errors, listInputProps).vietnamese} />
-
                     <ListArrayInputs {...elementsListProps(form, handleDeleteItem).english} />
                     <ListInputs {...elementsInputProps(errors, listInputProps).english} />
 
-                    <ListArrayInputs {...elementsListProps(form, handleDeleteItem).antonyms} />
-                    <ListInputs {...elementsInputProps(errors, listInputProps).antonyms} />
+                    <ListArrayInputs {...elementsListProps(form, handleDeleteItem).vietnamese} />
+                    <ListInputs {...elementsInputProps(errors, listInputProps).vietnamese} />
 
                     <ListArrayInputs {...elementsListProps(form, handleDeleteItem).synonyms} />
                     <ListInputs {...elementsInputProps(errors, listInputProps).synonyms} />
+
+                    <ListArrayInputs {...elementsListProps(form, handleDeleteItem).antonyms} />
+                    <ListInputs {...elementsInputProps(errors, listInputProps).antonyms} />
 
                     <ListArrayInputs {...elementsListProps(form, handleDeleteItem).tags} />
                     <ListInputs {...elementsInputProps(errors, listInputProps).tags} />
 
                     <Grid item xs={12} mt={1} ref={photoRef}>
-                        <FormControl fullWidth error={isOver10MB}>
+                        <FormControl fullWidth error={Math.ceil(isOver10MB / 1024 / 1024) > 10}>
                             <FormLabel>Illustration</FormLabel>
                             <Paper variant='outlined' sx={{
                                 position: 'relative',
@@ -460,15 +489,18 @@ export default function CreateNewWord({ open = false, setOpen }) {
                                     data={Boolean(photo?.get('photo')) ? photo?.get('photo') : null}
                                     CustomIcon={UploadIconIllustration}
                                     showIconUpload={Boolean(photo?.get('photo')) ? false : true}
-                                    getFileSize={(data) => setIsOver10MB(Math.ceil(data / 1024 / 1024) > 10)}
+                                    getFileSize={(data) => setIsOver10MB(data)}
                                     isFormik
                                     clickWhole
                                 />
                             </Paper>
                             <FormHelperText>
-                                {isOver10MB
-                                    ? 'File size is over 10MB'
-                                    : 'Should be in square shape. MUST smaller 10MB in size.'}
+                                {Math.ceil(isOver10MB / 1024 / 1024) > 10
+                                    ? 'File size is over 10MB.'
+                                    : (isOver10MB
+                                        ? `THis file's size is ${Math.ceil(isOver10MB / 1024 / 1024)}MB.`
+                                        : 'Should be in square shape. MUST smaller 10MB in size.'
+                                    )}
                             </FormHelperText>
                         </FormControl>
                     </Grid>
@@ -481,7 +513,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
         <div>
             <Dialog
                 open={open}
-                onClose={handleClose}
+                onClose={loading ? null : handleClose}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
                 scroll="paper"
@@ -489,22 +521,78 @@ export default function CreateNewWord({ open = false, setOpen }) {
                 fullScreen={windowSize?.width < theme.breakpoints.values.sm ? true : false}
                 onSubmit={handleSubmit}
             >
+                <div style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    width: 150,
+                    height: 150,
+                    transform: 'translate(-50%, -50%)',
+                    zIndex: 100,
+                    display: loading ? 'flex' : 'none',
+                }}>
+                    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                        <LoadingImage
+                            src="https://res.cloudinary.com/katyperrycbt/image/upload/v1645255061/Spinner-1s-200px_3_m1pkiz.svg"
+                            alt="Illustration"
+                            objectFit='contain'
+                            priority={true}
+                            draggable={false}
+                            bgColor="transparent"
+                            layout='fill'
+                        />
+                    </div>
+                </div>
                 <DialogTitle id="scroll-dialog-title" sx={{
-                    py: 1, display: 'flex',
+                    py: 0, display: 'flex',
                     alignItems: 'center', justifyContent: 'center'
                 }}>
-                    <Image
-                        src="/logo.icon.svg"
-                        width={30}
-                        height={30}
-                        alt="Logo"
-                    />
+                    <div style={{
+                        position: 'relative',
+                        width: 50, height: 50,
+                        display: 'flex',
+                        alignItems: 'center', justifyContent: 'center',
+                    }}>
+                        <Image
+                            src="/logo.icon.svg"
+                            width={fetchingAPI ? 15 : 30}
+                            height={fetchingAPI ? 15 : 30}
+                            alt="Logo"
+                        />
+                        <div style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%',
+                            display: fetchingAPI ? 'flex' : 'none',
+                        }}>
+                            <div style={{
+                                position: 'relative',
+                                width: '100%',
+                                height: '100%',
+                            }}>
+                                <Image
+                                    src="https://res.cloudinary.com/katyperrycbt/image/upload/v1645608152/Double_Ring-1s-200px_nw6bl0.svg"
+                                    alt="Logo"
+                                    layout='fill'
+                                />
+                            </div>
+                        </div>
+                    </div>
+
                     <Typography
                         id="modal-modal-title"
                         align="center"
-                        sx={{ fontSize: [Fonts.FS_22], ml: 1 }}
+                        sx={{
+                            fontSize: Fonts.FS_20,
+                            fontWeight: Fonts.FW_500,
+                            ml: 1
+                        }}
                     >
-                        New Word
+                        {
+                            !fetchingAPI ? 'New Word' : 'Loading...'
+                        }
                     </Typography>
                 </DialogTitle>
 
@@ -525,6 +613,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
                                     ["public"]: e.target.value === "true",
                                 }))
                             }
+                            disabled={loading}
                         >
                             <ToggleButton value="false" sx={SXs.TOGGLE_BUTTON_STYLES}>Private</ToggleButton>
                             <ToggleButton value="true" sx={SXs.TOGGLE_BUTTON_STYLES}>Public</ToggleButton>

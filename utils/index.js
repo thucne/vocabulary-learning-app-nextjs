@@ -346,6 +346,7 @@ export const groupBy = function (xs, key) {
 };
 
 export const handleDictionaryData = (firstData, vocabTypes) => {
+  console.log(firstData);
   const allPronounces =
     firstData?.phonetics
       .filter((item) => item?.audio && item?.text)
