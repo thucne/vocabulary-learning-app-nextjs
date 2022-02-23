@@ -51,3 +51,9 @@ export const TOGGLE_BUTTON_STYLES = {
     textTransform: "none !important",
   },
 };
+
+export const AUTO_FILLED_TEXT_COLOR = {
+  background: `linear-gradient(to top right, #9b314d 0%, #ffd54f 100%)`,
+  WebkitBackgroundClip: "text",
+  WebkitTextFillColor: "transparent !important",
+};

@@ -346,6 +346,7 @@ export const groupBy = function (xs, key) {
 };
 
 export const handleDictionaryData = (firstData, vocabTypes) => {
+  console.log(firstData);
   const allPronounces =
     firstData?.phonetics
       .filter((item) => item?.audio && item?.text)
@@ -461,7 +462,7 @@ export const handleDictionaryData = (firstData, vocabTypes) => {
   return {
     pronounce: text || altPronounce,
     audio: audio,
-    clasifyVocab: allTypes,
+    clasifyVocab: [...new Set(allTypes)],
     examples: highPriorityExamples,
     engMeanings: highPriorityMeanings,
     synonyms: allSynonyms,

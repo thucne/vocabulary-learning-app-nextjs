@@ -17,11 +17,16 @@ import { useSelector } from 'react-redux';
 
 import ScrollPaper from '@katyperrycbt/react-mui-scroll-view';
 
+import { isEqual, differenceWith } from 'lodash';
+
 const WordListBlock = () => {
     const theme = useTheme();
     const [sizes, setSizes] = useState({ width: 0, height: 0 });
     const [words, setWords] = useState([]);
-    const wordList = useSelector(state => state.userData?.vips?.length > 0 ? state.userData.vips : []);
+    const wordList = useSelector(state => state.userData?.vips?.length > 0
+        ? state.userData.vips
+        : []
+    );
 
     const config = {
         mui: {
@@ -36,7 +41,7 @@ const WordListBlock = () => {
             // backgroundColor: theme.palette.scroll_button.main,
             ...SXs.MUI_NAV_ICON_BUTTON
         },
-        iconStyle:{
+        iconStyle: {
             fontSize: Fonts.FS_20,
         },
         getElementSizes: (data) => {
@@ -54,10 +59,17 @@ const WordListBlock = () => {
     }
 
     useEffect(() => {
-        if (JSON.stringify(wordList) !== JSON.stringify(words)) {
-            setWords(wordList);
-        }
-    }, [wordList, words]);
+        setWords(prev => {
+            if (differenceWith(prev, wordList, isEqual).length
+                || (isEqual(prev, []) && wordList.length > 0)) {
+                return wordList;
+            }
+            return prev;
+        });
+    }, [wordList]);
+
+    // sort by updatedAt
+    const memorizedWord = useMemo(() => words.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)), [words]);
 
     return (
         <Container maxWidth="lg" disableGutters>
@@ -69,13 +81,14 @@ const WordListBlock = () => {
                 </Grid>
                 <Grid item xs={12} sx={{ px: 2 }}>
                     <ScrollPaper {...config}>
-                        {words?.length > 0 && words.map((word, index) => (
-                            <EachChild
-                                key={`render-word-list-${index}`}
-                                word={word}
-                                width={sizes.width}
-                            />
-                        ))}
+                        {memorizedWord?.length > 0 && memorizedWord
+                            .map((word, index) => (
+                                <EachChild
+                                    key={`render-word-list-${index}`}
+                                    word={word}
+                                    width={sizes.width}
+                                />
+                            ))}
                     </ScrollPaper>
                 </Grid>
             </Grid>
