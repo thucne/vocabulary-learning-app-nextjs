@@ -82,7 +82,6 @@ const showTypes = {
 };
 
 const WordCard = ({ open, setOpen, vip }) => {
-  console.log("parent render");
   const windowSize = useWindowSize();
   const theme = useTheme();
 

@@ -21,11 +21,8 @@ const Welcome = (props) => {
   const [openReviseWordModal, setOpenReviseWordModal] = useState(false);
 
   const User = useSelector((state) => state.userData);
-  
-  useEffect(() => {
-      
-      console.log("Welcome.jsx", { User });
-  });
+
+
   return (
     <Container maxWidth="lg" disableGutters>
       <Grid container direction="row" mt={[0, 1, 2, 3]}>
