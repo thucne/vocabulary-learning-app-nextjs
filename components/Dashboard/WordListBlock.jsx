@@ -55,6 +55,9 @@ const WordListBlock = () => {
         containerStyle: {
             maxWidth: '100%',
         },
+        gridItemSize: {
+            xs: 6, sm: 4, md: 3, lg: 2
+        },
         React,
     }
 
@@ -79,7 +82,7 @@ const WordListBlock = () => {
                         Word List
                     </Typography>
                 </Grid>
-                <Grid item xs={12} sx={{ px: 2 }}>
+                <Grid item xs={12} sx={{ px: 2, position: 'relative' }}>
                     <ScrollPaper {...config}>
                         {memorizedWord?.length > 0 && memorizedWord
                             .map((word, index) => (
@@ -127,7 +130,7 @@ const EachChild = ({ word, width }) => {
                 <Typography
                     sx={{
                         fontWeight: Fonts.FW_500,
-                        fontSize: [Fonts.FS_25],
+                        fontSize: [Fonts.FS_18],
                         mt: 2
                     }}
                     className='overflowTypography'
@@ -141,7 +144,7 @@ const EachChild = ({ word, width }) => {
                 <Typography
                     sx={{
                         fontWeight: Fonts.FW_500,
-                        fontSize: [Fonts.FS_15],
+                        fontSize: [Fonts.FS_13],
                     }}
                     className='overflowTypography'
                 >

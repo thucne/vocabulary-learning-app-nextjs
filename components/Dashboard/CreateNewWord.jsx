@@ -339,7 +339,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
                         />
                     </Grid>
 
-                    <Grid item xs={6} pr={0.5}>
+                    <Grid item xs={4} pr={0.5}>
                         <FormControl fullWidth margin="dense" required>
                             <InputLabel id="demo-multiple-chip-label">Type</InputLabel>
                             <Select
@@ -363,7 +363,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
                     </Grid>
 
                     {form.type === "vocab" && (
-                        <Grid item xs={6} pl={0.5}>
+                        <Grid item xs={8} pl={0.5}>
                             <FormControl fullWidth margin="dense" size="small" required>
                                 <InputLabel id="demo-multiple-chip-label"
                                     sx={form.auto ? {

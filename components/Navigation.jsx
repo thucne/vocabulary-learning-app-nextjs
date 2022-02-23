@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useContext, useMemo, useLayoutEffect } from 'react';
 import Router from 'next/router';
 import Image from 'next/image';
+import Link from 'next/link';
 
 import { styled } from '@mui/system';
 import { useTheme } from "@mui/material/styles";
@@ -21,6 +22,7 @@ import MailIcon from '@mui/icons-material/Mail';
 import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
+import MuiLink from '@mui/material/Link';
 
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
@@ -29,6 +31,12 @@ import LoginIcon from '@mui/icons-material/Login';
 
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
+
+import SettingsIcon from '@mui/icons-material/Settings';
+import ViewListIcon from '@mui/icons-material/ViewList';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import PhotoLibraryIcon from '@mui/icons-material/PhotoLibrary';
+import DashboardIcon from '@mui/icons-material/Dashboard';
 
 import { Container, Grid, Stack, Avatar, Button } from '@mui/material';
 
@@ -151,14 +159,56 @@ function ResponsiveDrawer(props) {
             {/* </Toolbar> */}
             <Divider />
             <List>
-                {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-                    <ListItem button key={text}>
-                        <ListItemIcon>
-                            {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                        </ListItemIcon>
-                        <ListItemText primary={text} />
-                    </ListItem>
-                ))}
+                <Link href='/dashboard' passHref>
+                    <MuiLink underline='none' sx={{ width: '100%', color: theme => theme.palette.footer_title.main }}>
+                        <ListItem button sx={{ width: '100%', py: 1.5 }}>
+                            <Stack direction='row' alignItems='center' spacing={4}>
+                                <DashboardIcon sx={{ color: 'inherit !important', display: 'flex' }} />
+                                <Typography>Dashboard</Typography>
+                            </Stack>
+                        </ListItem>
+                    </MuiLink>
+                </Link>
+                <Link href='/my-word-list' passHref>
+                    <MuiLink underline='none' sx={{ width: '100%', color: theme => theme.palette.footer_title.main }}>
+                        <ListItem button sx={{ width: '100%', py: 1.5 }}>
+                            <Stack direction='row' alignItems='center' spacing={4}>
+                                <ViewListIcon sx={{ color: 'inherit !important', display: 'flex' }} />
+                                <Typography>Word List</Typography>
+                            </Stack>
+                        </ListItem>
+                    </MuiLink>
+                </Link>
+                <Link href='/my-settings' passHref >
+                    <MuiLink underline='none' sx={{ width: '100%', color: theme => theme.palette.footer_title.main }}>
+                        <ListItem button sx={{ width: '100%', py: 1.5 }}>
+                            <Stack direction='row' alignItems='center' spacing={4}>
+                                <SettingsIcon sx={{ color: 'inherit !important', display: 'flex' }} />
+                                <Typography>Settings</Typography>
+                            </Stack>
+                        </ListItem>
+                    </MuiLink>
+                </Link>
+                <Link href='/my-account' passHref>
+                    <MuiLink underline='none' sx={{ width: '100%', color: theme => theme.palette.footer_title.main }}>
+                        <ListItem button sx={{ width: '100%', py: 1.5 }}>
+                            <Stack direction='row' alignItems='center' spacing={4}>
+                                <ManageAccountsIcon sx={{ color: 'inherit !important', display: 'flex' }} />
+                                <Typography>Account</Typography>
+                            </Stack>
+                        </ListItem>
+                    </MuiLink>
+                </Link>
+                <Link href='/my-library' passHref>
+                    <MuiLink underline='none' sx={{ width: '100%', color: theme => theme.palette.footer_title.main }}>
+                        <ListItem button sx={{ width: '100%', py: 1.5 }}>
+                            <Stack direction='row' alignItems='center' spacing={4}>
+                                <PhotoLibraryIcon sx={{ color: 'inherit !important', display: 'flex' }} />
+                                <Typography>Library</Typography>
+                            </Stack>
+                        </ListItem>
+                    </MuiLink>
+                </Link>
             </List>
         </div>
     );
