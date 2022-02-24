@@ -6,6 +6,7 @@ import backdrop from "./backdrop";
 import tabName from "./tabName";
 import bgColor from "./bgColor";
 import userData from "./userData";
+import recaptcha from "./recaptcha";
 
 const rootReducer = combineReducers({
   user,
@@ -14,7 +15,8 @@ const rootReducer = combineReducers({
   backdrop,
   tabName,
   bgColor,
-  userData
+  userData,
+  recaptcha
 });
 
 export default rootReducer;

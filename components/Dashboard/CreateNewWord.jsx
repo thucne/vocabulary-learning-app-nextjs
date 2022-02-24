@@ -19,7 +19,7 @@ import {
 import { LoadingButton } from "@mui/lab";
 import { useTheme } from '@mui/material/styles';
 
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import Uploader from '@components/Upload';
 import LoadingImage from '@components/LoadingImage';
@@ -33,7 +33,7 @@ import {
     getJWT, groupBy, handleDictionaryData
 } from '@utils';
 import { Fonts, SXs } from "@styles";
-import { API } from '@config';
+import { API, RECAPTCHA } from '@config';
 
 import useSWR from 'swr';
 import { debounce } from "lodash";
@@ -96,6 +96,8 @@ export default function CreateNewWord({ open = false, setOpen }) {
     const [shouldFetchPronouce, setShouldFetchPronouce] = useState(false);
 
     const [fetchingAPI, setFetchingAPI] = useState(false);
+
+    const recaptcha = useSelector(state => state.recaptcha);
 
     const resetWhole = () => {
         setTemptInput(initTempInputs);
@@ -173,7 +175,6 @@ export default function CreateNewWord({ open = false, setOpen }) {
             audio: form.audio,
         }
 
-        formData.append("data", JSON.stringify(data));
         formData.append("files.illustration", photo?.get('illustration'));
 
         let temp = {};
@@ -181,16 +182,23 @@ export default function CreateNewWord({ open = false, setOpen }) {
             temp[pair[0]] = pair[1];
         }
 
-        if (window?.adHocFetch) {
-            adHocFetch({
-                dispatch,
-                action: createVIP(formData),
-                onSuccess: (data) => resetWhole(),
-                onError: (error) => console.log(error),
-                onStarting: () => setLoading(true),
-                onFinally: () => setLoading(false),
-                snackbarMessageOnSuccess: "Added!"
-            })
+        if (window?.adHocFetch && recaptcha === true && window.grecaptcha) {
+            grecaptcha.ready(function () {
+                grecaptcha.execute(`${RECAPTCHA}`, { action: 'vip_authentication' }).then(function (token) {
+                    // Add your logic to submit to your backend server here.
+                    formData.append("data", JSON.stringify({...data, token}));
+
+                    adHocFetch({
+                        dispatch,
+                        action: createVIP(formData),
+                        onSuccess: (data) => resetWhole(),
+                        onError: (error) => console.log(error),
+                        onStarting: () => setLoading(true),
+                        onFinally: () => setLoading(false),
+                        snackbarMessageOnSuccess: "Added!"
+                    });
+                });
+            });
         }
     };
 

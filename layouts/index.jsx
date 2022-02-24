@@ -3,13 +3,14 @@ import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
+import Script from 'next/script';
 
 import { Container, Snackbar, Slide, Alert as MuiAlert, Backdrop, LinearProgress, Typography } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
 import { styled } from '@mui/system';
 
 import * as t from '@consts';
-import { FB } from 'config';
+import { RECAPTCHA } from '@config';
 
 import Meta from "@components/Meta";
 import Navigation from '@components/Navigation';
@@ -37,12 +38,19 @@ const Layout = ({ children, login = false, landing = false }) => {
     const snackbar = useSelector(state => state.snackbar);
     const linear = useSelector(state => state.linear);
     const backdrop = useSelector(state => state.backdrop);
+    const recaptcha = useSelector(state => state.recaptcha);
 
     useEffect(() => {
         if (router?.query?.message) {
             setOpenMessage(true);
         }
     }, [router]);
+
+    useEffect(() => {
+        if (!recaptcha) {
+            dispatch({ type: t.RELOAD_RECAPTCHA });
+        }
+    },[recaptcha, dispatch]);
 
     const handleClose = async (event, reason) => {
         if (reason === 'clickaway') {
@@ -64,6 +72,11 @@ const Layout = ({ children, login = false, landing = false }) => {
         pointerEvents: backdrop?.show ? 'none' : 'auto',
     }}>
         <Meta />
+        <Script
+            id='recaptcha-v3'
+            src={`https://www.google.com/recaptcha/api.js?render=${RECAPTCHA}`}
+            onLoad={() => dispatch({ type: t.DONE_RECAPTCHA })}
+        />
         <Backdrop
             sx={{
                 zIndex: (theme) => theme.zIndex.drawer + 1,

@@ -26,3 +26,8 @@ export const IMAGE_ALT =
 
 export const VIP_TYPES = ["vocab", "idiom", "phrase"];
 export const VOCAB_TYPES = ["noun", "verb", "adverb", "adjective", "other"];
+
+export const NO_RECAPTCHA = 'NO_RECAPTCHA';
+export const DONE_RECAPTCHA = 'DONE_RECAPTCHA';
+export const RELOAD_RECAPTCHA = 'RELOAD_RECAPTCHA';
+
