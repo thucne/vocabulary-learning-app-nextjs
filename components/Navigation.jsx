@@ -159,7 +159,7 @@ function ResponsiveDrawer(props) {
             <Divider />
             <List>
                 <Link href='/dashboard' passHref>
-                    <MuiLink underline='none' sx={{ width: '100%', color: theme => theme.palette.footer_title.main }}>
+                    <MuiLink underline='none' sx={{ width: '100%', color: theme => theme.palette.drawer.main }}>
                         <ListItem button sx={{ width: '100%', py: 1.5 }}>
                             <Stack direction='row' alignItems='center' spacing={4}>
                                 <DashboardIcon sx={{ color: 'inherit !important', display: 'flex' }} />
@@ -169,7 +169,7 @@ function ResponsiveDrawer(props) {
                     </MuiLink>
                 </Link>
                 <Link href='/my-word-list' passHref>
-                    <MuiLink underline='none' sx={{ width: '100%', color: theme => theme.palette.footer_title.main }}>
+                    <MuiLink underline='none' sx={{ width: '100%', color: theme => theme.palette.drawer.main }}>
                         <ListItem button sx={{ width: '100%', py: 1.5 }}>
                             <Stack direction='row' alignItems='center' spacing={4}>
                                 <ViewListIcon sx={{ color: 'inherit !important', display: 'flex' }} />
@@ -179,7 +179,7 @@ function ResponsiveDrawer(props) {
                     </MuiLink>
                 </Link>
                 <Link href='/my-settings' passHref >
-                    <MuiLink underline='none' sx={{ width: '100%', color: theme => theme.palette.footer_title.main }}>
+                    <MuiLink underline='none' sx={{ width: '100%', color: theme => theme.palette.drawer.main }}>
                         <ListItem button sx={{ width: '100%', py: 1.5 }}>
                             <Stack direction='row' alignItems='center' spacing={4}>
                                 <SettingsIcon sx={{ color: 'inherit !important', display: 'flex' }} />
@@ -189,7 +189,7 @@ function ResponsiveDrawer(props) {
                     </MuiLink>
                 </Link>
                 <Link href='/my-account' passHref>
-                    <MuiLink underline='none' sx={{ width: '100%', color: theme => theme.palette.footer_title.main }}>
+                    <MuiLink underline='none' sx={{ width: '100%', color: theme => theme.palette.drawer.main }}>
                         <ListItem button sx={{ width: '100%', py: 1.5 }}>
                             <Stack direction='row' alignItems='center' spacing={4}>
                                 <ManageAccountsIcon sx={{ color: 'inherit !important', display: 'flex' }} />
@@ -199,7 +199,7 @@ function ResponsiveDrawer(props) {
                     </MuiLink>
                 </Link>
                 <Link href='/my-library' passHref>
-                    <MuiLink underline='none' sx={{ width: '100%', color: theme => theme.palette.footer_title.main }}>
+                    <MuiLink underline='none' sx={{ width: '100%', color: theme => theme.palette.drawer.main }}>
                         <ListItem button sx={{ width: '100%', py: 1.5 }}>
                             <Stack direction='row' alignItems='center' spacing={4}>
                                 <PhotoLibraryIcon sx={{ color: 'inherit !important', display: 'flex' }} />
