@@ -44,20 +44,26 @@ const Footer = ({ bottom, landing }) => {
         >
             <Grid item xs={14} lg={3} mb={[1, 0, 0, 0]}>
                 <Grid container alignItems='center'>
-                    <Grid item xs={5} lg={12} sx={{ width: '100%', height: 200 }}>
-                        <div 
-                        style={{ width: '100%', height: '100%', position: 'relative', cursor: 'pointer' }}
-                        onClick={() => router.push('/')}
-                        >
-                            <Image
-                                src='/logo.full.svg'
-                                alt='logo'
-                                layout='fill'
-                                objectFit='contain'
-                                priority={true}
-                                draggable={false}
-                            />
-                        </div>
+                    <Grid item xs={5} lg={12} sx={{
+                        width: '100%', height: 200,
+                        ':hover': {
+                            filter: 'brightness(0.5)',
+                        }
+                    }}>
+                        <Link href="/" passHref>
+                            <MuiLink>
+                                <div style={{ width: '100%', height: '100%', position: 'relative', cursor: 'pointer', }}>
+                                    <Image
+                                        src='/logo.full.svg'
+                                        alt='logo'
+                                        layout='fill'
+                                        objectFit='contain'
+                                        priority={true}
+                                        draggable={false}
+                                    />
+                                </div>
+                            </MuiLink>
+                        </Link>
                     </Grid>
                     <Grid item xs={7} lg={12} >
                         <Typography variant='caption' sx={{ lineHeight: '50%', fontWeight: Fonts.FW_300 }} color='footer_title.main'>
