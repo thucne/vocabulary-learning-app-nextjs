@@ -469,3 +469,23 @@ export const handleDictionaryData = (firstData, vocabTypes) => {
     tags: allTags,
   };
 };
+
+export const toggleSettings = (value, selectionValue, current, setCurrent) => {
+  const currentIndex = current.findIndex((item) => item?.includes(value));
+  const newChecked = [...current];
+
+  if (currentIndex === -1) {
+    newChecked.push(`${value}${selectionValue ? `/${selectionValue}` : ""}`);
+  } else {
+    if (!selectionValue) {
+      newChecked.splice(currentIndex, 1);
+    } else {
+      newChecked[currentIndex] = `${value}/${selectionValue}`;
+    }
+  }
+  setCurrent(newChecked);
+
+  if (window) {
+    localStorage.setItem("vip-settings", JSON.stringify(newChecked));
+  }
+};

@@ -30,6 +30,9 @@ const MyTheme = (mode) => ({
     main: mode === "light" ? "#fff" : "rgba(131, 119, 125, 0.8)",
     contrastText: mode === "light" ? "#000" : "#fff",
   },
+  paper_grey: {
+    main: mode === "light" ? "#fff" : Colors.PAPER_GREY_DARK,
+  }
 });
 
 export default MyTheme;

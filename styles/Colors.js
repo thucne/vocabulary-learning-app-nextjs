@@ -149,6 +149,9 @@ export const GREY_600 = '#757575';
 export const GREY_700 = '#616161';
 export const GREY_800 = '#424242';
 
+export const PAPER_GREY_DARK = "#263238";
+export const PAPER_GREY_DARK_LIGHTER = "#455a64";
+
 // backgrounds
 export const BG_MAIN = "#1976d2";
 export const BG_MAIN_DARK = "#2a3eb1";
