@@ -81,10 +81,9 @@ const showTypes = {
   HIDE: "HIDE",
 };
 
-const WordCard = ({ open, setOpen, vip }) => {
+const WordCard = ({ open, setOpen, word }) => {
   const windowSize = useWindowSize();
   const theme = useTheme();
-
   const audioRef = useRef(null);
 
   const handleClose = () => {
@@ -103,6 +102,7 @@ const WordCard = ({ open, setOpen, vip }) => {
     console.log("OK");
   };
 
+  if (!word) return <div></div>;
   return (
     <div>
       <Dialog
@@ -124,7 +124,7 @@ const WordCard = ({ open, setOpen, vip }) => {
               <Image
                 width={200}
                 height={200}
-                src={dummyImage}
+                src={word?.illustration ?? dummyImage}
                 alt="something"
               />
               <Box sx={style.flexCenter}>
@@ -138,7 +138,7 @@ const WordCard = ({ open, setOpen, vip }) => {
                     mx: 3,
                   }}
                 >
-                  Lucky
+                  {word.vip}
                 </Typography>
                 <IconButton onClick={handleFowardbutton}>
                   <ArrowForwardIosIcon sx={{ fontSize: Fonts.FS_16 }} />
@@ -146,36 +146,36 @@ const WordCard = ({ open, setOpen, vip }) => {
               </Box>
 
               <Typography sx={{ color: Colors.GRAY_5 }}>
-                {dummyVip.pronounce}
+                {word.pronounce}
               </Typography>
 
               {/* Audio  Section*/}
-              <IconButton onClick={() => audioRef.current.play()}>
+              <IconButton
+                  disabled={!word.audio}
+                onClick={() => audioRef.current.play()}
+              >
                 <PlayCircleFilledWhiteIcon sx={{ fontSize: Fonts.FS_16 }} />
               </IconButton>
               <audio ref={audioRef}>
-                <source
-                  src="https://api.dictionaryapi.dev/media/pronunciations/en/caution-us.mp3"
-                  type="audio/mpeg"
-                />
+                <source src={word.audio} type="audio/mpeg" />
               </audio>
             </Box>
 
-                  {/* Meaningis & example section */}
+            {/* Meaningis & example section */}
             <Box>
               <DynamicListContent
-                {...listContentProps(dummyVip, showTypes.ONLY_ONE).example}
+                {...listContentProps(word, showTypes.ONLY_ONE).example}
               />
               <DynamicListContent
-                {...listContentProps(dummyVip, showTypes.HIDE).english}
+                {...listContentProps(word, showTypes.HIDE).english}
               />
 
               <DynamicListContent
-                {...listContentProps(dummyVip, showTypes.HIDE).vietnamese}
+                {...listContentProps(word, showTypes.HIDE).vietnamese}
               />
             </Box>
 
-                  {/* Rating section */}
+            {/* Rating section */}
             <Box sx={{ textAlign: "center", mt: 3 }}>
               <Typography sx={style.text}>Rate this word</Typography>
               <Box>
@@ -242,7 +242,7 @@ const DynamicListContent = ({ title, content, defaultShowType }) => {
         return <div></div>;
     }
   };
-
+  if (!content.length) return <div></div>;
   return (
     <React.Fragment>
       <Box sx={{ display: "flex", alignItems: "center" }}>

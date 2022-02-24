@@ -489,3 +489,15 @@ export const toggleSettings = (value, selectionValue, current, setCurrent) => {
     localStorage.setItem("vip-settings", JSON.stringify(newChecked));
   }
 };
+
+
+export const getLastReviewWord =(words) => {
+    if (!words.length) 
+        return null;
+    
+    let orderedWords = words.filter(word => word.lastReview && !word.lastReviewOK).sort((a, b) => {
+        return new Date(a.lastReview) - new Date(b.lastReview);
+    })
+    
+    return orderedWords[0]
+}

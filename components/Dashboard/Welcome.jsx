@@ -15,13 +15,20 @@ import AddIcon from "@mui/icons-material/Add";
 import CreateNewWord from "./CreateNewWord";
 import { useSelector } from "react-redux";
 import WordCard from "./WordCard";
+import { getLastReviewWord } from "@utils";
 
 const Welcome = (props) => {
   const [openNewWordForm, setOpenNewWordForm] = useState(false);
   const [openReviseWordModal, setOpenReviseWordModal] = useState(false);
 
   const User = useSelector((state) => state.userData);
+  const [lastReviewWord,setLastReviewWord] = useState(null);
 
+  useEffect(()=>{
+      if(User?.vips){
+        setLastReviewWord(getLastReviewWord([...User.vips]))
+      }
+  },[User])
 
   return (
     <Container maxWidth="lg" disableGutters>
@@ -52,7 +59,9 @@ const Welcome = (props) => {
               sx={{ fontSize: Fonts.FS_15, p: "8px 0px 0px" }}
             >
               It look like you haven&#96;t been revised your words today.{" "}
-              <Button onClick={() => setOpenReviseWordModal(true)}>
+              <Button 
+              disabled={!lastReviewWord}
+              onClick={() => setOpenReviseWordModal(true)}>
                 Let&#96;s check it out!
               </Button>
             </Typography>
@@ -87,7 +96,7 @@ const Welcome = (props) => {
         </Grid>
       </Grid>
       <CreateNewWord open={openNewWordForm} setOpen={setOpenNewWordForm} />
-      <WordCard open={openReviseWordModal} setOpen={setOpenReviseWordModal} />
+      <WordCard open={openReviseWordModal} setOpen={setOpenReviseWordModal} word={lastReviewWord} />
     </Container>
   );
 };
