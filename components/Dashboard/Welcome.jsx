@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 import {
   Container,
@@ -8,27 +9,27 @@ import {
   IconButton,
   Button,
 } from "@mui/material";
-import { Colors, Fonts } from "@styles";
 import CachedIcon from "@mui/icons-material/Cached";
 import AddIcon from "@mui/icons-material/Add";
 
 import CreateNewWord from "./CreateNewWord";
-import { useSelector } from "react-redux";
 import WordCard from "./WordCard";
+
 import { getLastReviewWord } from "@utils";
+import { Colors, Fonts } from "@styles";
 
 const Welcome = (props) => {
   const [openNewWordForm, setOpenNewWordForm] = useState(false);
   const [openReviseWordModal, setOpenReviseWordModal] = useState(false);
 
   const User = useSelector((state) => state.userData);
-  const [lastReviewWord,setLastReviewWord] = useState(null);
+  const [reviewList, setReviewList] = useState(null);
 
-  useEffect(()=>{
-      if(User?.vips){
-        setLastReviewWord(getLastReviewWord([...User.vips]))
-      }
-  },[User])
+  useEffect(() => {
+    if (User?.vips) {
+      setReviewList(getLastReviewWord([...User.vips]));
+    }
+  }, [User]);
 
   return (
     <Container maxWidth="lg" disableGutters>
@@ -58,10 +59,11 @@ const Welcome = (props) => {
               component="p"
               sx={{ fontSize: Fonts.FS_15, p: "8px 0px 0px" }}
             >
-              It look like you haven&#96;t been revised your words today.{" "}
-              <Button 
-              disabled={!lastReviewWord}
-              onClick={() => setOpenReviseWordModal(true)}>
+              It look like you haven&#96;t been revised your words today.
+              <Button
+                disabled={!reviewList?.length}
+                onClick={() => setOpenReviseWordModal(true)}
+              >
                 Let&#96;s check it out!
               </Button>
             </Typography>
@@ -96,7 +98,13 @@ const Welcome = (props) => {
         </Grid>
       </Grid>
       <CreateNewWord open={openNewWordForm} setOpen={setOpenNewWordForm} />
-      <WordCard open={openReviseWordModal} setOpen={setOpenReviseWordModal} word={lastReviewWord} />
+      {reviewList?.length && (
+        <WordCard
+          open={openReviseWordModal}
+          setOpen={setOpenReviseWordModal}
+          wordList={reviewList}
+        />
+      )}
     </Container>
   );
 };
