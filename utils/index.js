@@ -207,7 +207,7 @@ const useIsomorphicLayoutEffect =
 
 export function useThisToGetSizesFromRef(elRef, options = {}) {
   const [sizes, setSizes] = useState({ width: 0, height: 0 });
-  const { revalidate, timeout, falseCondition } = options;
+  const { revalidate, timeout, falseCondition, terminalCondition } = options;
 
   useIsomorphicLayoutEffect(() => {
     function updateSize() {
@@ -223,16 +223,20 @@ export function useThisToGetSizesFromRef(elRef, options = {}) {
 
     if (revalidate && typeof revalidate === "number") {
       loop = setInterval(() => {
-        if (
-          falseCondition &&
-          falseCondition({
-            width: elRef?.current?.clientWidth || 0,
-            height: elRef?.current?.clientHeight || 0,
-          })
-        ) {
-          clearInterval(loop);
+        const temp = {
+          width: elRef?.current?.clientWidth || 0,
+          height: elRef?.current?.clientHeight || 0,
+        };
+        
+        if (falseCondition && falseCondition(temp)) {
+          return;
         }
         updateSize();
+
+        if (terminalCondition && terminalCondition(temp)) {
+          clearInterval(loop);
+        }
+
       }, [revalidate]);
       if (timeout) {
         setTimeout(() => clearInterval(loop), timeout);
@@ -263,7 +267,7 @@ export function useThisToGetPositionFromRef(elRef, options = {}) {
     x: 0,
     y: 0,
   });
-  const { revalidate, timeout, falseCondition } = options;
+  const { revalidate, timeout, falseCondition, terminalCondition } = options;
   const [oldWidth, setOldWidth] = useState(0);
 
   useIsomorphicLayoutEffect(() => {
@@ -283,13 +287,18 @@ export function useThisToGetPositionFromRef(elRef, options = {}) {
 
     if (revalidate && typeof revalidate === "number") {
       loop = setInterval(() => {
-        if (
-          falseCondition &&
-          falseCondition(elRef?.current?.getBoundingClientRect() || {})
-        ) {
+        const temp = elRef?.current?.getBoundingClientRect() || {};
+
+        if (falseCondition && falseCondition(temp)) {
+          return;
+        }
+
+        updatePosition(true);
+        
+        if (terminalCondition && terminalCondition(temp)) {
           clearInterval(loop);
         }
-        updatePosition(true);
+
       }, [revalidate]);
       if (timeout) {
         setTimeout(() => clearInterval(loop), timeout);
@@ -509,4 +518,11 @@ export const getLastReviewWord = (words) => {
     });
 
   return orderedWords[0];
+};
+
+export const useSettings = () => {
+  if (window) {
+    const settings = localStorage.getItem("vip-settings");
+    return JSON.parse(settings);
+  }
 };

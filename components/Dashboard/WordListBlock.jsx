@@ -65,8 +65,7 @@ const WordListBlock = () => {
 
     useEffect(() => {
         setWords(prev => {
-            if (differenceWith(prev, wordList, isEqual).length
-                || (isEqual(prev, []) && wordList.length > 0)) {
+            if (!isEqual(prev, wordList)) {
                 return wordList;
             }
             return prev;
