@@ -537,6 +537,16 @@
   resolved "https://registry.yarnpkg.com/@rushstack/eslint-patch/-/eslint-patch-1.1.0.tgz#7f698254aadf921e48dda8c0a6b304026b8a9323"
   integrity sha512-JLo+Y592QzIE+q7Dl2pMUtt4q8SKYI5jDrZxrozEQxnGVOyYE+GWK9eLkwTaeN9DDctlaRAQ3TBmzZ1qdLE30A==
 
+"@tallis/react-mui-scroll-view@^0.0.5":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@tallis/react-mui-scroll-view/-/react-mui-scroll-view-0.0.5.tgz#2f10fa701e1e4963813e50cdaf2202e53cf25a90"
+  integrity sha512-yuIdMXkDIJ1UZmRekV6Y5PRLgkn5W6EgQahbQkzYW5Yn8nVuh/bYNeQSR/m4caT7H5SmaPJK7Hb9huS15o+etA==
+  dependencies:
+    "@babel/preset-react" "^7.16.7"
+    core-js "^3.21.1"
+    lodash "^4.17.21"
+    web-vitals "^2.1.4"
+
 "@types/hoist-non-react-statics@^3.3.0":
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/@types/hoist-non-react-statics/-/hoist-non-react-statics-3.3.1.tgz#1124aafe5118cb591977aeb1ceaaed1070eb039f"

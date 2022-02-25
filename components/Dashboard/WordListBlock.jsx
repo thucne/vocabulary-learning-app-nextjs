@@ -15,7 +15,8 @@ import { IMAGE_ALT } from '@consts';
 import LoadingImage from '@components/LoadingImage';
 import { useSelector } from 'react-redux';
 
-import ScrollPaper from '@katyperrycbt/react-mui-scroll-view';
+import ScrollPaper from '@tallis/react-mui-scroll-view';
+// import ScrollPaper from './ScrollPaper';
 
 import { isEqual, differenceWith } from 'lodash';
 
@@ -58,6 +59,7 @@ const WordListBlock = () => {
         gridItemSize: {
             xs: 6, sm: 4, md: 3, lg: 2
         },
+        showScrollbar: true,
         React,
     }
 
@@ -76,13 +78,13 @@ const WordListBlock = () => {
 
     return (
         <Container maxWidth="lg" disableGutters>
-            <Grid container direction="row" mt={[0, 1, 2, 3]} sx={{ position: 'relative' }}>
+            <Grid container direction="row" mt={[0, 1, 2, 3]}>
                 <Grid item xs={12}>
                     <Typography variant="h5" component="h2" gutterBottom sx={{ fontWeight: Fonts.FW_500 }}>
                         Word List
                     </Typography>
                 </Grid>
-                <Grid item xs={12} sx={{ px: 2, position: 'relative' }}>
+                <Grid item xs={12} sx={{ px: 2 }}>
                     <ScrollPaper {...config}>
                         {memorizedWord?.length > 0 && memorizedWord
                             .map((word, index) => (

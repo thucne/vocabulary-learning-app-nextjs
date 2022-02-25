@@ -141,6 +141,11 @@ const Footer = ({ bottom, landing }) => {
                             </Grid>
                         </Grid>
                     </Grid>
+                    <Grid item xs={12} mt={2}>
+                        This site is protected by reCAPTCHA and the Google{' '}
+                        <MuiLink href="https://policies.google.com/privacy" underline='hover'>Privacy Policy</MuiLink> and{' '}
+                        <MuiLink href="https://policies.google.com/terms" underline='hover'>Terms of Service</MuiLink> apply.
+                    </Grid>
                 </Grid>
             </Grid>
         </Grid>

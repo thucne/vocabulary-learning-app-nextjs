@@ -224,6 +224,7 @@ export function useThisToGetSizesFromRef(elRef, options = {}) {
     if (revalidate && typeof revalidate === "number") {
       loop = setInterval(() => {
         if (
+          falseCondition &&
           falseCondition({
             width: elRef?.current?.clientWidth || 0,
             height: elRef?.current?.clientHeight || 0,
@@ -262,7 +263,7 @@ export function useThisToGetPositionFromRef(elRef, options = {}) {
     x: 0,
     y: 0,
   });
-  const { revalidate, timeout } = options;
+  const { revalidate, timeout, falseCondition } = options;
   const [oldWidth, setOldWidth] = useState(0);
 
   useIsomorphicLayoutEffect(() => {
@@ -281,7 +282,15 @@ export function useThisToGetPositionFromRef(elRef, options = {}) {
     let loop;
 
     if (revalidate && typeof revalidate === "number") {
-      loop = setInterval(() => updatePosition(true), [revalidate]);
+      loop = setInterval(() => {
+        if (
+          falseCondition &&
+          falseCondition(elRef?.current?.getBoundingClientRect() || {})
+        ) {
+          clearInterval(loop);
+        }
+        updatePosition(true);
+      }, [revalidate]);
       if (timeout) {
         setTimeout(() => clearInterval(loop), timeout);
       }
@@ -490,14 +499,14 @@ export const toggleSettings = (value, selectionValue, current, setCurrent) => {
   }
 };
 
+export const getLastReviewWord = (words) => {
+  if (!words.length) return null;
 
-export const getLastReviewWord =(words) => {
-    if (!words.length) 
-        return null;
-    
-    let orderedWords = words.filter(word => word.lastReview && !word.lastReviewOK).sort((a, b) => {
-        return new Date(a.lastReview) - new Date(b.lastReview);
-    })
-    
-    return orderedWords[0]
-}
+  let orderedWords = words
+    .filter((word) => word.lastReview && !word.lastReviewOK)
+    .sort((a, b) => {
+      return new Date(a.lastReview) - new Date(b.lastReview);
+    });
+
+  return orderedWords[0];
+};

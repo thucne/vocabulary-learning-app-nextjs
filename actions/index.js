@@ -16,6 +16,7 @@ export const login = (data) => async (dispatch) => {
       .post(`${API}/api/auth/local`, {
         identifier: data.identifier,
         password: data.password,
+        token: data.token,
       })
       .then((res) => handleCommonResponse(res))
       .catch((err) => handleServerError(err));
@@ -31,6 +32,7 @@ export const signup = (data) => async (dispatch) => {
       email: data.email,
       password: data.password,
       username: data.username,
+      token: data.token,
     })
     .then((res) => handleCommonResponse(res))
     .catch((err) => handleServerError(err));
@@ -44,13 +46,14 @@ export const logout = async (next) => {
   next();
 };
 
-export const sendResetPasswordEmail = (email) => async (dispatch) => {
+export const sendResetPasswordEmail = (email, token) => async (dispatch) => {
   if (!email?.length) {
     return { error: "Please enter email" };
   } else {
     return await axios
       .post(`${API}/api/auth/forgot-password`, {
         email,
+        token
       })
       .then((res) => handleCommonResponse(res))
       .catch((err) => handleServerError(err));
@@ -66,6 +69,7 @@ export const resetPassword = (data) => async (dispatch) => {
         code: data.code,
         password: data.password,
         passwordConfirmation: data.passwordConfirmation,
+        token: data.token,
       })
       .then((res) => handleCommonResponse(res))
       .catch((err) => handleServerError(err));
