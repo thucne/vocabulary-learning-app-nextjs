@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Router from "next/router";
 
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import {
     Link as MuiLink, Box, FormControl, FormHelperText,
@@ -23,6 +23,7 @@ import { Colors, Fonts, SXs } from "@styles";
 import { LoadingButton } from "@mui/lab";
 import { signup } from "@actions";
 import { validateEmail, validatePassword } from '@utils';
+import { RECAPTCHA } from "@config";
 
 import LoadingImage from '@components/LoadingImage';
 
@@ -67,24 +68,28 @@ export default function Signup() {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        if (window?.adHocFetch) {
-
-            adHocFetch({
-                dispatch,
-                action: signup({
-                    name: name.trim(),
-                    password: password.trim(),
-                    username: username.trim(),
-                    email: email.trim()
-                }),
-                onSuccess: () => setSignUpSuccessfully(true),
-                onStarting: () => setLoading(true),
-                onFinally: () => setLoading(false),
-                onError: err => console.log(err),
-                snackbarMessageOnSuccess: "Successfully signed up, please confirm your email.",
+        if (window?.adHocFetch && recaptcha === true && window?.grecaptcha) {
+            grecaptcha.ready(function () {
+                grecaptcha.execute(`${RECAPTCHA}`, { action: 'vip_authentication' }).then(function (token) {
+                    // Add your logic to submit to your backend server here.
+                    adHocFetch({
+                        dispatch,
+                        action: signup({
+                            name: name.trim(),
+                            password: password.trim(),
+                            username: username.trim(),
+                            email: email.trim(),
+                            token
+                        }),
+                        onSuccess: () => setSignUpSuccessfully(true),
+                        onStarting: () => setLoading(true),
+                        onFinally: () => setLoading(false),
+                        onError: err => console.log(err),
+                        snackbarMessageOnSuccess: "Successfully signed up, please confirm your email.",
+                    });
+                });
             });
         }
-
     };
 
     const preventCopyPaste = (e) => {
@@ -499,6 +504,12 @@ export default function Signup() {
                                 </Grid>
 
                             </Box>
+
+                            <Typography variant='caption' sx={{ mt: 2 }}>
+                                This site is protected by reCAPTCHA and the Google{' '}
+                                <MuiLink href="https://policies.google.com/privacy" underline='hover'>Privacy Policy</MuiLink> and{' '}
+                                <MuiLink href="https://policies.google.com/terms" underline='hover'>Terms of Service</MuiLink> apply.
+                            </Typography>
                         </Paper>
                     </Box>
                 </Grid>

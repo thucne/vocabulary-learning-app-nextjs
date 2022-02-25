@@ -30,7 +30,8 @@ import { IMAGE_ALT, VIP_TYPES } from "@consts";
 import { fetcherJWT, createVIP } from "@actions";
 import {
     useWindowSize, useThisToGetSizesFromRef,
-    getJWT, groupBy, handleDictionaryData
+    getJWT, groupBy, handleDictionaryData,
+    useSettings
 } from '@utils';
 import { Fonts, SXs } from "@styles";
 import { API, RECAPTCHA } from '@config';
@@ -145,8 +146,9 @@ export default function CreateNewWord({ open = false, setOpen }) {
     const photoSizes = useThisToGetSizesFromRef(
         photoRef,
         {
-            revalidate: 250,
-            falseCondition: (data) => data.width !== 0
+            revalidate: 1000,
+            terminalCondition: ({ width }) => width !== 0,
+            falseCondition: ({ width }) => width === 0,
         }
     );
 
@@ -186,7 +188,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
             grecaptcha.ready(function () {
                 grecaptcha.execute(`${RECAPTCHA}`, { action: 'vip_authentication' }).then(function (token) {
                     // Add your logic to submit to your backend server here.
-                    formData.append("data", JSON.stringify({...data, token}));
+                    formData.append("data", JSON.stringify({ ...data, token }));
 
                     adHocFetch({
                         dispatch,
@@ -211,7 +213,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
         try {
             setFetchingAPI(true);
             const res = await fetch(
-                `https://api.dictionaryapi.dev/api/v2/entries/en/${value}`,
+                `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(value.toString().toLowerCase())}`,
             );
             const data = await res.json();
 
@@ -219,7 +221,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
 
             const firstData = data?.[0];
 
-            if (!data.message && firstData?.word === value) {
+            if (!data.message && firstData?.word === value.toString().toLowerCase()) {
                 const processedData = handleDictionaryData(firstData, vocabTypes);
                 setForm((form) => ({ ...form, ...processedData, auto: true }));
             } else {
@@ -536,12 +538,12 @@ export default function CreateNewWord({ open = false, setOpen }) {
                     width: 150,
                     height: 150,
                     transform: 'translate(-50%, -50%)',
-                    zIndex: 100,
-                    display: loading ? 'flex' : 'none',
+                    zIndex: loading ? 100 : -1,
+                    opacity: loading ? 1 : 0,
                 }}>
                     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
                         <LoadingImage
-                            src="https://res.cloudinary.com/katyperrycbt/image/upload/v1645255061/Spinner-1s-200px_3_m1pkiz.svg"
+                            src="https://res.cloudinary.com/katyperrycbt/image/upload/v1645240546/Dual_Ball-1s-200px_tbjrjw.svg"
                             alt="Illustration"
                             objectFit='contain'
                             priority={true}

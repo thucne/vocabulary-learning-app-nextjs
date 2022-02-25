@@ -206,6 +206,7 @@ const useIsomorphicLayoutEffect =
     typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 export function useThisToGetSizesFromRef(elRef, options = {}) {
+<<<<<<< HEAD
     const [sizes, setSizes] = useState({ width: 0, height: 0 });
     const { revalidate, timeout, falseCondition } = options;
 
@@ -237,6 +238,44 @@ export function useThisToGetSizesFromRef(elRef, options = {}) {
                 setTimeout(() => clearInterval(loop), timeout);
             }
         }
+=======
+  const [sizes, setSizes] = useState({ width: 0, height: 0 });
+  const { revalidate, timeout, falseCondition, terminalCondition } = options;
+
+  useIsomorphicLayoutEffect(() => {
+    function updateSize() {
+      setSizes({
+        width: elRef?.current?.clientWidth || 0,
+        height: elRef?.current?.clientHeight || 0,
+      });
+    }
+
+    window.addEventListener("resize", updateSize);
+
+    let loop;
+
+    if (revalidate && typeof revalidate === "number") {
+      loop = setInterval(() => {
+        const temp = {
+          width: elRef?.current?.clientWidth || 0,
+          height: elRef?.current?.clientHeight || 0,
+        };
+        
+        if (falseCondition && falseCondition(temp)) {
+          return;
+        }
+        updateSize();
+
+        if (terminalCondition && terminalCondition(temp)) {
+          clearInterval(loop);
+        }
+
+      }, [revalidate]);
+      if (timeout) {
+        setTimeout(() => clearInterval(loop), timeout);
+      }
+    }
+>>>>>>> main
 
         updateSize();
 
@@ -252,6 +291,7 @@ export function useThisToGetSizesFromRef(elRef, options = {}) {
 }
 
 export function useThisToGetPositionFromRef(elRef, options = {}) {
+<<<<<<< HEAD
     const [position, setPosition] = useState({
         top: 0,
         left: 0,
@@ -275,17 +315,64 @@ export function useThisToGetPositionFromRef(elRef, options = {}) {
                 setOldWidth(elRef?.current?.clientWidth);
             }
         }
+=======
+  const [position, setPosition] = useState({
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: 0,
+    height: 0,
+    x: 0,
+    y: 0,
+  });
+  const { revalidate, timeout, falseCondition, terminalCondition } = options;
+  const [oldWidth, setOldWidth] = useState(0);
+
+  useIsomorphicLayoutEffect(() => {
+    function updatePosition(bypass = false) {
+      const { top, left, right, bottom, width, height, x, y } =
+        elRef?.current?.getBoundingClientRect() || {};
+
+      if (bypass || elRef?.current?.clientWidth !== oldWidth) {
+        setPosition({ top, left, right, bottom, width, height, x, y });
+        setOldWidth(elRef?.current?.clientWidth);
+      }
+    }
+>>>>>>> main
 
         window.addEventListener("resize", updatePosition);
 
         let loop;
 
+<<<<<<< HEAD
         if (revalidate && typeof revalidate === "number") {
             loop = setInterval(() => updatePosition(true), [revalidate]);
             if (timeout) {
                 setTimeout(() => clearInterval(loop), timeout);
             }
         }
+=======
+    if (revalidate && typeof revalidate === "number") {
+      loop = setInterval(() => {
+        const temp = elRef?.current?.getBoundingClientRect() || {};
+
+        if (falseCondition && falseCondition(temp)) {
+          return;
+        }
+
+        updatePosition(true);
+        
+        if (terminalCondition && terminalCondition(temp)) {
+          clearInterval(loop);
+        }
+
+      }, [revalidate]);
+      if (timeout) {
+        setTimeout(() => clearInterval(loop), timeout);
+      }
+    }
+>>>>>>> main
 
         return () => {
             window && window.removeEventListener("resize", updatePosition);
@@ -490,7 +577,10 @@ export const toggleSettings = (value, selectionValue, current, setCurrent) => {
     }
 };
 
+export const getLastReviewWord = (words) => {
+  if (!words.length) return null;
 
+<<<<<<< HEAD
 export const getLastReviewWord = (words) => {
     if (!words.length)
         return null;
@@ -503,3 +593,20 @@ export const getLastReviewWord = (words) => {
 
     return orderedWords
 }
+=======
+  let orderedWords = words
+    .filter((word) => word.lastReview && !word.lastReviewOK)
+    .sort((a, b) => {
+      return new Date(a.lastReview) - new Date(b.lastReview);
+    });
+
+  return orderedWords[0];
+};
+
+export const useSettings = () => {
+  if (window) {
+    const settings = localStorage.getItem("vip-settings");
+    return JSON.parse(settings);
+  }
+};
+>>>>>>> main

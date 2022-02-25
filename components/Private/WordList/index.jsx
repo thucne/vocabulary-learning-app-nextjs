@@ -213,7 +213,8 @@ const PractiseInputNumber = ({ Icon, name, title, subtitle, handleChange, isExis
                 secondary={subtitle}
             />
             <TextField
-                sx={{ width: '90px' }}
+                sx={{ maxWidth: '90px' }}
+                fullWidth
                 size="small"
                 id={`outlined-number-${name}`}
                 label="Max"
@@ -244,7 +245,7 @@ const ListHeadings = ({ title, subtitle }) => [
 const AutoFillLevel = ({ handleChange, name, values, title, isExist, Icon, noGutter, label, defaultValue, subtitle }) => (
     <Collapse in={isExist('auto-fill')[0] ? isExist('auto-fill')[1] === 'true' : true} timeout="auto" unmountOnExit>
         <ListItem>
-            <ListItemIcon sx={{ ml: noGutter ? 0 : 2 }}>
+            <ListItemIcon sx={{ pl: noGutter ? 0 : 2 }}>
                 {Icon ? <Icon /> : <SubdirectoryArrowRightIcon />}
             </ListItemIcon>
             <Grid container direction='row' alignItems='center'>
@@ -254,14 +255,13 @@ const AutoFillLevel = ({ handleChange, name, values, title, isExist, Icon, noGut
                         primary={title}
                         secondary={subtitle}
                         secondaryTypographyProps={{ align: 'justify' }}
-                        sx={{pr: 1}}
+                        sx={{ pr: 1, width: '100%' }}
                     />
                 </Grid>
-                <Grid item xs={4}>
-                    <FormControl>
+                <Grid item xs={4} display='flex' justifyContent='flex-end'>
+                    <FormControl fullWidth sx={{ maxWidth: '90px' }}>
                         <InputLabel id={`demo-simple-select-${name}`}>{label || 'Max'}</InputLabel>
                         <Select
-                            sx={{ width: '90px' }}
                             size='small'
                             label={label || "Max"}
                             labelId={`demo-simple-select-label-${name}`}

@@ -22,8 +22,9 @@ import LoadingButton from '@mui/lab/LoadingButton';
 
 import { Colors, Fonts, SXs } from '@styles';
 import { login } from '@actions';
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
+import { RECAPTCHA } from '@config';
 
 import LoadingImage from '@components/LoadingImage';
 
@@ -40,6 +41,7 @@ export default function Login() {
     const canSubmit = !errors?.identifier && !errors?.password && form?.identifier && form?.password;
 
     const dispatch = useDispatch();
+    const recaptcha = useSelector(state => state.recaptcha);
 
     const loginRefs = useRef([]);
 
@@ -47,17 +49,23 @@ export default function Login() {
     const handleSubmit = (e) => {
         e?.preventDefault();
 
-        if (window?.adHocFetch) {
-            adHocFetch({
-                dispatch,
-                action: login({
-                    identifier: form.identifier,
-                    password: form.password
-                }),
-                onSuccess: handleSuccessResponse,
-                onStarting: () => setLoading(true),
-                onFinally: () => setLoading(false),
-                snackbarMessageOnSuccess: "Welcome back!"
+        if (window?.adHocFetch && recaptcha === true && window?.grecaptcha) {
+            grecaptcha.ready(function () {
+                grecaptcha.execute(`${RECAPTCHA}`, { action: 'vip_authentication' }).then(function (token) {
+                    // Add your logic to submit to your backend server here.
+                    adHocFetch({
+                        dispatch,
+                        action: login({
+                            identifier: form.identifier,
+                            password: form.password,
+                            token
+                        }),
+                        onSuccess: handleSuccessResponse,
+                        onStarting: () => setLoading(true),
+                        onFinally: () => setLoading(false),
+                        snackbarMessageOnSuccess: "Welcome back!"
+                    });
+                });
             });
         }
     };
@@ -271,6 +279,11 @@ export default function Login() {
                                 </Grid>
 
                             </Box>
+                            <Typography variant='caption' sx={{ mt: 2 }}>
+                                This site is protected by reCAPTCHA and the Google{' '}
+                                <MuiLink href="https://policies.google.com/privacy" underline='hover'>Privacy Policy</MuiLink> and{' '}
+                                <MuiLink href="https://policies.google.com/terms" underline='hover'>Terms of Service</MuiLink> apply.
+                            </Typography>
                         </Paper>
                     </Box>
                 </Grid>

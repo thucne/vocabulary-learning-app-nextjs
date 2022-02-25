@@ -104,3 +104,7 @@ a {
   -webkit-hyphens: auto;
   hyphens: auto;
 }
+
+.grecaptcha-badge { 
+    visibility: hidden;
+}

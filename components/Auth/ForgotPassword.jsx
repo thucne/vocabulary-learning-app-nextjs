@@ -23,9 +23,10 @@ import LoadingButton from '@mui/lab/LoadingButton';
 
 import { Colors, Fonts, SXs } from '@styles';
 import { sendResetPasswordEmail, resetPassword } from '@actions';
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { validateEmail, validatePassword, isValidHttpUrl } from '@utils';
 import * as t from '@consts';
+import { RECAPTCHA } from '@config';
 
 import LoadingImage from '@components/LoadingImage';
 
@@ -47,6 +48,7 @@ export default function Login() {
 
     const router = useRouter();
     const dispatch = useDispatch();
+    const recaptcha = useSelector(state => state.recaptcha);
 
     useEffect(() => {
         if (router?.query?.code) {
@@ -75,22 +77,28 @@ export default function Login() {
     const handleResetPassword = (e) => {
         e?.preventDefault();
 
-        if (window?.adHocFetch) {
-            adHocFetch({
-                dispatch,
-                action: resetPassword({
-                    code: code?.trim(),
-                    password: password?.trim(),
-                    passwordConfirmation: confirmPassword?.trim()
-                }),
-                onError: (data) => {
-                    setCode('');
-                    setErrors({ ...errors, code: 'Incorrect reset link' });
-                },
-                onSuccess: handleSuccessResponse,
-                onStarting: () => setLoading(true),
-                onFinally: () => setLoading(false),
-                snackbarMessageOnSuccess: 'Password reset successfully. Redirecting...'
+        if (window?.adHocFetch && recaptcha === true && window?.grecaptcha) {
+            grecaptcha.ready(function () {
+                grecaptcha.execute(`${RECAPTCHA}`, { action: 'vip_authentication' }).then(function (token) {
+                    // Add your logic to submit to your backend server here.
+                    adHocFetch({
+                        dispatch,
+                        action: resetPassword({
+                            code: code?.trim(),
+                            password: password?.trim(),
+                            passwordConfirmation: confirmPassword?.trim(),
+                            token
+                        }),
+                        onError: (data) => {
+                            setCode('');
+                            setErrors({ ...errors, code: 'Incorrect reset link' });
+                        },
+                        onSuccess: handleSuccessResponse,
+                        onStarting: () => setLoading(true),
+                        onFinally: () => setLoading(false),
+                        snackbarMessageOnSuccess: 'Password reset successfully. Redirecting...'
+                    });
+                });
             });
         }
     };
@@ -98,19 +106,24 @@ export default function Login() {
     const handleSendResetPasswordEmail = (e) => {
         e?.preventDefault();
 
-        if (window?.adHocFetch) {
-            adHocFetch({
-                dispatch,
-                action: sendResetPasswordEmail(email?.trim()),
-                onSuccess: (data) => {
-                    handleNext();
-                },
-                onError: (data) => {
-                    // console.log(data);
-                },
-                onStarting: () => setLoading(true),
-                onFinally: () => setLoading(false),
-            })
+        if (window?.adHocFetch && recaptcha === true && window?.grecaptcha) {
+            grecaptcha.ready(function () {
+                grecaptcha.execute(`${RECAPTCHA}`, { action: 'vip_authentication' }).then(function (token) {
+                    // Add your logic to submit to your backend server here.
+                    adHocFetch({
+                        dispatch,
+                        action: sendResetPasswordEmail(email?.trim(), token),
+                        onSuccess: (data) => {
+                            handleNext();
+                        },
+                        onError: (data) => {
+                            // console.log(data);
+                        },
+                        onStarting: () => setLoading(true),
+                        onFinally: () => setLoading(false),
+                    })
+                });
+            });
         }
     }
 
@@ -529,6 +542,12 @@ export default function Login() {
                                     }
                                 </Grid>
                             </Box>
+
+                            <Typography variant='caption' sx={{ mt: 2 }}>
+                                This site is protected by reCAPTCHA and the Google{' '}
+                                <MuiLink href="https://policies.google.com/privacy" underline='hover'>Privacy Policy</MuiLink> and{' '}
+                                <MuiLink href="https://policies.google.com/terms" underline='hover'>Terms of Service</MuiLink> apply.
+                            </Typography>
                         </Paper>
                     </Box>
                 </Grid>

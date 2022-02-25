@@ -4,7 +4,6 @@ import { useThisToGetSizesFromRef, useThisToGetPositionFromRef, useWindowSize } 
 
 import { debounce } from 'lodash';
 
-
 const muiItemsName = [
     'Container',
     'Grid',
@@ -23,6 +22,7 @@ const ScrollPages = (props) => {
         containerStyle = {},
         buttonStyle = {},
         buttonIconStyle = {},
+        iconStyle = {},
         gridItemSize: {
             xs, sm, md, lg
         } = {},
@@ -35,9 +35,8 @@ const ScrollPages = (props) => {
             ArrowForwardIcon
         },
         getElementSizes,
-        react: {
-            React = {},
-        }
+        showScrollbar = false,
+        React = {}
     } = props;
 
     const {
@@ -45,11 +44,19 @@ const ScrollPages = (props) => {
         useRef,
         useMemo,
         useEffect,
-        useState
+        useState,
+        useLayoutEffect
     } = React;
+
+    const hookConfig = {
+        useState,
+        useLayoutEffect,
+        useEffect
+    }
 
     const [invalidProps, setInvalidProps] = useState('');
     const [mounted, setMounted] = useState(0);
+    const [currentIndex, setCurrentIndex] = useState(0);
 
     useEffect(() => {
         [
@@ -72,9 +79,17 @@ const ScrollPages = (props) => {
     const gridRef = useRef(null);
     const itemRefs = useRef([]);
 
-    const { width } = useThisToGetSizesFromRef(myRef, { revalidate: 100, timeout: 500 });
-    const { left, width: gridWidth, height: gridHeight } = useThisToGetPositionFromRef(gridRef, { revalidate: 100, timeout: 500 });
-    const { width: windowWidth } = useWindowSize();
+    const { width } = useThisToGetSizesFromRef(myRef, {
+        revalidate: 100,
+        timeout: 500,
+        ...hookConfig
+    });
+    const { left, width: gridWidth, height: gridHeight } = useThisToGetPositionFromRef(gridRef, {
+        revalidate: 100,
+        timeout: 500,
+        ...hookConfig
+    });
+    const { width: windowWidth } = useWindowSize(hookConfig);
 
     useEffect(() => {
         if (getElementSizes && typeof getElementSizes === 'function') {
@@ -86,14 +101,17 @@ const ScrollPages = (props) => {
 
     const stackLength = width * numberOfChildren;
 
+    const lowerThreshold = left - width / 2;
+    const upperThreshold = left + width / 2;
+
     const handleBackAction = async () => {
         // find which item is in the middle of the screen
-        const halfOfScreen = windowWidth / 2;
 
         const wordIndex = itemRefs.current.findIndex(itemRef => {
             const { left: wordLeft } = itemRef.getBoundingClientRect();
-            return (wordLeft < halfOfScreen && wordLeft > 0) ||
-                (wordLeft + width > halfOfScreen && wordLeft + width < windowWidth);
+            return (wordLeft > lowerThreshold && wordLeft < left) ||
+                (wordLeft + width >= left && wordLeft + width > upperThreshold)
+
         });
 
         // scroll left
@@ -110,12 +128,11 @@ const ScrollPages = (props) => {
 
     const handleForwardAction = async () => {
         // find which item is in the middle of the screen
-        const halfOfScreen = windowWidth / 2;
 
         const wordIndex = itemRefs.current.findIndex(itemRef => {
             const { left: wordLeft } = itemRef.getBoundingClientRect();
-            return (wordLeft < halfOfScreen && wordLeft > 0) ||
-                (wordLeft + width > halfOfScreen && wordLeft + width < windowWidth);
+            return (wordLeft > lowerThreshold && wordLeft < left) ||
+                (wordLeft + width >= left && wordLeft + width > upperThreshold)
         });
 
         // scroll left
@@ -131,28 +148,30 @@ const ScrollPages = (props) => {
     }
 
     const debounceScroll = useMemo(() => debounce(() => {
-        const autoScroll = async () => {
-            const halfOfScreen = windowWidth / 2;
 
-            const wordIndex = itemRefs?.current?.findIndex(itemRef => {
+        const autoScroll = async () => {
+
+            const wordIndex = itemRefs?.current?.findIndex((itemRef, index) => {
                 const { left: wordLeft } = itemRef?.getBoundingClientRect();
-                return (wordLeft < halfOfScreen && wordLeft > 0) ||
-                    (wordLeft + width > halfOfScreen && wordLeft + width < windowWidth);
+
+                return (wordLeft > lowerThreshold && wordLeft < left) ||
+                    (wordLeft + width >= left && wordLeft + width > upperThreshold)
             });
 
-            const itemRef = itemRefs?.current?.[wordIndex];
 
-            if (itemRef) {
+            if (wordIndex > 0 && wordIndex < itemRefs.current.length - 1) {
+                const itemRef = itemRefs?.current?.[wordIndex];
+
                 const { left: wordLeft } = itemRef?.getBoundingClientRect();
 
-                const a = Math.abs(wordIndex * width - left);
+                const a = Math.abs(left);
                 const b = Math.abs(wordLeft);
                 const whichBigger = Math.max(a, b);
                 const different = Math.round(Math.abs(a - b) * 100 / whichBigger);
 
-                if (different > 10) {
+                if (different > 2) {
                     gridRef?.current?.scrollTo({
-                        left: wordLeft + (wordIndex * width - wordLeft),
+                        left: (wordIndex) * width,
                         behavior: 'smooth'
                     });
                 }
@@ -160,10 +179,34 @@ const ScrollPages = (props) => {
 
         };
         autoScroll();
-    }, debounceTime), [left, width, windowWidth, debounceTime]);
+    }, debounceTime), [left, width, debounceTime, lowerThreshold, upperThreshold]);
 
     const onScroll = () => {
         debounceScroll();
+    }
+
+    const EachItem = ({ width, itemRefs, index, children, elementStyle = {}, Grid, isValidGrid }) => {
+        if (!isValidGrid) {
+            return <div>Invalid Grid</div>
+        }
+        return <Grid
+            ref={el => itemRefs.current[index] = el}
+            container
+            direction='column'
+            alignItems='center'
+            wrap='nowrap'
+            sx={{
+                p: 1,
+                width,
+                height: 'auto',
+                '&:hover': {
+                    filter: 'brightness(50%)'
+                },
+                ...elementStyle
+            }}
+        >
+            {children}
+        </Grid>
     }
 
     if (invalidProps?.length || mounted !== 6) {
@@ -185,8 +228,8 @@ const ScrollPages = (props) => {
                     zIndex: 10,
                     ...buttonStyle
                 }} >
-                    <IconButton aria-label="left" onClick={handleBackAction}>
-                        <ArrowBackIcon fontSize="large" sx={buttonIconStyle} />
+                    <IconButton aria-label="left" onClick={handleBackAction} sx={buttonIconStyle}>
+                        <ArrowBackIcon fontSize="large" sx={iconStyle} />
                     </IconButton>
                 </div>
                 <div style={{
@@ -199,7 +242,7 @@ const ScrollPages = (props) => {
                     ...buttonStyle
                 }}>
                     <IconButton aria-label="left" onClick={handleForwardAction} sx={buttonIconStyle}>
-                        <ArrowForwardIcon fontSize="large" />
+                        <ArrowForwardIcon fontSize="large" sx={iconStyle} />
                     </IconButton>
                 </div>
                 <Grid
@@ -211,8 +254,11 @@ const ScrollPages = (props) => {
                         width: [width],
                         overflow: 'auto',
                         borderRadius: '10px',
+                        '::-webkit-scrollbar': {
+                            width: showScrollbar ? '10px' : '0px',
+                            height: showScrollbar ? '10px' : '0px'
+                        }
                     }}
-                    className='hideScrollBar'
                     onScroll={onScroll}
                 >
                     <Stack direction="row" sx={{ width: stackLength }}>
@@ -224,6 +270,8 @@ const ScrollPages = (props) => {
                                 index={index}
                                 elementStyle={elementStyle}
                                 Grid={Grid}
+                                isValidGrid={isValidElement(<Grid />)}
+                                React={React}
                             >
                                 {eachChild}
                             </EachItem>
@@ -238,26 +286,5 @@ const ScrollPages = (props) => {
     );
 
 };
-
-const EachItem = ({ width, itemRefs, index, children, elementStyle = {}, Grid }) => {
-    return <Grid
-        ref={el => itemRefs.current[index] = el}
-        container
-        direction='column'
-        alignItems='center'
-        wrap='nowrap'
-        sx={{
-            p: 1,
-            width,
-            height: 'auto',
-            '&:hover': {
-                filter: 'brightness(50%)'
-            },
-            ...elementStyle
-        }}
-    >
-        {children}
-    </Grid>
-}
 
 export default ScrollPages;
