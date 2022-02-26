@@ -364,8 +364,11 @@ export const groupBy = function (xs, key) {
 export const handleDictionaryData = (
     firstData,
     vocabTypes,
-    settings = defaultSettings
+    settings = defaultSettings,
+    originalWord = "",
 ) => {
+    const camAudio = generateAudioLink(originalWord);
+
     const allPronounces =
         firstData?.phonetics
             .filter((item) => item?.audio && item?.text)
@@ -483,7 +486,7 @@ export const handleDictionaryData = (
     if (!autoFill) {
         return {
             pronounce: text || altPronounce,
-            audio: audio,
+            audio: camAudio ? `${camAudio}<vip>${audio}` : audio,
             clasifyVocab: [...new Set(allTypes)],
             synonyms: allSynonyms,
         };
@@ -507,7 +510,7 @@ export const handleDictionaryData = (
 
         return {
             pronounce: text || altPronounce,
-            audio: audio,
+            audio: camAudio ? `${camAudio}<vip>${audio}` : audio,
             clasifyVocab: [...new Set(allTypes)],
             examples: filteredExamples,
             engMeanings: filteredMeanings,
@@ -600,4 +603,30 @@ function isNumeric(str) {
         !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
         !isNaN(parseFloat(str))
     ); // ...and ensure strings of whitespace fail
+}
+
+const generateAudioLink = (words) => {
+
+    if (words?.length) {
+        const firstChar = words[0].toLowerCase();
+        // get first 3 chars and replace the empty space with _
+        let firstThreeChars = words.toLowerCase().substring(0, 3);
+        firstThreeChars = firstThreeChars.length < 3
+            ? firstThreeChars + "_".repeat(3 - firstThreeChars.length)
+            : firstThreeChars;
+
+        // get first 5 chars and replace the empty space with _
+        let firstFiveChars = words.toLowerCase().substring(0, 5).replace(/\s/g, "_");
+        firstFiveChars = firstFiveChars.length < 5
+            ? firstFiveChars + "_".repeat(5 - firstFiveChars.length)
+            : firstFiveChars;
+
+        //get first 3 characters of words and add _ if it is not enough
+
+        const filesLink = `${firstChar}/${firstThreeChars}/${firstFiveChars}/${words}.mp3`;
+
+        return `https://dictionary.cambridge.org/vi/media/english/us_pron/${filesLink}`;
+    } else {
+        return "";
+    }
 }

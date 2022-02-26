@@ -229,7 +229,8 @@ export default function CreateNewWord({ open = false, setOpen }) {
                     const processedData = handleDictionaryData(
                         firstData,
                         vocabTypes,
-                        settings
+                        settings,
+                        value.toString().toLowerCase()
                     );
 
                     setForm((form) => ({ ...form, ...processedData, auto: true }));

@@ -26,10 +26,10 @@ const Welcome = (props) => {
     const [reviewList, setReviewList] = useState(null);
 
     useEffect(() => {
-        if (User?.vips) {
+        if (User?.vips && !reviewList?.length) {
             setReviewList(getLastReviewWord([...User.vips]));
         }
-    }, [User]);
+    }, [User?.vips, reviewList]);
 
     return (
         <Container maxWidth="lg" disableGutters>

@@ -20,7 +20,7 @@ import { isEqual, differenceWith } from "lodash";
 const WordListBlock = () => {
     const theme = useTheme();
     const [sizes, setSizes] = useState({ width: 0, height: 0 });
-    const [words, setWords] = useState([]);
+
     const wordList = useSelector((state) =>
         state.userData?.vips?.length > 0 ? state.userData.vips : []
     );
@@ -62,21 +62,6 @@ const WordListBlock = () => {
         React,
     };
 
-    useEffect(() => {
-        setWords((prev) => {
-            if (!isEqual(prev, wordList)) {
-                return wordList;
-            }
-            return prev;
-        });
-    }, [wordList]);
-
-    // sort by updatedAt
-    const memorizedWord = useMemo(
-        () => words.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)),
-        [words]
-    );
-
     return (
         <Container maxWidth="lg" disableGutters>
             <Grid container direction="row" mt={[0, 1, 2, 3]}>
@@ -92,8 +77,8 @@ const WordListBlock = () => {
                 </Grid>
                 <Grid item xs={12} sx={{ px: 2 }}>
                     <ScrollPaper {...config}>
-                        {memorizedWord?.length > 0 &&
-                            memorizedWord.map((word, index) => (
+                        {wordList?.length > 0 &&
+                            wordList.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)).map((word, index) => (
                                 <EachChild
                                     key={`render-word-list-${index}`}
                                     word={word}

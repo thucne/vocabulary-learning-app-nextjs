@@ -61,6 +61,8 @@ import { useDispatch, useSelector } from "react-redux";
 
 import useSWR from "swr";
 
+import { isEqual } from 'lodash';
+
 const drawerWidth = 240;
 
 const fetcher = async (...args) => await fetcherJWT(...args);
@@ -100,6 +102,7 @@ function ResponsiveDrawer(props) {
     const User = useSelector((state) => state?.user);
     const tabName = useSelector((state) => state?.tabName);
     const bgColor = useSelector((state) => state?.bgColor);
+    const userData = useSelector((state) => state?.userData);
 
     const [width, height] = useWindowSize(appBarRef);
 
@@ -109,14 +112,18 @@ function ResponsiveDrawer(props) {
     });
 
     // get words
-    useSWR(getJWT() ? `${API}/api/users/me` : null, fetcher, {
-        onSuccess: (data) =>
+    const { data, error, isValidating } = useSWR(getJWT() ? `${API}/api/users/me` : null, fetcher, {
+        refreshInterval: 500,
+    });
+
+    useEffect(() => {
+        if (!error && !isValidating && !isEqual(userData, data)) {
             dispatch({
                 type: t.UPDATE_USER_DATA,
                 payload: data,
-            }),
-        refreshInterval: 1000,
-    });
+            });
+        }
+    }, [data, error, isValidating, dispatch, userData]);
 
     useMemo(() => {
         if (trigger) {

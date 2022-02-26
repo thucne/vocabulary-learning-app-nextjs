@@ -1,5 +1,5 @@
 import * as t from "@consts";
-import { isEqual, cloneDeep } from "lodash";
+import { isEqual } from "lodash";
 
 const userData = (state = {}, action) => {
     switch (action.type) {
@@ -8,13 +8,14 @@ const userData = (state = {}, action) => {
         case t.CLEAR_USER_DATA:
             return {};
         case t.UPDATE_USER_DATA:
-            const oldState = cloneDeep(state);
-            const newState = cloneDeep(action.payload);
+            const oldState = structuredClone(state);
+            const newState = structuredClone(action.payload);
 
             return !isEqual(oldState, newState) &&
                 JSON.stringify(oldState).length !== JSON.stringify(newState).length
                 ? { ...state, ...action.payload }
                 : state;
+
         default:
             return { ...state };
     }
