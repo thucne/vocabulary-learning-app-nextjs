@@ -42,7 +42,7 @@ const UploadComponent = ({
     setData, setFileName, setSize, containerProps, CustomIcon,
     showDelete, stylesImage, stylesImage2,
     clickWhole, showIconUpload, data,
-    isFormik, getFileSize
+    isFormik, getFileSize, helperText
 }) => {
     const [dragging, setDragging] = useState(false);
     const [loadingImage, setLoadingImage] = useState(false);
@@ -260,41 +260,41 @@ const UploadComponent = ({
             </div>
         }
         <Grid item xs={12} display='flex' justifyContent='center' alignItems='center'>
-            <label htmlFor="icon-button-file">
-                <Input onChange={handleChange} ref={upLoadRef} accept="image/*" id="icon-button-file" type="file" />
-                <IconButton
-                    sx={{
-                        '&:hover': {
-                            backgroundColor: 'transparent'
-                        },
-                        '&.onDragging': {
-                            backgroundColor: Colors.GREY_200,
-                            filter: 'brightness(0.5)'
-                        }
-                    }}
-                    disableFocusRipple={true} disableRipple={true}
-                    color="primary" aria-label="upload picture" component="span"
-                >
-                    {
-                        !photo?.length > 0 && showIconUpload && (
-                            CustomIcon ? <CustomIcon style={{
-                                width: 100, height: 100, backgroundColor: Colors.GREY_400,
-                                borderRadius: '50%', padding: 10, color: 'white',
-                            }} />
-                                :
-                                <UploadFileIcon
-                                    style={{
-                                        width: 100, height: 100, backgroundColor: Colors.GREY_400,
-                                        borderRadius: '50%', padding: 10, color: 'white',
-                                    }}
-                                />
-                        )
-                    }
-                </IconButton>
-            </label>
+            <Input onChange={handleChange} ref={upLoadRef} accept="image/*" id="icon-button-file" type="file" />
+            <IconButton
+                sx={{
+                    '&:hover': {
+                        backgroundColor: 'transparent'
+                    },
+                    '&.onDragging': {
+                        backgroundColor: Colors.GREY_200,
+                        filter: 'brightness(0.5)'
+                    },
+                    position: 'relative',
+                    maxWidth: '70%',
+                    maxHeight: '70%',
+                }}
+                disableFocusRipple={true} disableRipple={true}
+                color="primary" aria-label="upload picture" component="span"
+            >
+                {
+                    !photo?.length > 0 && showIconUpload && (
+                        CustomIcon
+                            ? <CustomIcon />
+                            : <UploadFileIcon
+                                style={{
+                                    width: 100, height: 100, backgroundColor: Colors.GREY_400,
+                                    borderRadius: '50%', padding: 10, color: 'white',
+                                }}
+                            />
+                    )
+                }
+            </IconButton>
         </Grid>
         {!photo && showIconUpload && <Grid item xs={12} display='flex' justifyContent='center' alignItems='center'>
-            <Typography variant='caption' sx={{ maxWidth: '200px' }} align='center'>Select a photo from the gallery or drag and drop it here.</Typography>
+            <Typography variant='caption' sx={{ px: 2 }} align='center'>
+                {helperText || 'Select a photo from the gallery or drag and drop it here.'}
+            </Typography>
         </Grid>}
     </Grid>
 }

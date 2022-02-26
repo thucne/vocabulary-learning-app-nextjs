@@ -23,12 +23,11 @@ import { useTheme } from '@mui/material/styles';
 
 import { useDispatch, useSelector } from "react-redux";
 
-import Uploader from '@components/Upload';
 import LoadingImage from '@components/LoadingImage';
 import ListArrayInputs from './FormComponents/ListArrayInputs';
 import ListInputs from './FormComponents/ListInputs';
 
-import { IMAGE_ALT, VIP_TYPES } from "@consts";
+import { IMAGE_ALT, VIP_TYPES, SHOW_SNACKBAR } from "@consts";
 import { fetcherJWT, createVIP } from "@actions";
 import {
     useWindowSize, useThisToGetSizesFromRef,
@@ -40,6 +39,8 @@ import { API, RECAPTCHA } from '@config';
 
 import useSWR from 'swr';
 import { debounce } from "lodash";
+
+import Uploader from '@tallis/react-dndp';
 
 const fetcher = async (...args) => await fetcherJWT(...args);
 
@@ -531,11 +532,16 @@ export default function CreateNewWord({ open = false, setOpen }) {
                     <Grid item xs={12} mt={opens.illustration ? 1 : 0}>
                         <Collapse in={opens.illustration} sx={{ width: '100%' }} timeout="auto" unmountOnExit>
                             <Grid container>
-                                <Grid item xs={12} mt={1} ref={photoRef}>
-                                    <FormControl fullWidth error={Math.ceil(isOver10MB / 1024 / 1024) > 10}>
+                                <Grid item xs={12} ref={photoRef}>
+                                    <FormControl
+                                        fullWidth
+                                        error={Math.ceil(isOver10MB / 1024 / 1024) > 10}
+                                        sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                    >
                                         <Paper variant='outlined' sx={{
                                             position: 'relative',
-                                            height: photoSizes?.width,
+                                            height: photoSizes?.width * 0.7,
+                                            width: photoSizes?.width * 0.7,
                                             overflow: 'hidden',
                                             borderRadius: '10px',
                                             mt: 1
@@ -553,7 +559,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
                                                         display: 'flex',
                                                         flexDirection: 'row',
                                                         justifyContent: 'center',
-                                                        alignItems: 'center',
+                                                        alignItems: 'center'
                                                     },
                                                     container: true
                                                 }}
@@ -584,13 +590,16 @@ export default function CreateNewWord({ open = false, setOpen }) {
                                                 getFileSize={(data) => setIsOver10MB(data)}
                                                 isFormik
                                                 clickWhole
+                                                NextImage={Image}
+                                                React={React}
+                                                onError={() => dispatch({ type: SHOW_SNACKBAR, payload: { message: 'Only image file is allowed', type: 'error' } })}
                                             />
                                         </Paper>
                                         <FormHelperText>
                                             {Math.ceil(isOver10MB / 1024 / 1024) > 10
                                                 ? 'File size is over 10MB.'
                                                 : (isOver10MB
-                                                    ? `THis file's size is ${Math.ceil(isOver10MB / 1024 / 1024)}MB.`
+                                                    ? `This file's size is ${Math.ceil(isOver10MB / 1024 / 1024)}MB.`
                                                     : 'Should be in square shape. MUST smaller 10MB in size.'
                                                 )}
                                         </FormHelperText>
@@ -746,8 +755,8 @@ const UploadIconIllustration = () => {
         objectFit='contain'
         priority={true}
         draggable={false}
-        width={200}
-        height={200}
+        width={180}
+        height={180}
         bgColor="transparent"
     />
 }
