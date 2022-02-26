@@ -8,12 +8,14 @@ import {
     DialogContent, DialogTitle, OutlinedInput,
     ToggleButton, ToggleButtonGroup,
     Typography, Box, FormHelperText, Paper, FormLabel,
-    CircularProgress, SvgIcon, Tooltip, Stack
+    SvgIcon, Tooltip, Stack, Divider, Collapse,
+    ListItemButton, Button
 } from "@mui/material";
 
 import {
     Send as SendIcon,
     AutoAwesome as AutoAwesomeIcon,
+    ExpandLess, ExpandMore,
 } from '@mui/icons-material';
 
 import { LoadingButton } from "@mui/lab";
@@ -41,45 +43,12 @@ import { debounce } from "lodash";
 
 const fetcher = async (...args) => await fetcherJWT(...args);
 
-const initForm = {
-    vip: "",
-    type: VIP_TYPES[0],
-    examples: [],
-    vnMeanings: [],
-    engMeanings: [],
-    pronounce: "",
-    synonyms: [],
-    antonyms: [],
-    clasifyVocab: [],
-    public: true,
-    tags: [],
-    auto: false
-}
-
-const initTempInputs = {
-    example: "",
-    vnMeaning: "",
-    engMeaning: "",
-    antonym: "",
-    synonym: "",
-    tag: "",
-}
-
-const resetSome = {
-    pronounce: "",
-    audio: "",
-    clasifyVocab: [],
-    examples: [],
-    engMeanings: [],
-    synonyms: [],
-    tags: [],
-    auto: false
-}
 
 export default function CreateNewWord({ open = false, setOpen }) {
     const theme = useTheme();
     const windowSize = useWindowSize();
     const dispatch = useDispatch();
+    const settings = useSettings();
 
     const photoRef = useRef(null);
     const [photo, setPhoto] = useState(null);
@@ -87,28 +56,27 @@ export default function CreateNewWord({ open = false, setOpen }) {
 
     const [vocabTypes, setVocabTypes] = useState([]);
 
-    const [form, setForm] = useState(initForm);
+    const [form, setForm] = useState(initForm(settings?.publicWords));
     const [temptInput, setTemptInput] = useState(initTempInputs);
 
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
-    const pronounceRef = useRef(null);
-    const [shouldFetchPronouce, setShouldFetchPronouce] = useState(false);
-
     const [fetchingAPI, setFetchingAPI] = useState(false);
+
+    const [opens, setOpens] = useState(initOpens);
 
     const recaptcha = useSelector(state => state.recaptcha);
 
     const resetWhole = () => {
         setTemptInput(initTempInputs);
-        setForm(initForm);
+        setForm(initForm(settings?.publicWords));
         setPhoto(null);
         setErrors({});
         setLoading(false);
         setIsOver10MB(false);
-        setVocabTypes([]);
         setFetchingAPI(false);
+        setOpens(initOpens);
     }
 
     const handleClose = () => {
@@ -222,7 +190,9 @@ export default function CreateNewWord({ open = false, setOpen }) {
             const firstData = data?.[0];
 
             if (!data.message && firstData?.word === value.toString().toLowerCase()) {
-                const processedData = handleDictionaryData(firstData, vocabTypes);
+
+                const processedData = handleDictionaryData(firstData, vocabTypes, settings);
+
                 setForm((form) => ({ ...form, ...processedData, auto: true }));
             } else {
                 setForm((form) => ({ ...form, ...resetSome }));
@@ -232,7 +202,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
             setForm((form) => ({ ...form, ...resetSome }));
             setFetchingAPI(false);
         }
-    }, [vocabTypes]);
+    }, [vocabTypes, settings]);
 
     const debounceFunction = useMemo(() => debounce((e) => {
         handleChangeValue(e, "vip");
@@ -295,7 +265,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
                 setErrors((state) => ({ ...state, ["meanings"]: error }));
                 return;
             default:
-                error = e.target.value?.length
+                error = e.target.value?.length || form[name].length
                     ? ""
                     : "This field is required";
                 setErrors((state) => ({
@@ -303,7 +273,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
                     [name]: error,
                 }));
         }
-    }, [form.vnMeanings, form.engMeanings]);
+    }, [form]);
 
     const handleVocabTypesChange = (e) => {
         const { target: { value } } = e;
@@ -333,187 +303,303 @@ export default function CreateNewWord({ open = false, setOpen }) {
             <Box component="form" noValidate onSubmit={handleSubmit}>
                 <Grid container>
                     <Grid item xs={12}>
-                        <TextField
-                            required
+                        <Button
                             fullWidth
-                            label="Word"
-                            id="word"
-                            size="small"
-                            margin="dense"
-                            error={errors?.vip?.length > 0}
-                            helperText={errors?.vip || "A vocabulary, idiom or phrase"}
-                            onChange={debounceFetchPronouce}
-                            InputLabelProps={{
-                                shrink: true
+                            disableRipple
+                            onClick={() => setOpens(prev => ({ ...prev, primary: !prev.primary }))}
+                            sx={{
+                                ...SXs.COMMON_BUTTON_STYLES,
+                                justifyContent: 'space-between',
+                                ml: '-8px',
+                                width: 'calc(100% + 16px)',
+                                color: theme => theme.palette.text.primary,
                             }}
-                        />
+                        >
+                            <Typography variant="h6">
+                                Primary information
+                            </Typography>
+                            {opens.primary ? <ExpandLess /> : <ExpandMore />}
+                        </Button>
                     </Grid>
 
-                    <Grid item xs={4} pr={0.5}>
-                        <FormControl fullWidth margin="dense" required>
-                            <InputLabel id="demo-multiple-chip-label">Type</InputLabel>
-                            <Select
-                                size="small"
-                                margin="dense"
-                                id="demo-simple-select"
-                                value={form.type}
-                                label="Type"
-                                onChange={(e) => {
-                                    handleChangeValue(e, "type");
-                                }}
-                            >
-                                {VIP_TYPES.map((type, index) => (
-                                    <MenuItem key={`${type}-${index}`} value={type}>
-                                        {type}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                            <FormHelperText>Vocab, idiom or phrase</FormHelperText>
-                        </FormControl>
+                    <Grid item xs={12} mt={opens.primary ? 1 : 0}>
+                        <Collapse in={opens.primary} sx={{ width: '100%' }} timeout="auto" unmountOnExit>
+                            <Grid container>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        autoFocus
+                                        required
+                                        fullWidth
+                                        label="Word"
+                                        id="word"
+                                        size="small"
+                                        margin="dense"
+                                        error={errors?.vip?.length > 0}
+                                        helperText={errors?.vip || "A vocabulary, idiom or phrase"}
+                                        onChange={debounceFetchPronouce}
+                                        InputLabelProps={{
+                                            shrink: true
+                                        }}
+                                    />
+                                </Grid>
+
+                                <Grid item xs={4} pr={0.5}>
+                                    <FormControl fullWidth margin="dense" required>
+                                        <InputLabel id="demo-multiple-chip-label">Type</InputLabel>
+                                        <Select
+                                            size="small"
+                                            margin="dense"
+                                            id="demo-simple-select"
+                                            value={form.type}
+                                            label="Type"
+                                            onChange={(e) => {
+                                                handleChangeValue(e, "type");
+                                            }}
+                                        >
+                                            {VIP_TYPES.map((type, index) => (
+                                                <MenuItem key={`${type}-${index}`} value={type}>
+                                                    {type}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                        <FormHelperText>For searching</FormHelperText>
+                                    </FormControl>
+                                </Grid>
+
+                                {form.type === "vocab" && (
+                                    <Grid item xs={8} pl={0.5}>
+                                        <FormControl fullWidth margin="dense" size="small" required>
+                                            <InputLabel id="demo-multiple-chip-label"
+                                                sx={form.auto ? {
+                                                    ...SXs.AUTO_FILLED_TEXT_COLOR,
+                                                    display: "flex",
+                                                } : {}}
+                                            >
+                                                <SpecialLabel label="Classify" auto={form.auto} />
+                                            </InputLabel>
+                                            <Select
+                                                labelId="demo-multiple-chip-label"
+                                                id="demo-multiple-chip"
+                                                multiple
+                                                value={form.clasifyVocab}
+                                                onChange={handleVocabTypesChange}
+                                                label={<SpecialLabel label="Classify" auto={form.auto} />}
+                                                input={
+                                                    <OutlinedInput
+                                                        id="select-multiple-chip"
+                                                        label={<SpecialLabel label="Classify" auto={form.auto} />}
+                                                    />
+                                                }
+                                            >
+                                                {vocabTypes?.map(item => item.value)?.map((name, index) => (
+                                                    <MenuItem key={`${name}-type2-${index}`} value={name}>
+                                                        {name}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                            <FormHelperText>For searching. Multi-selection</FormHelperText>
+                                        </FormControl>
+                                    </Grid>
+                                )}
+
+                                <Grid item xs={12}>
+                                    <TextField
+                                        fullWidth
+                                        label={<SpecialLabel label="Pronounce" auto={form.auto} />}
+                                        id="pronounce"
+                                        size="small"
+                                        margin="dense"
+                                        multiline
+                                        InputLabelProps={{
+                                            sx: form.auto ? SXs.AUTO_FILLED_TEXT_COLOR : {},
+                                            shrink: form.pronounce?.length > 0
+                                        }}
+                                        error={errors?.pronounce?.length > 0}
+                                        helperText={errors?.pronounce || "Optional"}
+                                        value={form.pronounce}
+                                        onChange={(e) => {
+                                            handleChangeValue(e, "pronounce");
+                                            checkInputCriteria(e, "pronounce");
+                                        }}
+                                    />
+                                </Grid>
+                            </Grid>
+                        </Collapse>
                     </Grid>
 
-                    {form.type === "vocab" && (
-                        <Grid item xs={8} pl={0.5}>
-                            <FormControl fullWidth margin="dense" size="small" required>
-                                <InputLabel id="demo-multiple-chip-label"
-                                    sx={form.auto ? {
-                                        ...SXs.AUTO_FILLED_TEXT_COLOR,
-                                        display: "flex",
-                                    } : {}}
-                                >
-                                    <SpecialLabel label="Classify" auto={form.auto} />
-                                </InputLabel>
-                                <Select
-                                    labelId="demo-multiple-chip-label"
-                                    id="demo-multiple-chip"
-                                    multiple
-                                    value={form.clasifyVocab}
-                                    onChange={handleVocabTypesChange}
-                                    label={<SpecialLabel label="Classify" auto={form.auto} />}
-                                    input={
-                                        <OutlinedInput
-                                            id="select-multiple-chip"
-                                            label={<SpecialLabel label="Classify" auto={form.auto} />}
-                                        />
-                                    }
-                                >
-                                    {vocabTypes?.map(item => item.value)?.map((name, index) => (
-                                        <MenuItem key={`${name}-type2-${index}`} value={name}>
-                                            {name}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                                <FormHelperText>Multi-selection</FormHelperText>
-                            </FormControl>
-                        </Grid>
-                    )}
+                    <Divider sx={{ width: '100%', my: 1 }} />
 
                     <Grid item xs={12}>
-                        <TextField
+                        <Button
                             fullWidth
-                            inputRef={pronounceRef}
-                            label={<SpecialLabel label="Pronounce" auto={form.auto} />}
-                            id="pronounce"
-                            size="small"
-                            margin="dense"
-                            multiline
-                            InputLabelProps={{
-                                sx: form.auto ? SXs.AUTO_FILLED_TEXT_COLOR : {},
-                                shrink: form.pronounce?.length > 0
+                            disableRipple
+                            onClick={() => setOpens(prev => ({ ...prev, secondary: !prev.secondary }))}
+                            sx={{
+                                ...SXs.COMMON_BUTTON_STYLES,
+                                justifyContent: 'space-between',
+                                ml: '-8px',
+                                width: 'calc(100% + 16px)',
+                                color: theme => theme.palette.text.primary,
                             }}
-                            error={errors?.pronounce?.length > 0}
-                            helperText={errors?.pronounce || "Optional"}
-                            value={form.pronounce}
-                            onChange={(e) => {
-                                handleChangeValue(e, "pronounce");
-                                checkInputCriteria(e, "pronounce");
-                            }}
-                        />
+                        >
+                            <Typography variant="h6">
+                                Secondary information
+                            </Typography>
+                            {opens.secondary ? <ExpandLess /> : <ExpandMore />}
+                        </Button>
                     </Grid>
 
-                    <ListArrayInputs {...elementsListProps(form, handleDeleteItem).examples} />
-                    <ListInputs {...elementsInputProps(errors, listInputProps).examples} />
+                    <Grid item xs={12} mt={opens.secondary ? 1 : 0}>
+                        <Collapse in={opens.secondary} sx={{ width: '100%' }} timeout="auto" unmountOnExit>
+                            <Grid container>
+                                <ListArrayInputs {...elementsListProps(form, handleDeleteItem).english} />
+                                <ListInputs {...elementsInputProps(errors, listInputProps).english} />
+                                <Divider sx={{ width: '100%', my: 1 }} />
 
-                    <ListArrayInputs {...elementsListProps(form, handleDeleteItem).english} />
-                    <ListInputs {...elementsInputProps(errors, listInputProps).english} />
+                                <ListArrayInputs {...elementsListProps(form, handleDeleteItem).vietnamese} />
+                                <ListInputs {...elementsInputProps(errors, listInputProps).vietnamese} />
+                                <Divider sx={{ width: '100%', my: 1 }} />
 
-                    <ListArrayInputs {...elementsListProps(form, handleDeleteItem).vietnamese} />
-                    <ListInputs {...elementsInputProps(errors, listInputProps).vietnamese} />
-
-                    <ListArrayInputs {...elementsListProps(form, handleDeleteItem).synonyms} />
-                    <ListInputs {...elementsInputProps(errors, listInputProps).synonyms} />
-
-                    <ListArrayInputs {...elementsListProps(form, handleDeleteItem).antonyms} />
-                    <ListInputs {...elementsInputProps(errors, listInputProps).antonyms} />
-
-                    <ListArrayInputs {...elementsListProps(form, handleDeleteItem).tags} />
-                    <ListInputs {...elementsInputProps(errors, listInputProps).tags} />
-
-                    <Grid item xs={12} mt={1} ref={photoRef}>
-                        <FormControl fullWidth error={Math.ceil(isOver10MB / 1024 / 1024) > 10}>
-                            <FormLabel>Illustration</FormLabel>
-                            <Paper variant='outlined' sx={{
-                                position: 'relative',
-                                height: photoSizes?.width,
-                                overflow: 'hidden',
-                                borderRadius: '10px'
-                            }}>
-                                <Uploader
-                                    containerProps={{
-                                        sx: {
-                                            position: 'absolute',
-                                            top: 0,
-                                            left: 0,
-                                            zIndex: 2,
-                                            width: '100%',
-                                            height: '100%',
-                                            cursor: 'pointer',
-                                            display: 'flex',
-                                            flexDirection: 'row',
-                                            justifyContent: 'center',
-                                            alignItems: 'center',
-                                        },
-                                        container: true
-                                    }}
-                                    stylesImage={{
-                                        style: {
-                                            position: 'absolute',
-                                            top: 0,
-                                            left: 0,
-                                            width: '100%',
-                                            height: '100%',
-                                        }
-                                    }}
-                                    stylesImage2={{
-                                        style: {
-                                            width: '100%',
-                                            height: '100%',
-                                            position: 'relative'
-                                        }
-                                    }}
-                                    setData={(data, base64) => {
-                                        photo?.set('illustration', data);
-                                        photo?.set('photo', base64);
-                                        setPhoto(photo);
-                                    }}
-                                    data={Boolean(photo?.get('photo')) ? photo?.get('photo') : null}
-                                    CustomIcon={UploadIconIllustration}
-                                    showIconUpload={Boolean(photo?.get('photo')) ? false : true}
-                                    getFileSize={(data) => setIsOver10MB(data)}
-                                    isFormik
-                                    clickWhole
-                                />
-                            </Paper>
-                            <FormHelperText>
-                                {Math.ceil(isOver10MB / 1024 / 1024) > 10
-                                    ? 'File size is over 10MB.'
-                                    : (isOver10MB
-                                        ? `THis file's size is ${Math.ceil(isOver10MB / 1024 / 1024)}MB.`
-                                        : 'Should be in square shape. MUST smaller 10MB in size.'
-                                    )}
-                            </FormHelperText>
-                        </FormControl>
+                                <ListArrayInputs {...elementsListProps(form, handleDeleteItem).examples} />
+                                <ListInputs {...elementsInputProps(errors, listInputProps).examples} />
+                            </Grid>
+                        </Collapse>
                     </Grid>
+
+                    <Divider sx={{ width: '100%', my: 1 }} />
+
+                    <Grid item xs={12}>
+                        <Button
+                            fullWidth
+                            disableRipple
+                            onClick={() => setOpens(prev => ({ ...prev, tertiary: !prev.tertiary }))}
+                            sx={{
+                                ...SXs.COMMON_BUTTON_STYLES,
+                                justifyContent: 'space-between',
+                                ml: '-8px',
+                                width: 'calc(100% + 16px)',
+                                color: theme => theme.palette.text.primary,
+                            }}
+                        >
+                            <Typography variant="h6">
+                                Tertiary information
+                            </Typography>
+                            {opens.tertiary ? <ExpandLess /> : <ExpandMore />}
+                        </Button>
+                    </Grid>
+
+                    <Grid item xs={12} mt={opens.tertiary ? 1 : 0}>
+                        <Collapse in={opens.tertiary} sx={{ width: '100%' }} timeout="auto" unmountOnExit>
+                            <Grid container>
+                                <ListArrayInputs {...elementsListProps(form, handleDeleteItem).synonyms} />
+                                <ListInputs {...elementsInputProps(errors, listInputProps).synonyms} />
+                                <Divider sx={{ width: '100%', my: 1 }} />
+
+                                <ListArrayInputs {...elementsListProps(form, handleDeleteItem).antonyms} />
+                                <ListInputs {...elementsInputProps(errors, listInputProps).antonyms} />
+                                <Divider sx={{ width: '100%', my: 1 }} />
+
+                                <ListArrayInputs {...elementsListProps(form, handleDeleteItem).tags} />
+                                <ListInputs {...elementsInputProps(errors, listInputProps).tags} />
+                            </Grid>
+                        </Collapse>
+                    </Grid>
+
+                    <Divider sx={{ width: '100%', my: 1 }} />
+
+                    <Grid item xs={12}>
+                        <Button
+                            fullWidth
+                            disableRipple
+                            onClick={() => setOpens(prev => ({ ...prev, illustration: !prev.illustration }))}
+                            sx={{
+                                ...SXs.COMMON_BUTTON_STYLES,
+                                justifyContent: 'space-between',
+                                ml: '-8px',
+                                width: 'calc(100% + 16px)',
+                                color: theme => theme.palette.text.primary,
+                            }}
+                        >
+                            <Typography variant="h6">
+                                Illustration
+                            </Typography>
+                            {opens.illustration ? <ExpandLess /> : <ExpandMore />}
+                        </Button>
+                    </Grid>
+
+
+                    <Grid item xs={12} mt={opens.illustration ? 1 : 0}>
+                        <Collapse in={opens.illustration} sx={{ width: '100%' }} timeout="auto" unmountOnExit>
+                            <Grid container>
+                                <Grid item xs={12} mt={1} ref={photoRef}>
+                                    <FormControl fullWidth error={Math.ceil(isOver10MB / 1024 / 1024) > 10}>
+                                        <Paper variant='outlined' sx={{
+                                            position: 'relative',
+                                            height: photoSizes?.width,
+                                            overflow: 'hidden',
+                                            borderRadius: '10px',
+                                            mt: 1
+                                        }}>
+                                            <Uploader
+                                                containerProps={{
+                                                    sx: {
+                                                        position: 'absolute',
+                                                        top: 0,
+                                                        left: 0,
+                                                        zIndex: 2,
+                                                        width: '100%',
+                                                        height: '100%',
+                                                        cursor: 'pointer',
+                                                        display: 'flex',
+                                                        flexDirection: 'row',
+                                                        justifyContent: 'center',
+                                                        alignItems: 'center',
+                                                    },
+                                                    container: true
+                                                }}
+                                                stylesImage={{
+                                                    style: {
+                                                        position: 'absolute',
+                                                        top: 0,
+                                                        left: 0,
+                                                        width: '100%',
+                                                        height: '100%',
+                                                    }
+                                                }}
+                                                stylesImage2={{
+                                                    style: {
+                                                        width: '100%',
+                                                        height: '100%',
+                                                        position: 'relative'
+                                                    }
+                                                }}
+                                                setData={(data, base64) => {
+                                                    photo?.set('illustration', data);
+                                                    photo?.set('photo', base64);
+                                                    setPhoto(photo);
+                                                }}
+                                                data={Boolean(photo?.get('photo')) ? photo?.get('photo') : null}
+                                                CustomIcon={UploadIconIllustration}
+                                                showIconUpload={Boolean(photo?.get('photo')) ? false : true}
+                                                getFileSize={(data) => setIsOver10MB(data)}
+                                                isFormik
+                                                clickWhole
+                                            />
+                                        </Paper>
+                                        <FormHelperText>
+                                            {Math.ceil(isOver10MB / 1024 / 1024) > 10
+                                                ? 'File size is over 10MB.'
+                                                : (isOver10MB
+                                                    ? `THis file's size is ${Math.ceil(isOver10MB / 1024 / 1024)}MB.`
+                                                    : 'Should be in square shape. MUST smaller 10MB in size.'
+                                                )}
+                                        </FormHelperText>
+                                    </FormControl>
+                                </Grid>
+                            </Grid>
+                        </Collapse>
+                    </Grid>
+
                 </Grid>
             </Box>
         </Box>
@@ -770,4 +856,47 @@ const elementsListProps = (form, handleDeleteItem) => ({
         label: "Tags",
         form, handleDeleteItem
     }
-})
+});
+
+
+const initForm = (publicWords = true) => ({
+    vip: "",
+    type: VIP_TYPES[0],
+    examples: [],
+    vnMeanings: [],
+    engMeanings: [],
+    pronounce: "",
+    synonyms: [],
+    antonyms: [],
+    clasifyVocab: [],
+    public: publicWords,
+    tags: [],
+    auto: false
+});
+
+const initTempInputs = {
+    example: "",
+    vnMeaning: "",
+    engMeaning: "",
+    antonym: "",
+    synonym: "",
+    tag: "",
+}
+
+const resetSome = {
+    pronounce: "",
+    audio: "",
+    clasifyVocab: [],
+    examples: [],
+    engMeanings: [],
+    synonyms: [],
+    tags: [],
+    auto: false
+}
+
+const initOpens = {
+    primary: true,
+    secondary: false,
+    tertiary: false,
+    illustration: true
+}

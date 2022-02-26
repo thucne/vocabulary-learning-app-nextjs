@@ -155,7 +155,8 @@ const styles = (overflow) => ({
     },
     paper: {
         borderRadius: '4px', overflow: 'hidden', width: '100%',
-        border: `2px solid ${Colors.GREY_200}`,
+        border: `1px solid ${Colors.GREY_200}`,
+        backgroundColor: theme => theme.palette.img_bg.main,
     },
     gridItem: {
         display: "flex",
