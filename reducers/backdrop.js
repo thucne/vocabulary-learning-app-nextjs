@@ -9,6 +9,6 @@ const backdrop = (state = { show: false }, action) => {
         default:
             return { ...state };
     }
-}
+};
 
 export default backdrop;

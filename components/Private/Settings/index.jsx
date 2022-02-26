@@ -1,12 +1,30 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from "react";
 
 import {
-    List, ListItem, ListItemIcon, ListItemText,
-    ListSubheader, Switch, Container, Grid, Typography,
-    Divider, Collapse, ToggleButton, ToggleButtonGroup,
-    Slider, FormControl, InputLabel, Select, MenuItem,
-    IconButton, Tooltip, Paper, TextField, Stack
-} from '@mui/material';
+    List,
+    ListItem,
+    ListItemIcon,
+    ListItemText,
+    ListSubheader,
+    Switch,
+    Container,
+    Grid,
+    Typography,
+    Divider,
+    Collapse,
+    ToggleButton,
+    ToggleButtonGroup,
+    Slider,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+    IconButton,
+    Tooltip,
+    Paper,
+    TextField,
+    Stack,
+} from "@mui/material";
 
 import {
     AutoAwesome as AutoAwesomeIcon,
@@ -16,11 +34,11 @@ import {
     Lock as LockIcon,
     AutoStories as AutoStoriesIcon,
     Timelapse as TimelapseIcon,
-    LowPriority as LowPriorityIcon
-} from '@mui/icons-material';
+    LowPriority as LowPriorityIcon,
+} from "@mui/icons-material";
 
-import { Colors, Fonts, SXs } from '@styles';
-import { toggleSettings } from '@utils';
+import { Colors, Fonts, SXs } from "@styles";
+import { toggleSettings } from "@utils";
 
 import { debounce } from "lodash";
 
@@ -31,7 +49,7 @@ export default function SwitchListSecondary() {
     useEffect(() => {
         const loop = setInterval(() => {
             if (window && !isSet) {
-                setChecked(JSON.parse(localStorage.getItem('vip-settings')) || []);
+                setChecked(JSON.parse(localStorage.getItem("vip-settings")) || []);
                 setIsSet(true);
                 clearInterval(loop);
             }
@@ -40,18 +58,22 @@ export default function SwitchListSecondary() {
         return () => clearInterval(loop);
     }, [isSet]);
 
-    const handleChange = (value, selectionValue) => () => toggleSettings(value, selectionValue, checked, setChecked);
+    const handleChange = (value, selectionValue) => () =>
+        toggleSettings(value, selectionValue, checked, setChecked);
 
-    const getItem = (name) => checked?.find(item => item.includes(`${name}`))
+    const getItem = (name) => checked?.find((item) => item.includes(`${name}`));
 
     const isExist = (name) => {
         const temp = getItem(name);
-        const isTheirASlash = temp?.includes('/');
-        return [temp !== undefined, isTheirASlash ? temp.split("/").slice(-1)[0] : temp];
+        const isTheirASlash = temp?.includes("/");
+        return [
+            temp !== undefined,
+            isTheirASlash ? temp.split("/").slice(-1)[0] : temp,
+        ];
     };
 
     const handleReset = () => {
-        window && localStorage.setItem('vip-settings', JSON.stringify([]));
+        window && localStorage.setItem("vip-settings", JSON.stringify([]));
         setChecked([]);
     };
 
@@ -59,10 +81,17 @@ export default function SwitchListSecondary() {
         <Container maxWidth="lg">
             <Grid container>
                 <Grid item xs={12} mt={[3, 4, 5]}>
-                    <Typography variant="h5" gutterBottom sx={{ fontWeight: Fonts.FW_500 }}>
+                    <Typography
+                        variant="h5"
+                        gutterBottom
+                        sx={{ fontWeight: Fonts.FW_500 }}
+                    >
                         Settings
                         <Tooltip title="Reset settings">
-                            <IconButton sx={{ ...SXs.MUI_NAV_ICON_BUTTON, ml: 2 }} onClick={handleReset}>
+                            <IconButton
+                                sx={{ ...SXs.MUI_NAV_ICON_BUTTON, ml: 2 }}
+                                onClick={handleReset}
+                            >
                                 <RefreshIcon />
                             </IconButton>
                         </Tooltip>
@@ -71,13 +100,15 @@ export default function SwitchListSecondary() {
                 </Grid>
 
                 <Grid item xs={12} sm={6} md={4} my={1} px={[0, 0.5]}>
-                    <Paper variant='outlined' sx={gridSX}>
+                    <Paper variant="outlined" sx={gridSX}>
                         <List
-                            sx={{ width: '100%', mt: 0 }}
-                            subheader={<ListHeadings
-                                title="Helper"
-                                subtitle="This will help you fill out most of the fields. Note that sometimes it will fail."
-                            />}
+                            sx={{ width: "100%", mt: 0 }}
+                            subheader={
+                                <ListHeadings
+                                    title="Helper"
+                                    subtitle="This will help you fill out most of the fields. Note that sometimes it will fail."
+                                />
+                            }
                         >
                             <ListItem>
                                 <ListItemIcon>
@@ -86,10 +117,16 @@ export default function SwitchListSecondary() {
                                 <ListItemText id="switch-list-label-wifi" primary="Auto fill" />
                                 <Switch
                                     edge="end"
-                                    onChange={(e, value) => handleChange('autoFill', `${value.toString()}`)()}
-                                    checked={isExist('autoFill')[0] ? isExist('autoFill')[1] === 'true' : true}
+                                    onChange={(e, value) =>
+                                        handleChange("autoFill", `${value.toString()}`)()
+                                    }
+                                    checked={
+                                        isExist("autoFill")[0]
+                                            ? isExist("autoFill")[1] === "true"
+                                            : true
+                                    }
                                     inputProps={{
-                                        'aria-labelledby': 'switch-list-label-wifi',
+                                        "aria-labelledby": "switch-list-label-wifi",
                                     }}
                                 />
                             </ListItem>
@@ -113,24 +150,39 @@ export default function SwitchListSecondary() {
                 </Grid>
 
                 <Grid item xs={12} sm={6} md={4} my={1} px={[0, 0.5]}>
-                    <Paper variant='outlined' sx={gridSX}>
+                    <Paper variant="outlined" sx={gridSX}>
                         <List
-                            sx={{ width: '100%', mt: 0 }}
-                            subheader={<ListHeadings
-                                title="Publicity"
-                            />}
+                            sx={{ width: "100%", mt: 0 }}
+                            subheader={<ListHeadings title="Publicity" />}
                         >
                             <ListItem>
                                 <ListItemIcon>
-                                    {(isExist('publicWords')[0] ? isExist('publicWords')[1] === 'true' : true) ? <PublicIcon /> : <LockIcon />}
+                                    {(
+                                        isExist("publicWords")[0]
+                                            ? isExist("publicWords")[1] === "true"
+                                            : true
+                                    ) ? (
+                                        <PublicIcon />
+                                    ) : (
+                                        <LockIcon />
+                                    )}
                                 </ListItemIcon>
-                                <ListItemText id="switch-list-label-wifi" primary="Make future words public" />
+                                <ListItemText
+                                    id="switch-list-label-wifi"
+                                    primary="Make future words public"
+                                />
                                 <Switch
                                     edge="end"
-                                    onChange={(e, value) => handleChange('publicWords', `${value.toString()}`)()}
-                                    checked={isExist('publicWords')[0] ? isExist('publicWords')[1] === 'true' : true}
+                                    onChange={(e, value) =>
+                                        handleChange("publicWords", `${value.toString()}`)()
+                                    }
+                                    checked={
+                                        isExist("publicWords")[0]
+                                            ? isExist("publicWords")[1] === "true"
+                                            : true
+                                    }
                                     inputProps={{
-                                        'aria-labelledby': 'switch-list-label-publicWords',
+                                        "aria-labelledby": "switch-list-label-publicWords",
                                     }}
                                 />
                             </ListItem>
@@ -139,13 +191,15 @@ export default function SwitchListSecondary() {
                 </Grid>
 
                 <Grid item xs={12} sm={6} md={4} my={1} px={[0, 0.5]}>
-                    <Paper variant='outlined' sx={gridSX}>
+                    <Paper variant="outlined" sx={gridSX}>
                         <List
-                            sx={{ width: '100%', mt: 0 }}
-                            subheader={<ListHeadings
-                                title="Practice"
-                                subtitle="Set level of practice"
-                            />}
+                            sx={{ width: "100%", mt: 0 }}
+                            subheader={
+                                <ListHeadings
+                                    title="Practice"
+                                    subtitle="Set level of practice"
+                                />
+                            }
                         >
                             <PractiseInputNumber
                                 handleChange={handleChange}
@@ -187,20 +241,31 @@ export default function SwitchListSecondary() {
     );
 }
 
-const PractiseInputNumber = ({ Icon, name, title, subtitle, handleChange, isExist, max, min, defaultValue }) => {
+const PractiseInputNumber = ({
+    Icon,
+    name,
+    title,
+    subtitle,
+    handleChange,
+    isExist,
+    max,
+    min,
+    defaultValue,
+}) => {
+    const debounceFixValue = useMemo(
+        () =>
+            debounce((e) => {
+                if (Number(e.target.value) > max) {
+                    e.target.value = max;
+                }
+                if (Number(e.target.value) < min) {
+                    e.target.value = min;
+                }
 
-    const debounceFixValue = useMemo(() => debounce((e) => {
-
-        if (Number(e.target.value) > max) {
-            e.target.value = max;
-        }
-        if (Number(e.target.value) < min) {
-            e.target.value = min;
-        }
-
-        handleChange(`${name}`, `${e.target.value}`)();
-
-    }, 500), [max, min, handleChange, name]);
+                handleChange(`${name}`, `${e.target.value}`)();
+            }, 500),
+        [max, min, handleChange, name]
+    );
 
     return (
         <ListItem>
@@ -213,7 +278,7 @@ const PractiseInputNumber = ({ Icon, name, title, subtitle, handleChange, isExis
                 secondary={subtitle}
             />
             <TextField
-                sx={{ maxWidth: '90px' }}
+                sx={{ maxWidth: "90px" }}
                 fullWidth
                 size="small"
                 id={`outlined-number-${name}`}
@@ -222,57 +287,88 @@ const PractiseInputNumber = ({ Icon, name, title, subtitle, handleChange, isExis
                 value={isExist(name)[0] ? Number(isExist(name)[1]) : defaultValue}
                 onChange={(e) => {
                     debounceFixValue(e);
-                    handleChange(`${name}`, `${e.target.value}`)()
+                    handleChange(`${name}`, `${e.target.value}`)();
                 }}
             />
         </ListItem>
-    )
-}
+    );
+};
 
 const ListHeadings = ({ title, subtitle }) => [
-    <Typography sx={{ ml: 2, mt: 2 }} variant="h6" component="div" key={`heading-list-${title}`}>
+    <Typography
+        sx={{ ml: 2, mt: 2 }}
+        variant="h6"
+        component="div"
+        key={`heading-list-${title}`}
+    >
         {title}
     </Typography>,
-    <ListSubheader sx={{
-        bgcolor: theme => theme.palette.paper_grey.main,
-        lineHeight: 'normal',
-        my: 1
-    }} key={`sub-heading-list-${title}`}>
+    <ListSubheader
+        sx={{
+            bgcolor: (theme) => theme.palette.paper_grey.main,
+            lineHeight: "normal",
+            my: 1,
+        }}
+        key={`sub-heading-list-${title}`}
+    >
         {subtitle}
-    </ListSubheader>
-]
+    </ListSubheader>,
+];
 
-const AutoFillLevel = ({ handleChange, name, values, title, isExist, Icon, noGutter, label, defaultValue, subtitle }) => (
-    <Collapse in={isExist('autoFill')[0] ? isExist('autoFill')[1] === 'true' : true} timeout="auto" unmountOnExit>
+const AutoFillLevel = ({
+    handleChange,
+    name,
+    values,
+    title,
+    isExist,
+    Icon,
+    noGutter,
+    label,
+    defaultValue,
+    subtitle,
+}) => (
+    <Collapse
+        in={isExist("autoFill")[0] ? isExist("autoFill")[1] === "true" : true}
+        timeout="auto"
+        unmountOnExit
+    >
         <ListItem>
             <ListItemIcon sx={{ pl: noGutter ? 0 : 2 }}>
                 {Icon ? <Icon /> : <SubdirectoryArrowRightIcon />}
             </ListItemIcon>
-            <Grid container direction='row' alignItems='center'>
+            <Grid container direction="row" alignItems="center">
                 <Grid item xs={8}>
                     <ListItemText
                         id={`switch-list-label-${name}`}
                         primary={title}
                         secondary={subtitle}
-                        secondaryTypographyProps={{ align: 'justify' }}
-                        sx={{ pr: 1, width: '100%' }}
+                        secondaryTypographyProps={{ align: "justify" }}
+                        sx={{ pr: 1, width: "100%" }}
                     />
                 </Grid>
-                <Grid item xs={4} display='flex' justifyContent='flex-end'>
-                    <FormControl fullWidth sx={{ maxWidth: '90px' }}>
-                        <InputLabel id={`demo-simple-select-${name}`}>{label || 'Max'}</InputLabel>
+                <Grid item xs={4} display="flex" justifyContent="flex-end">
+                    <FormControl fullWidth sx={{ maxWidth: "90px" }}>
+                        <InputLabel id={`demo-simple-select-${name}`}>
+                            {label || "Max"}
+                        </InputLabel>
                         <Select
-                            size='small'
+                            size="small"
                             label={label || "Max"}
                             labelId={`demo-simple-select-label-${name}`}
                             id={`demo-simple-select-${name}`}
-                            value={isExist(`${name}`)[0] ? isExist(`${name}`)[1] : (defaultValue ? defaultValue : values[1].value)}
-                            onChange={(e) =>
-                                handleChange(`${name}`, `${e.target.value}`)()
+                            value={
+                                isExist(`${name}`)[0]
+                                    ? isExist(`${name}`)[1]
+                                    : defaultValue
+                                        ? defaultValue
+                                        : values[1].value
                             }
+                            onChange={(e) => handleChange(`${name}`, `${e.target.value}`)()}
                         >
                             {values?.map((value, index) => (
-                                <MenuItem value={value?.value} key={`render-${name}-${index}`}>{value?.label}</MenuItem>
+                                <MenuItem value={value?.value} key={`render-${name}-${index}`}>
+                                    {value?.label}
+                                </MenuItem>
                             ))}
                         </Select>
                     </FormControl>
@@ -283,95 +379,97 @@ const AutoFillLevel = ({ handleChange, name, values, title, isExist, Icon, noGut
 );
 
 const gridSX = {
-    overflow: 'hidden',
-    bgcolor: theme => theme.palette.paper_grey.main,
-    borderRadius: '10px',
-    ':hover': {
-        boxShadow: theme => theme.shadows[3]
-    }
-}
+    overflow: "hidden",
+    bgcolor: (theme) => theme.palette.paper_grey.main,
+    borderRadius: "10px",
+    ":hover": {
+        boxShadow: (theme) => theme.shadows[3],
+    },
+};
 
 const autoFillLevelsProps = {
     examples: {
-        title: 'Examples',
+        title: "Examples",
         values: [
-            { value: 0, label: 'None' },
-            { value: 1, label: '1' },
-            { value: 2, label: '2' },
-            { value: 3, label: '3' },
-            { value: 4, label: '4' },
-            { value: 5, label: '5' },
-            { value: 10, label: '10' },
-            { value: 100, label: 'All' },
+            { value: 0, label: "None" },
+            { value: 1, label: "1" },
+            { value: 2, label: "2" },
+            { value: 3, label: "3" },
+            { value: 4, label: "4" },
+            { value: 5, label: "5" },
+            { value: 10, label: "10" },
+            { value: 100, label: "All" },
         ],
-        name: 'examples'
+        name: "examples",
     },
     english: {
-        title: 'English',
+        title: "English",
         values: [
-            { value: 0, label: 'None' },
-            { value: 1, label: '1' },
-            { value: 2, label: '2' },
-            { value: 3, label: '3' },
-            { value: 4, label: '4' },
-            { value: 5, label: '5' },
-            { value: 10, label: '10' },
-            { value: 100, label: 'All' },
+            { value: 0, label: "None" },
+            { value: 1, label: "1" },
+            { value: 2, label: "2" },
+            { value: 3, label: "3" },
+            { value: 4, label: "4" },
+            { value: 5, label: "5" },
+            { value: 10, label: "10" },
+            { value: 100, label: "All" },
         ],
-        name: 'english'
+        name: "english",
     },
     tags: {
-        title: 'Tags',
+        title: "Tags",
         values: [
-            { value: 0, label: 'None' },
-            { value: 1, label: '10' },
-            { value: 2, label: '20' },
-            { value: 3, label: '50' },
-            { value: 4, label: '100' },
-            { value: 5, label: 'All' },
+            { value: 0, label: "None" },
+            { value: 1, label: "10" },
+            { value: 2, label: "20" },
+            { value: 3, label: "50" },
+            { value: 4, label: "100" },
+            { value: 5, label: "All" },
         ],
-        name: 'tags'
+        name: "tags",
     },
     lastReview: {
-        title: 'Last review - date',
+        title: "Last review - date",
         values: [
-            { value: 1, label: '1' },
-            { value: 2, label: '2' },
-            { value: 3, label: '3' },
-            { value: 4, label: '4' },
-            { value: 5, label: '5' },
-            { value: 6, label: '6' },
-            { value: 7, label: '7' },
-            { value: 8, label: '8' },
-            { value: 9, label: '9' },
-            { value: 10, label: '10' },
+            { value: 1, label: "1" },
+            { value: 2, label: "2" },
+            { value: 3, label: "3" },
+            { value: 4, label: "4" },
+            { value: 5, label: "5" },
+            { value: 6, label: "6" },
+            { value: 7, label: "7" },
+            { value: 8, label: "8" },
+            { value: 9, label: "9" },
+            { value: 10, label: "10" },
         ],
-        name: 'lastReview',
-        subtitle: 'The bigger the number, the higher chance for the word to be selected when the last review date is far in the past.',
+        name: "lastReview",
+        subtitle:
+            "The bigger the number, the higher chance for the word to be selected when the last review date is far in the past.",
         Icon: LowPriorityIcon,
         noGutter: true,
         defaultValue: 1,
-        label: "Factor"
+        label: "Factor",
     },
     lastReviewOK: {
-        title: 'Last review - result',
+        title: "Last review - result",
         values: [
-            { value: 1, label: '1' },
-            { value: 2, label: '2' },
-            { value: 3, label: '3' },
-            { value: 4, label: '4' },
-            { value: 5, label: '5' },
-            { value: 6, label: '6' },
-            { value: 7, label: '7' },
-            { value: 8, label: '8' },
-            { value: 9, label: '9' },
-            { value: 10, label: '10' },
+            { value: 1, label: "1" },
+            { value: 2, label: "2" },
+            { value: 3, label: "3" },
+            { value: 4, label: "4" },
+            { value: 5, label: "5" },
+            { value: 6, label: "6" },
+            { value: 7, label: "7" },
+            { value: 8, label: "8" },
+            { value: 9, label: "9" },
+            { value: 10, label: "10" },
         ],
-        name: 'lastReviewOK',
-        subtitle: 'The bigger the number, the higher chance for the word to be selected when the last review is not OK.',
+        name: "lastReviewOK",
+        subtitle:
+            "The bigger the number, the higher chance for the word to be selected when the last review is not OK.",
         Icon: LowPriorityIcon,
         noGutter: true,
         defaultValue: 5,
-        label: "Factor"
-    }
-}
+        label: "Factor",
+    },
+};

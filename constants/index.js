@@ -22,12 +22,11 @@ export const CLEAR_USER_DATA = "CLEAR_USER_DATA";
 export const UPDATE_USER_DATA = "UPDATE_USER_DATA";
 
 export const IMAGE_ALT =
-  "https://res.cloudinary.com/katyperrycbt/image/upload/v1645343005/sammy-blue-mountains-image_einbhn.svg";
+    "https://res.cloudinary.com/katyperrycbt/image/upload/v1645343005/sammy-blue-mountains-image_einbhn.svg";
 
 export const VIP_TYPES = ["vocab", "idiom", "phrase"];
 export const VOCAB_TYPES = ["noun", "verb", "adverb", "adjective", "other"];
 
-export const NO_RECAPTCHA = 'NO_RECAPTCHA';
-export const DONE_RECAPTCHA = 'DONE_RECAPTCHA';
-export const RELOAD_RECAPTCHA = 'RELOAD_RECAPTCHA';
-
+export const NO_RECAPTCHA = "NO_RECAPTCHA";
+export const DONE_RECAPTCHA = "DONE_RECAPTCHA";
+export const RELOAD_RECAPTCHA = "RELOAD_RECAPTCHA";

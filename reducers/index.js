@@ -9,14 +9,14 @@ import userData from "./userData";
 import recaptcha from "./recaptcha";
 
 const rootReducer = combineReducers({
-  user,
-  snackbar,
-  linear,
-  backdrop,
-  tabName,
-  bgColor,
-  userData,
-  recaptcha
+    user,
+    snackbar,
+    linear,
+    backdrop,
+    tabName,
+    bgColor,
+    userData,
+    recaptcha,
 });
 
 export default rootReducer;

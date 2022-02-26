@@ -1,14 +1,13 @@
-import { forwardRef } from 'react';
+import { forwardRef } from "react";
 // material
-import { Box } from '@mui/material';
+import { Box } from "@mui/material";
 
-const Page = forwardRef(({ children, title = '', ...other }, ref) => (
+const Page = forwardRef(({ children, title = "", ...other }, ref) => (
     <Box ref={ref} {...other}>
         {children}
     </Box>
 ));
 
-
-Page.displayName = 'Page';
+Page.displayName = "Page";
 
 export default Page;

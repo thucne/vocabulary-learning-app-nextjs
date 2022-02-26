@@ -48,7 +48,6 @@ const WordCard = ({ open, setOpen, wordList }) => {
     const [wordIndex, setWordIndex] = useState(0);
     const [learnStatus, setLearnStatus] = useState([]);
 
-
     const handleClose = () => {
         setOpen(false);
     };
@@ -339,6 +338,5 @@ const style = {
         borderRadius: "5px",
     },
 };
-
 
 export default React.memo(WordCard);

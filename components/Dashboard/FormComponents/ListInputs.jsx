@@ -1,11 +1,15 @@
-import React from 'react';
+import React from "react";
 
 import {
-    Grid, Box, TextField,
-    FormControl, Button, FormHelperText,
-} from '@mui/material';
+    Grid,
+    Box,
+    TextField,
+    FormControl,
+    Button,
+    FormHelperText,
+} from "@mui/material";
 
-import { SXs } from '@styles';
+import { SXs } from "@styles";
 
 const ListInput = ({
     temptField,
@@ -18,17 +22,19 @@ const ListInput = ({
     handleChangeTemptInput,
     checkInputCriteria,
     clearTemptInputField,
-    addToFormState
+    addToFormState,
 }) => (
     <React.Fragment>
         <Grid item xs={12}>
             <FormControl fullWidth error={error?.length > 0}>
-                <Box sx={{
-                    display: "flex",
-                    alignItems: "flex-start",
-                    justifyContent: "flex-start",
-                    width: "100%"
-                }}>
+                <Box
+                    sx={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        justifyContent: "flex-start",
+                        width: "100%",
+                    }}
+                >
                     <TextField
                         fullWidth
                         required={required}
@@ -45,7 +51,7 @@ const ListInput = ({
                     />
                     <Button
                         variant="outlined"
-                        sx={{ mt: '8px', height: '40px', ...SXs.COMMON_BUTTON_STYLES }}
+                        sx={{ mt: "8px", height: "40px", ...SXs.COMMON_BUTTON_STYLES }}
                         onClick={(e) => {
                             addToFormState(e, temptField, formField);
                             clearTemptInputField(temptField);

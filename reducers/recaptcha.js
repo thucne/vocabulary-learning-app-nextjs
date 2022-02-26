@@ -7,10 +7,10 @@ const recaptcha = (state = false, action) => {
         case t.DONE_RECAPTCHA:
             return true;
         case t.RELOAD_RECAPTCHA:
-            return 'loading';
+            return "loading";
         default:
             return state;
     }
-}
+};
 
 export default recaptcha;

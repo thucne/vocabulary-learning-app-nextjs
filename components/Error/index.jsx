@@ -1,30 +1,36 @@
-import { motion } from 'framer-motion';
-import Link from 'next/link';
+import { motion } from "framer-motion";
+import Link from "next/link";
 // material
-import { styled } from '@mui/system';
-import { Box, Button, Typography, Container } from '@mui/material';
+import { styled } from "@mui/system";
+import { Box, Button, Typography, Container } from "@mui/material";
 // components
-import { MotionContainer, varBounceIn } from './animate';
-import Page from './Page';
+import { MotionContainer, varBounceIn } from "./animate";
+import Page from "./Page";
 
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
-    display: 'flex',
-    minHeight: '100%',
-    alignItems: 'center',
+    display: "flex",
+    minHeight: "100%",
+    alignItems: "center",
     paddingTop: theme.spacing(5),
-    paddingBottom: theme.spacing(10)
+    paddingBottom: theme.spacing(10),
 }));
 
 // ----------------------------------------------------------------------
 
-export default function PageError({ title, errorMessage, message, illustration, redirectTo }) {
+export default function PageError({
+    title,
+    errorMessage,
+    message,
+    illustration,
+    redirectTo,
+}) {
     return (
         <RootStyle title={title}>
-            <Container className='noselect'>
+            <Container className="noselect">
                 <MotionContainer initial="initial" open>
-                    <Box sx={{ maxWidth: 480, margin: 'auto', textAlign: 'center' }}>
+                    <Box sx={{ maxWidth: 480, margin: "auto", textAlign: "center" }}>
                         <motion.div variants={varBounceIn}>
                             <Typography variant="h3" paragraph>
                                 {errorMessage}
@@ -32,7 +38,7 @@ export default function PageError({ title, errorMessage, message, illustration, 
                         </motion.div>
 
                         <motion.div variants={varBounceIn}>
-                            <Typography sx={{ color: 'text.secondary' }}>
+                            <Typography sx={{ color: "text.secondary" }}>
                                 {message}
                             </Typography>
                         </motion.div>
@@ -41,12 +47,12 @@ export default function PageError({ title, errorMessage, message, illustration, 
                             <Box
                                 component="img"
                                 src={illustration}
-                                sx={{ height: 260, mx: 'auto', my: { xs: 5, sm: 5 } }}
+                                sx={{ height: 260, mx: "auto", my: { xs: 5, sm: 5 } }}
                             />
                         </motion.div>
 
                         <Link href={redirectTo.link} passHref>
-                            <Button variant='outlined'>{redirectTo.title}</Button>
+                            <Button variant="outlined">{redirectTo.title}</Button>
                         </Link>
                     </Box>
                 </MotionContainer>

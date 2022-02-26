@@ -1,49 +1,76 @@
-import React, { useEffect, useState, useRef, useMemo, useCallback } from "react";
+import React, {
+    useEffect,
+    useState,
+    useRef,
+    useMemo,
+    useCallback,
+} from "react";
 
-import Image from 'next/image';
+import Image from "next/image";
 
 import {
-    Grid, TextField, InputLabel, Select, MenuItem,
-    FormControl, Dialog, DialogActions,
-    DialogContent, DialogTitle, OutlinedInput,
-    ToggleButton, ToggleButtonGroup,
-    Typography, Box, FormHelperText, Paper, FormLabel,
-    SvgIcon, Tooltip, Stack, Divider, Collapse,
-    ListItemButton, Button
+    Grid,
+    TextField,
+    InputLabel,
+    Select,
+    MenuItem,
+    FormControl,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    OutlinedInput,
+    ToggleButton,
+    ToggleButtonGroup,
+    Typography,
+    Box,
+    FormHelperText,
+    Paper,
+    FormLabel,
+    SvgIcon,
+    Tooltip,
+    Stack,
+    Divider,
+    Collapse,
+    ListItemButton,
+    Button,
 } from "@mui/material";
 
 import {
     Send as SendIcon,
     AutoAwesome as AutoAwesomeIcon,
-    ExpandLess, ExpandMore,
-} from '@mui/icons-material';
+    ExpandLess,
+    ExpandMore,
+} from "@mui/icons-material";
 
 import { LoadingButton } from "@mui/lab";
-import { useTheme } from '@mui/material/styles';
+import { useTheme } from "@mui/material/styles";
 
 import { useDispatch, useSelector } from "react-redux";
 
-import LoadingImage from '@components/LoadingImage';
-import ListArrayInputs from './FormComponents/ListArrayInputs';
-import ListInputs from './FormComponents/ListInputs';
+import LoadingImage from "@components/LoadingImage";
+import ListArrayInputs from "./FormComponents/ListArrayInputs";
+import ListInputs from "./FormComponents/ListInputs";
 
 import { IMAGE_ALT, VIP_TYPES, SHOW_SNACKBAR } from "@consts";
 import { fetcherJWT, createVIP } from "@actions";
 import {
-    useWindowSize, useThisToGetSizesFromRef,
-    getJWT, groupBy, handleDictionaryData,
-    useSettings
-} from '@utils';
+    useWindowSize,
+    useThisToGetSizesFromRef,
+    getJWT,
+    groupBy,
+    handleDictionaryData,
+    useSettings,
+} from "@utils";
 import { Fonts, SXs } from "@styles";
-import { API, RECAPTCHA } from '@config';
+import { API, RECAPTCHA } from "@config";
 
-import useSWR from 'swr';
+import useSWR from "swr";
 import { debounce } from "lodash";
 
-import Uploader from '@tallis/react-dndp';
+import Uploader from "@tallis/react-dndp";
 
 const fetcher = async (...args) => await fetcherJWT(...args);
-
 
 export default function CreateNewWord({ open = false, setOpen }) {
     const theme = useTheme();
@@ -67,7 +94,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
 
     const [opens, setOpens] = useState(initOpens);
 
-    const recaptcha = useSelector(state => state.recaptcha);
+    const recaptcha = useSelector((state) => state.recaptcha);
 
     const resetWhole = () => {
         setTemptInput(initTempInputs);
@@ -78,7 +105,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
         setIsOver10MB(false);
         setFetchingAPI(false);
         setOpens(initOpens);
-    }
+    };
 
     const handleClose = () => {
         // reset all
@@ -91,12 +118,14 @@ export default function CreateNewWord({ open = false, setOpen }) {
     useSWR(getJWT() ? `${API}/api/type2s` : null, fetcher, {
         onSuccess: (data) => {
             const raw = data?.data;
-            const types = raw?.sort((a, b) => a?.id - b?.id).map(item => ({
-                value: item?.attributes?.name,
-                id: item?.id
-            }));
+            const types = raw
+                ?.sort((a, b) => a?.id - b?.id)
+                .map((item) => ({
+                    value: item?.attributes?.name,
+                    id: item?.id,
+                }));
             setVocabTypes(types);
-        }
+        },
     });
 
     useEffect(() => {
@@ -112,14 +141,11 @@ export default function CreateNewWord({ open = false, setOpen }) {
 
     // useDebounce(form.vip, () => handleFetchPronouce(), 2000);
 
-    const photoSizes = useThisToGetSizesFromRef(
-        photoRef,
-        {
-            revalidate: 1000,
-            terminalCondition: ({ width }) => width !== 0,
-            falseCondition: ({ width }) => width === 0,
-        }
-    );
+    const photoSizes = useThisToGetSizesFromRef(photoRef, {
+        revalidate: 1000,
+        terminalCondition: ({ width }) => width !== 0,
+        falseCondition: ({ width }) => width === 0,
+    });
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -130,12 +156,13 @@ export default function CreateNewWord({ open = false, setOpen }) {
         const data = {
             vip: form.vip,
             type1: form.type,
-            type2: form.type === "vocab"
-                ? form.clasifyVocab.map((item) => {
-                    const findItem = vocabTypes.find(each => each.value === item);
-                    return vocabTypes.indexOf(findItem)
-                })
-                : null,
+            type2:
+                form.type === "vocab"
+                    ? form.clasifyVocab.map((item) => {
+                        const findItem = vocabTypes.find((each) => each.value === item);
+                        return vocabTypes.indexOf(findItem);
+                    })
+                    : null,
             examples: form.examples,
             pronounce: form.pronounce,
             meanings: { english: form.engMeanings, vietnamese: form.vnMeanings },
@@ -144,9 +171,9 @@ export default function CreateNewWord({ open = false, setOpen }) {
             tags: form.tags.join(","),
             public: form.public,
             audio: form.audio,
-        }
+        };
 
-        formData.append("files.illustration", photo?.get('illustration'));
+        formData.append("files.illustration", photo?.get("illustration"));
 
         let temp = {};
         for (let pair of formData.entries()) {
@@ -155,61 +182,78 @@ export default function CreateNewWord({ open = false, setOpen }) {
 
         if (window?.adHocFetch && recaptcha === true && window.grecaptcha) {
             grecaptcha.ready(function () {
-                grecaptcha.execute(`${RECAPTCHA}`, { action: 'vip_authentication' }).then(function (token) {
-                    // Add your logic to submit to your backend server here.
-                    formData.append("data", JSON.stringify({ ...data, token }));
+                grecaptcha
+                    .execute(`${RECAPTCHA}`, { action: "vip_authentication" })
+                    .then(function (token) {
+                        // Add your logic to submit to your backend server here.
+                        formData.append("data", JSON.stringify({ ...data, token }));
 
-                    adHocFetch({
-                        dispatch,
-                        action: createVIP(formData),
-                        onSuccess: (data) => resetWhole(),
-                        onError: (error) => console.log(error),
-                        onStarting: () => setLoading(true),
-                        onFinally: () => setLoading(false),
-                        snackbarMessageOnSuccess: "Added!"
+                        adHocFetch({
+                            dispatch,
+                            action: createVIP(formData),
+                            onSuccess: (data) => resetWhole(),
+                            onError: (error) => console.log(error),
+                            onStarting: () => setLoading(true),
+                            onFinally: () => setLoading(false),
+                            snackbarMessageOnSuccess: "Added!",
+                        });
                     });
-                });
             });
         }
     };
 
-    const handleFetchPronouce = useCallback(async (value) => {
-        if (!value) {
-            setForm((form) => ({ ...form, ...resetSome }));
-            setFetchingAPI(false);
-            return;
-        }
-        try {
-            setFetchingAPI(true);
-            const res = await fetch(
-                `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(value.toString().toLowerCase())}`,
-            );
-            const data = await res.json();
-
-            setFetchingAPI(false);
-
-            const firstData = data?.[0];
-
-            if (!data.message && firstData?.word === value.toString().toLowerCase()) {
-
-                const processedData = handleDictionaryData(firstData, vocabTypes, settings);
-
-                setForm((form) => ({ ...form, ...processedData, auto: true }));
-            } else {
+    const handleFetchPronouce = useCallback(
+        async (value) => {
+            if (!value) {
                 setForm((form) => ({ ...form, ...resetSome }));
+                setFetchingAPI(false);
+                return;
             }
-        } catch (e) {
-            console.log(e);
-            setForm((form) => ({ ...form, ...resetSome }));
-            setFetchingAPI(false);
-        }
-    }, [vocabTypes, settings]);
+            try {
+                setFetchingAPI(true);
+                const res = await fetch(
+                    `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(
+                        value.toString().toLowerCase()
+                    )}`
+                );
+                const data = await res.json();
 
-    const debounceFunction = useMemo(() => debounce((e) => {
-        handleChangeValue(e, "vip");
-        checkInputCriteria(e, "vip");
-        handleFetchPronouce(e.target.value);
-    }, 1000), [handleFetchPronouce, checkInputCriteria]);
+                setFetchingAPI(false);
+
+                const firstData = data?.[0];
+
+                if (
+                    !data.message &&
+                    firstData?.word === value.toString().toLowerCase()
+                ) {
+                    const processedData = handleDictionaryData(
+                        firstData,
+                        vocabTypes,
+                        settings
+                    );
+
+                    setForm((form) => ({ ...form, ...processedData, auto: true }));
+                } else {
+                    setForm((form) => ({ ...form, ...resetSome }));
+                }
+            } catch (e) {
+                console.log(e);
+                setForm((form) => ({ ...form, ...resetSome }));
+                setFetchingAPI(false);
+            }
+        },
+        [vocabTypes, settings]
+    );
+
+    const debounceFunction = useMemo(
+        () =>
+            debounce((e) => {
+                handleChangeValue(e, "vip");
+                checkInputCriteria(e, "vip");
+                handleFetchPronouce(e.target.value);
+            }, 1000),
+        [handleFetchPronouce, checkInputCriteria]
+    );
 
     const debounceFetchPronouce = (e) => {
         debounceFunction(e);
@@ -229,7 +273,9 @@ export default function CreateNewWord({ open = false, setOpen }) {
     const handleDeleteItem = (field, index) => {
         setForm((state) => ({
             ...state,
-            [field]: state[field].filter((item, i) => index !== -10 ? i !== index : false),
+            [field]: state[field].filter((item, i) =>
+                index !== -10 ? i !== index : false
+            ),
         }));
     };
 
@@ -244,40 +290,48 @@ export default function CreateNewWord({ open = false, setOpen }) {
     };
 
     const canSubmit = () =>
-        (
-            form.vip?.length
-            && form.examples?.length
-            && (form.vnMeanings?.length || form.engMeanings?.length)
-            && form.tags?.length
-            && !errors?.vip.error?.length
-            && !errors?.examples?.length
-            && !errors?.meanings?.length
-            && !errors?.tags?.length
-            && !(Math.ceil(isOver10MB / 1024 / 1024) > 10)
-        ) ?? false;
+        (form.vip?.length &&
+            form.examples?.length &&
+            (form.vnMeanings?.length || form.engMeanings?.length) &&
+            form.tags?.length &&
+            !errors?.vip.error?.length &&
+            !errors?.examples?.length &&
+            !errors?.meanings?.length &&
+            !errors?.tags?.length &&
+            !(Math.ceil(isOver10MB / 1024 / 1024) > 10)) ??
+        false;
 
-    const checkInputCriteria = useCallback((e, name) => {
-        let error = {};
-        switch (name) {
-            case "engMeanings", "vnMeanings":
-                error = (!e.target.value?.length && !form.vnMeanings.length && !form.engMeanings.length)
-                    ? "At least one meaning in Vietnamese (or English)"
-                    : "";
-                setErrors((state) => ({ ...state, ["meanings"]: error }));
-                return;
-            default:
-                error = e.target.value?.length || form[name].length
-                    ? ""
-                    : "This field is required";
-                setErrors((state) => ({
-                    ...state,
-                    [name]: error,
-                }));
-        }
-    }, [form]);
+    const checkInputCriteria = useCallback(
+        (e, name) => {
+            let error = {};
+            switch (name) {
+                case ("engMeanings", "vnMeanings"):
+                    error =
+                        !e.target.value?.length &&
+                            !form.vnMeanings.length &&
+                            !form.engMeanings.length
+                            ? "At least one meaning in Vietnamese (or English)"
+                            : "";
+                    setErrors((state) => ({ ...state, ["meanings"]: error }));
+                    return;
+                default:
+                    error =
+                        e.target.value?.length || form[name].length
+                            ? ""
+                            : "This field is required";
+                    setErrors((state) => ({
+                        ...state,
+                        [name]: error,
+                    }));
+            }
+        },
+        [form]
+    );
 
     const handleVocabTypesChange = (e) => {
-        const { target: { value } } = e;
+        const {
+            target: { value },
+        } = e;
         setForm((state) => ({
             ...state,
             ["clasifyVocab"]: typeof value === "string" ? value.split(",") : value,
@@ -289,17 +343,17 @@ export default function CreateNewWord({ open = false, setOpen }) {
         handleChangeTemptInput,
         checkInputCriteria,
         clearTemptInputField,
-        addToFormState
-    }
+        addToFormState,
+    };
 
     const gridForm = () => (
         <Box
             sx={{
                 width: "100%",
-                pointerEvents: loading ? 'none' : 'auto',
-                opacity: loading ? '0.2' : '1'
+                pointerEvents: loading ? "none" : "auto",
+                opacity: loading ? "0.2" : "1",
             }}
-            className={loading ? 'noselect' : ''}
+            className={loading ? "noselect" : ""}
         >
             <Box component="form" noValidate onSubmit={handleSubmit}>
                 <Grid container>
@@ -307,24 +361,29 @@ export default function CreateNewWord({ open = false, setOpen }) {
                         <Button
                             fullWidth
                             disableRipple
-                            onClick={() => setOpens(prev => ({ ...prev, primary: !prev.primary }))}
+                            onClick={() =>
+                                setOpens((prev) => ({ ...prev, primary: !prev.primary }))
+                            }
                             sx={{
                                 ...SXs.COMMON_BUTTON_STYLES,
-                                justifyContent: 'space-between',
-                                ml: '-8px',
-                                width: 'calc(100% + 16px)',
-                                color: theme => theme.palette.text.primary,
+                                justifyContent: "space-between",
+                                ml: "-8px",
+                                width: "calc(100% + 16px)",
+                                color: (theme) => theme.palette.text.primary,
                             }}
                         >
-                            <Typography variant="h6">
-                                Primary information
-                            </Typography>
+                            <Typography variant="h6">Primary information</Typography>
                             {opens.primary ? <ExpandLess /> : <ExpandMore />}
                         </Button>
                     </Grid>
 
                     <Grid item xs={12} mt={opens.primary ? 1 : 0}>
-                        <Collapse in={opens.primary} sx={{ width: '100%' }} timeout="auto" unmountOnExit>
+                        <Collapse
+                            in={opens.primary}
+                            sx={{ width: "100%" }}
+                            timeout="auto"
+                            unmountOnExit
+                        >
                             <Grid container>
                                 <Grid item xs={12}>
                                     <TextField
@@ -339,7 +398,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
                                         helperText={errors?.vip || "A vocabulary, idiom or phrase"}
                                         onChange={debounceFetchPronouce}
                                         InputLabelProps={{
-                                            shrink: true
+                                            shrink: true,
                                         }}
                                     />
                                 </Grid>
@@ -370,11 +429,16 @@ export default function CreateNewWord({ open = false, setOpen }) {
                                 {form.type === "vocab" && (
                                     <Grid item xs={8} pl={0.5}>
                                         <FormControl fullWidth margin="dense" size="small" required>
-                                            <InputLabel id="demo-multiple-chip-label"
-                                                sx={form.auto ? {
-                                                    ...SXs.AUTO_FILLED_TEXT_COLOR,
-                                                    display: "flex",
-                                                } : {}}
+                                            <InputLabel
+                                                id="demo-multiple-chip-label"
+                                                sx={
+                                                    form.auto
+                                                        ? {
+                                                            ...SXs.AUTO_FILLED_TEXT_COLOR,
+                                                            display: "flex",
+                                                        }
+                                                        : {}
+                                                }
                                             >
                                                 <SpecialLabel label="Classify" auto={form.auto} />
                                             </InputLabel>
@@ -384,21 +448,32 @@ export default function CreateNewWord({ open = false, setOpen }) {
                                                 multiple
                                                 value={form.clasifyVocab}
                                                 onChange={handleVocabTypesChange}
-                                                label={<SpecialLabel label="Classify" auto={form.auto} />}
+                                                label={
+                                                    <SpecialLabel label="Classify" auto={form.auto} />
+                                                }
                                                 input={
                                                     <OutlinedInput
                                                         id="select-multiple-chip"
-                                                        label={<SpecialLabel label="Classify" auto={form.auto} />}
+                                                        label={
+                                                            <SpecialLabel label="Classify" auto={form.auto} />
+                                                        }
                                                     />
                                                 }
                                             >
-                                                {vocabTypes?.map(item => item.value)?.map((name, index) => (
-                                                    <MenuItem key={`${name}-type2-${index}`} value={name}>
-                                                        {name}
-                                                    </MenuItem>
-                                                ))}
+                                                {vocabTypes
+                                                    ?.map((item) => item.value)
+                                                    ?.map((name, index) => (
+                                                        <MenuItem
+                                                            key={`${name}-type2-${index}`}
+                                                            value={name}
+                                                        >
+                                                            {name}
+                                                        </MenuItem>
+                                                    ))}
                                             </Select>
-                                            <FormHelperText>For searching. Multi-selection</FormHelperText>
+                                            <FormHelperText>
+                                                For searching. Multi-selection
+                                            </FormHelperText>
                                         </FormControl>
                                     </Grid>
                                 )}
@@ -413,7 +488,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
                                         multiline
                                         InputLabelProps={{
                                             sx: form.auto ? SXs.AUTO_FILLED_TEXT_COLOR : {},
-                                            shrink: form.pronounce?.length > 0
+                                            shrink: form.pronounce?.length > 0,
                                         }}
                                         error={errors?.pronounce?.length > 0}
                                         helperText={errors?.pronounce || "Optional"}
@@ -428,187 +503,249 @@ export default function CreateNewWord({ open = false, setOpen }) {
                         </Collapse>
                     </Grid>
 
-                    <Divider sx={{ width: '100%', my: 1 }} />
+                    <Divider sx={{ width: "100%", my: 1 }} />
 
                     <Grid item xs={12}>
                         <Button
                             fullWidth
                             disableRipple
-                            onClick={() => setOpens(prev => ({ ...prev, secondary: !prev.secondary }))}
+                            onClick={() =>
+                                setOpens((prev) => ({ ...prev, secondary: !prev.secondary }))
+                            }
                             sx={{
                                 ...SXs.COMMON_BUTTON_STYLES,
-                                justifyContent: 'space-between',
-                                ml: '-8px',
-                                width: 'calc(100% + 16px)',
-                                color: theme => theme.palette.text.primary,
+                                justifyContent: "space-between",
+                                ml: "-8px",
+                                width: "calc(100% + 16px)",
+                                color: (theme) => theme.palette.text.primary,
                             }}
                         >
-                            <Typography variant="h6">
-                                Secondary information
-                            </Typography>
+                            <Typography variant="h6">Secondary information</Typography>
                             {opens.secondary ? <ExpandLess /> : <ExpandMore />}
                         </Button>
                     </Grid>
 
                     <Grid item xs={12} mt={opens.secondary ? 1 : 0}>
-                        <Collapse in={opens.secondary} sx={{ width: '100%' }} timeout="auto" unmountOnExit>
+                        <Collapse
+                            in={opens.secondary}
+                            sx={{ width: "100%" }}
+                            timeout="auto"
+                            unmountOnExit
+                        >
                             <Grid container>
-                                <ListArrayInputs {...elementsListProps(form, handleDeleteItem).english} />
-                                <ListInputs {...elementsInputProps(errors, listInputProps).english} />
-                                <Divider sx={{ width: '100%', my: 1 }} />
+                                <ListArrayInputs
+                                    {...elementsListProps(form, handleDeleteItem).english}
+                                />
+                                <ListInputs
+                                    {...elementsInputProps(errors, listInputProps).english}
+                                />
+                                <Divider sx={{ width: "100%", my: 1 }} />
 
-                                <ListArrayInputs {...elementsListProps(form, handleDeleteItem).vietnamese} />
-                                <ListInputs {...elementsInputProps(errors, listInputProps).vietnamese} />
-                                <Divider sx={{ width: '100%', my: 1 }} />
+                                <ListArrayInputs
+                                    {...elementsListProps(form, handleDeleteItem).vietnamese}
+                                />
+                                <ListInputs
+                                    {...elementsInputProps(errors, listInputProps).vietnamese}
+                                />
+                                <Divider sx={{ width: "100%", my: 1 }} />
 
-                                <ListArrayInputs {...elementsListProps(form, handleDeleteItem).examples} />
-                                <ListInputs {...elementsInputProps(errors, listInputProps).examples} />
+                                <ListArrayInputs
+                                    {...elementsListProps(form, handleDeleteItem).examples}
+                                />
+                                <ListInputs
+                                    {...elementsInputProps(errors, listInputProps).examples}
+                                />
                             </Grid>
                         </Collapse>
                     </Grid>
 
-                    <Divider sx={{ width: '100%', my: 1 }} />
+                    <Divider sx={{ width: "100%", my: 1 }} />
 
                     <Grid item xs={12}>
                         <Button
                             fullWidth
                             disableRipple
-                            onClick={() => setOpens(prev => ({ ...prev, tertiary: !prev.tertiary }))}
+                            onClick={() =>
+                                setOpens((prev) => ({ ...prev, tertiary: !prev.tertiary }))
+                            }
                             sx={{
                                 ...SXs.COMMON_BUTTON_STYLES,
-                                justifyContent: 'space-between',
-                                ml: '-8px',
-                                width: 'calc(100% + 16px)',
-                                color: theme => theme.palette.text.primary,
+                                justifyContent: "space-between",
+                                ml: "-8px",
+                                width: "calc(100% + 16px)",
+                                color: (theme) => theme.palette.text.primary,
                             }}
                         >
-                            <Typography variant="h6">
-                                Tertiary information
-                            </Typography>
+                            <Typography variant="h6">Tertiary information</Typography>
                             {opens.tertiary ? <ExpandLess /> : <ExpandMore />}
                         </Button>
                     </Grid>
 
                     <Grid item xs={12} mt={opens.tertiary ? 1 : 0}>
-                        <Collapse in={opens.tertiary} sx={{ width: '100%' }} timeout="auto" unmountOnExit>
+                        <Collapse
+                            in={opens.tertiary}
+                            sx={{ width: "100%" }}
+                            timeout="auto"
+                            unmountOnExit
+                        >
                             <Grid container>
-                                <ListArrayInputs {...elementsListProps(form, handleDeleteItem).synonyms} />
-                                <ListInputs {...elementsInputProps(errors, listInputProps).synonyms} />
-                                <Divider sx={{ width: '100%', my: 1 }} />
+                                <ListArrayInputs
+                                    {...elementsListProps(form, handleDeleteItem).synonyms}
+                                />
+                                <ListInputs
+                                    {...elementsInputProps(errors, listInputProps).synonyms}
+                                />
+                                <Divider sx={{ width: "100%", my: 1 }} />
 
-                                <ListArrayInputs {...elementsListProps(form, handleDeleteItem).antonyms} />
-                                <ListInputs {...elementsInputProps(errors, listInputProps).antonyms} />
-                                <Divider sx={{ width: '100%', my: 1 }} />
+                                <ListArrayInputs
+                                    {...elementsListProps(form, handleDeleteItem).antonyms}
+                                />
+                                <ListInputs
+                                    {...elementsInputProps(errors, listInputProps).antonyms}
+                                />
+                                <Divider sx={{ width: "100%", my: 1 }} />
 
-                                <ListArrayInputs {...elementsListProps(form, handleDeleteItem).tags} />
-                                <ListInputs {...elementsInputProps(errors, listInputProps).tags} />
+                                <ListArrayInputs
+                                    {...elementsListProps(form, handleDeleteItem).tags}
+                                />
+                                <ListInputs
+                                    {...elementsInputProps(errors, listInputProps).tags}
+                                />
                             </Grid>
                         </Collapse>
                     </Grid>
 
-                    <Divider sx={{ width: '100%', my: 1 }} />
+                    <Divider sx={{ width: "100%", my: 1 }} />
 
                     <Grid item xs={12}>
                         <Button
                             fullWidth
                             disableRipple
-                            onClick={() => setOpens(prev => ({ ...prev, illustration: !prev.illustration }))}
+                            onClick={() =>
+                                setOpens((prev) => ({
+                                    ...prev,
+                                    illustration: !prev.illustration,
+                                }))
+                            }
                             sx={{
                                 ...SXs.COMMON_BUTTON_STYLES,
-                                justifyContent: 'space-between',
-                                ml: '-8px',
-                                width: 'calc(100% + 16px)',
-                                color: theme => theme.palette.text.primary,
+                                justifyContent: "space-between",
+                                ml: "-8px",
+                                width: "calc(100% + 16px)",
+                                color: (theme) => theme.palette.text.primary,
                             }}
                         >
-                            <Typography variant="h6">
-                                Illustration
-                            </Typography>
+                            <Typography variant="h6">Illustration</Typography>
                             {opens.illustration ? <ExpandLess /> : <ExpandMore />}
                         </Button>
                     </Grid>
 
-
                     <Grid item xs={12} mt={opens.illustration ? 1 : 0}>
-                        <Collapse in={opens.illustration} sx={{ width: '100%' }} timeout="auto" unmountOnExit>
+                        <Collapse
+                            in={opens.illustration}
+                            sx={{ width: "100%" }}
+                            timeout="auto"
+                            unmountOnExit
+                        >
                             <Grid container>
                                 <Grid item xs={12} ref={photoRef}>
                                     <FormControl
                                         fullWidth
                                         error={Math.ceil(isOver10MB / 1024 / 1024) > 10}
-                                        sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                        sx={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                        }}
                                     >
-                                        <Paper variant='outlined' sx={{
-                                            position: 'relative',
-                                            height: photoSizes?.width * 0.7,
-                                            width: photoSizes?.width * 0.7,
-                                            overflow: 'hidden',
-                                            borderRadius: '10px',
-                                            mt: 1
-                                        }}>
+                                        <Paper
+                                            variant="outlined"
+                                            sx={{
+                                                position: "relative",
+                                                height: photoSizes?.width * 0.7,
+                                                width: photoSizes?.width * 0.7,
+                                                overflow: "hidden",
+                                                borderRadius: "10px",
+                                                mt: 1,
+                                            }}
+                                        >
                                             <Uploader
                                                 containerProps={{
                                                     sx: {
-                                                        position: 'absolute',
+                                                        position: "absolute",
                                                         top: 0,
                                                         left: 0,
                                                         zIndex: 2,
-                                                        width: '100%',
-                                                        height: '100%',
-                                                        cursor: 'pointer',
-                                                        display: 'flex',
-                                                        flexDirection: 'row',
-                                                        justifyContent: 'center',
-                                                        alignItems: 'center'
+                                                        width: "100%",
+                                                        height: "100%",
+                                                        cursor: "pointer",
+                                                        display: "flex",
+                                                        flexDirection: "row",
+                                                        justifyContent: "center",
+                                                        alignItems: "center",
                                                     },
-                                                    container: true
+                                                    container: true,
                                                 }}
                                                 stylesImage={{
                                                     style: {
-                                                        position: 'absolute',
+                                                        position: "absolute",
                                                         top: 0,
                                                         left: 0,
-                                                        width: '100%',
-                                                        height: '100%',
-                                                    }
+                                                        width: "100%",
+                                                        height: "100%",
+                                                    },
                                                 }}
                                                 stylesImage2={{
                                                     style: {
-                                                        width: '100%',
-                                                        height: '100%',
-                                                        position: 'relative'
-                                                    }
+                                                        width: "100%",
+                                                        height: "100%",
+                                                        position: "relative",
+                                                    },
                                                 }}
                                                 setData={(data, base64) => {
-                                                    photo?.set('illustration', data);
-                                                    photo?.set('photo', base64);
+                                                    photo?.set("illustration", data);
+                                                    photo?.set("photo", base64);
                                                     setPhoto(photo);
                                                 }}
-                                                data={Boolean(photo?.get('photo')) ? photo?.get('photo') : null}
+                                                data={
+                                                    Boolean(photo?.get("photo"))
+                                                        ? photo?.get("photo")
+                                                        : null
+                                                }
                                                 CustomIcon={UploadIconIllustration}
-                                                showIconUpload={Boolean(photo?.get('photo')) ? false : true}
+                                                showIconUpload={
+                                                    Boolean(photo?.get("photo")) ? false : true
+                                                }
                                                 getFileSize={(data) => setIsOver10MB(data)}
                                                 isFormik
                                                 clickWhole
                                                 NextImage={Image}
                                                 React={React}
-                                                onError={() => dispatch({ type: SHOW_SNACKBAR, payload: { message: 'Only image file is allowed', type: 'error' } })}
+                                                onError={() =>
+                                                    dispatch({
+                                                        type: SHOW_SNACKBAR,
+                                                        payload: {
+                                                            message: "Only image file is allowed",
+                                                            type: "error",
+                                                        },
+                                                    })
+                                                }
                                             />
                                         </Paper>
                                         <FormHelperText>
                                             {Math.ceil(isOver10MB / 1024 / 1024) > 10
-                                                ? 'File size is over 10MB.'
-                                                : (isOver10MB
-                                                    ? `This file's size is ${Math.ceil(isOver10MB / 1024 / 1024)}MB.`
-                                                    : 'Should be in square shape. MUST smaller 10MB in size.'
-                                                )}
+                                                ? "File size is over 10MB."
+                                                : isOver10MB
+                                                    ? `This file's size is ${Math.ceil(
+                                                        isOver10MB / 1024 / 1024
+                                                    )}MB.`
+                                                    : "Should be in square shape. MUST smaller 10MB in size."}
                                         </FormHelperText>
                                     </FormControl>
                                 </Grid>
                             </Grid>
                         </Collapse>
                     </Grid>
-
                 </Grid>
             </Box>
         </Box>
@@ -623,64 +760,81 @@ export default function CreateNewWord({ open = false, setOpen }) {
                 aria-describedby="modal-modal-description"
                 scroll="paper"
                 maxWidth="xs"
-                fullScreen={windowSize?.width < theme.breakpoints.values.sm ? true : false}
+                fullScreen={
+                    windowSize?.width < theme.breakpoints.values.sm ? true : false
+                }
                 onSubmit={handleSubmit}
             >
-                <div style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    width: 150,
-                    height: 150,
-                    transform: 'translate(-50%, -50%)',
-                    zIndex: loading ? 100 : -1,
-                    opacity: loading ? 1 : 0,
-                }}>
-                    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                <div
+                    style={{
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        width: 150,
+                        height: 150,
+                        transform: "translate(-50%, -50%)",
+                        zIndex: loading ? 100 : -1,
+                        opacity: loading ? 1 : 0,
+                    }}
+                >
+                    <div style={{ position: "relative", width: "100%", height: "100%" }}>
                         <LoadingImage
                             src="https://res.cloudinary.com/katyperrycbt/image/upload/v1645240546/Dual_Ball-1s-200px_tbjrjw.svg"
                             alt="Illustration"
-                            objectFit='contain'
+                            objectFit="contain"
                             priority={true}
                             draggable={false}
                             bgColor="transparent"
-                            layout='fill'
+                            layout="fill"
                         />
                     </div>
                 </div>
-                <DialogTitle id="scroll-dialog-title" sx={{
-                    py: 0, display: 'flex',
-                    alignItems: 'center', justifyContent: 'center'
-                }}>
-                    <div style={{
-                        position: 'relative',
-                        width: 50, height: 50,
-                        display: 'flex',
-                        alignItems: 'center', justifyContent: 'center',
-                    }}>
+                <DialogTitle
+                    id="scroll-dialog-title"
+                    sx={{
+                        py: 0,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                    }}
+                >
+                    <div
+                        style={{
+                            position: "relative",
+                            width: 50,
+                            height: 50,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                    >
                         <Image
                             src="/logo.icon.svg"
                             width={fetchingAPI ? 15 : 30}
                             height={fetchingAPI ? 15 : 30}
                             alt="Logo"
                         />
-                        <div style={{
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            width: '100%',
-                            height: '100%',
-                            display: fetchingAPI ? 'flex' : 'none',
-                        }}>
-                            <div style={{
-                                position: 'relative',
-                                width: '100%',
-                                height: '100%',
-                            }}>
+                        <div
+                            style={{
+                                position: "absolute",
+                                top: 0,
+                                left: 0,
+                                width: "100%",
+                                height: "100%",
+                                display: fetchingAPI ? "flex" : "none",
+                            }}
+                        >
+                            <div
+                                style={{
+                                    position: "relative",
+                                    width: "100%",
+                                    height: "100%",
+                                }}
+                            >
                                 <Image
                                     src="https://res.cloudinary.com/katyperrycbt/image/upload/v1645608152/Double_Ring-1s-200px_nw6bl0.svg"
                                     alt="Logo"
-                                    layout='fill'
+                                    layout="fill"
                                 />
                             </div>
                         </div>
@@ -692,20 +846,20 @@ export default function CreateNewWord({ open = false, setOpen }) {
                         sx={{
                             fontSize: Fonts.FS_20,
                             fontWeight: Fonts.FW_500,
-                            ml: 1
+                            ml: 1,
                         }}
                     >
-                        {
-                            !fetchingAPI ? 'New Word' : 'Loading...'
-                        }
+                        {!fetchingAPI ? "New Word" : "Loading..."}
                     </Typography>
                 </DialogTitle>
 
                 <DialogContent dividers>{gridForm()}</DialogContent>
 
-                <DialogActions sx={{
-                    justifyContent: 'space-between',
-                }}>
+                <DialogActions
+                    sx={{
+                        justifyContent: "space-between",
+                    }}
+                >
                     <div>
                         <ToggleButtonGroup
                             size="small"
@@ -720,15 +874,24 @@ export default function CreateNewWord({ open = false, setOpen }) {
                             }
                             disabled={loading}
                         >
-                            <ToggleButton value="false" sx={SXs.TOGGLE_BUTTON_STYLES}>Private</ToggleButton>
-                            <ToggleButton value="true" sx={SXs.TOGGLE_BUTTON_STYLES}>Public</ToggleButton>
+                            <ToggleButton value="false" sx={SXs.TOGGLE_BUTTON_STYLES}>
+                                Private
+                            </ToggleButton>
+                            <ToggleButton value="true" sx={SXs.TOGGLE_BUTTON_STYLES}>
+                                Public
+                            </ToggleButton>
                         </ToggleButtonGroup>
                     </div>
                     <div>
-                        <LoadingButton sx={{
-                            ...SXs.LOADING_BUTTON_STYLES,
-                            mr: 1
-                        }} onClick={handleClose}>Cancel</LoadingButton>
+                        <LoadingButton
+                            sx={{
+                                ...SXs.LOADING_BUTTON_STYLES,
+                                mr: 1,
+                            }}
+                            onClick={handleClose}
+                        >
+                            Cancel
+                        </LoadingButton>
                         <LoadingButton
                             type="submit"
                             variant="contained"
@@ -749,39 +912,47 @@ export default function CreateNewWord({ open = false, setOpen }) {
 }
 
 const UploadIconIllustration = () => {
-    return <LoadingImage
-        src={IMAGE_ALT}
-        alt="Illustration"
-        objectFit='contain'
-        priority={true}
-        draggable={false}
-        width={180}
-        height={180}
-        bgColor="transparent"
-    />
-}
+    return (
+        <LoadingImage
+            src={IMAGE_ALT}
+            alt="Illustration"
+            objectFit="contain"
+            priority={true}
+            draggable={false}
+            width={180}
+            height={180}
+            bgColor="transparent"
+        />
+    );
+};
 
 const SpecialLabel = ({ auto, label }) => {
-    return !auto ? `${label}` : (<Tooltip title="Auto-filled" sx={{ display: 'flex' }}>
-        <Stack direction='row' alignItems='center' sx={{ display: 'flex' }}>
-            {label}
-            <SvgIcon fontSize='inherit' sx={{ verticalAlign: 'middle', ml: 0.5 }}>
-                <defs>
-                    <linearGradient id="Gradient1">
-                        <stop offset="0%" stopColor="#ffd54f" />
-                        <stop offset="100%" stopColor="#64b5f6" />
-                    </linearGradient>
-                </defs>
-                <AutoAwesomeIcon sx={{
-                    '&.MuiSvgIcon-root': {
-                        '*': { fill: `url(#Gradient1) #fff` }
-                    },
-                }} color='inherit' >
-                </AutoAwesomeIcon>
-            </SvgIcon>
-        </Stack>
-    </Tooltip>)
-}
+    return !auto ? (
+        `${label}`
+    ) : (
+        <Tooltip title="Auto-filled" sx={{ display: "flex" }}>
+            <Stack direction="row" alignItems="center" sx={{ display: "flex" }}>
+                {label}
+                <SvgIcon fontSize="inherit" sx={{ verticalAlign: "middle", ml: 0.5 }}>
+                    <defs>
+                        <linearGradient id="Gradient1">
+                            <stop offset="0%" stopColor="#ffd54f" />
+                            <stop offset="100%" stopColor="#64b5f6" />
+                        </linearGradient>
+                    </defs>
+                    <AutoAwesomeIcon
+                        sx={{
+                            "&.MuiSvgIcon-root": {
+                                "*": { fill: `url(#Gradient1) #fff` },
+                            },
+                        }}
+                        color="inherit"
+                    ></AutoAwesomeIcon>
+                </SvgIcon>
+            </Stack>
+        </Tooltip>
+    );
+};
 
 const elementsInputProps = (errors, others) => ({
     examples: {
@@ -791,7 +962,7 @@ const elementsInputProps = (errors, others) => ({
         label: "Examples",
         error: errors?.examples,
         required: true,
-        ...others
+        ...others,
     },
     vietnamese: {
         temptField: "vnMeaning",
@@ -800,7 +971,7 @@ const elementsInputProps = (errors, others) => ({
         label: "Vietnamese",
         error: errors?.meanings,
         required: true,
-        ...others
+        ...others,
     },
     english: {
         temptField: "engMeaning",
@@ -809,19 +980,19 @@ const elementsInputProps = (errors, others) => ({
         label: "English",
         error: errors?.meanings,
         required: true,
-        ...others
+        ...others,
     },
     antonyms: {
         temptField: "antonym",
         formField: "antonyms",
         label: "Antonyms",
-        ...others
+        ...others,
     },
     synonyms: {
         temptField: "synonym",
         formField: "synonyms",
         label: "Synonyms",
-        ...others
+        ...others,
     },
     tags: {
         temptField: "tag",
@@ -830,43 +1001,48 @@ const elementsInputProps = (errors, others) => ({
         label: "Tags",
         helperText: "At least one tag",
         required: true,
-        ...others
-    }
+        ...others,
+    },
 });
 
 const elementsListProps = (form, handleDeleteItem) => ({
     examples: {
         formField: "examples",
         label: "Examples",
-        form, handleDeleteItem
+        form,
+        handleDeleteItem,
     },
     vietnamese: {
         formField: "vnMeanings",
         label: "Vietnamese",
-        form, handleDeleteItem
+        form,
+        handleDeleteItem,
     },
     english: {
         formField: "engMeanings",
         label: "English",
-        form, handleDeleteItem
+        form,
+        handleDeleteItem,
     },
     antonyms: {
         formField: "antonyms",
         label: "Antonyms",
-        form, handleDeleteItem
+        form,
+        handleDeleteItem,
     },
     synonyms: {
         formField: "synonyms",
         label: "Synonyms",
-        form, handleDeleteItem
+        form,
+        handleDeleteItem,
     },
     tags: {
         formField: "tags",
         label: "Tags",
-        form, handleDeleteItem
-    }
+        form,
+        handleDeleteItem,
+    },
 });
-
 
 const initForm = (publicWords = true) => ({
     vip: "",
@@ -880,7 +1056,7 @@ const initForm = (publicWords = true) => ({
     clasifyVocab: [],
     public: publicWords,
     tags: [],
-    auto: false
+    auto: false,
 });
 
 const initTempInputs = {
@@ -890,7 +1066,7 @@ const initTempInputs = {
     antonym: "",
     synonym: "",
     tag: "",
-}
+};
 
 const resetSome = {
     pronounce: "",
@@ -900,12 +1076,12 @@ const resetSome = {
     engMeanings: [],
     synonyms: [],
     tags: [],
-    auto: false
-}
+    auto: false,
+};
 
 const initOpens = {
     primary: true,
     secondary: false,
     tertiary: false,
-    illustration: true
-}
+    illustration: true,
+};

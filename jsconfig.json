@@ -1,39 +1,66 @@
 {
     "compilerOptions": {
-      "baseUrl": ".",
-      "paths": {
-        // pages
-        "@pages/*": ["pages/*"],
-
-        // utils
-        "@utils": ["utils"],
-
-        // config
-        "@config": ["config"],
-        "@config/*": ["config/*"],
-
-        // component
-        "@components/*": ["components/*"],
-
-        // styles
-        "@styles":["styles"],
-        "@styles/*": ["styles/*"],
-        "@globalCSS": ["styles/globals.css"],
-
-        // layout
-        "@layouts/*": ["layouts/*"],
-        "@layouts": ["layouts"],
-
-        // redux
-        "@store": ["store"],
-        "@reducers": ["reducers"],
-        "@reducers/*": ["reducers/*"],
-        "@actions": ["actions"],
-        "@actions/*": ["actions/*"],
-        "@consts": ["constants"],
-
-        // meta
-        "@meta": ["components/Meta"],
-      }
+        "baseUrl": ".",
+        "paths": {
+            // pages
+            "@pages/*": [
+                "pages/*"
+            ],
+            // utils
+            "@utils": [
+                "utils"
+            ],
+            // config
+            "@config": [
+                "config"
+            ],
+            "@config/*": [
+                "config/*"
+            ],
+            // component
+            "@components/*": [
+                "components/*"
+            ],
+            // styles
+            "@styles": [
+                "styles"
+            ],
+            "@styles/*": [
+                "styles/*"
+            ],
+            "@globalCSS": [
+                "styles/globals.css"
+            ],
+            // layout
+            "@layouts/*": [
+                "layouts/*"
+            ],
+            "@layouts": [
+                "layouts"
+            ],
+            // redux
+            "@store": [
+                "store"
+            ],
+            "@reducers": [
+                "reducers"
+            ],
+            "@reducers/*": [
+                "reducers/*"
+            ],
+            "@actions": [
+                "actions"
+            ],
+            "@actions/*": [
+                "actions/*"
+            ],
+            "@consts": [
+                "constants"
+            ],
+            // meta
+            "@meta": [
+                "components/Meta"
+            ]
+        }
     }
-  }
+}
