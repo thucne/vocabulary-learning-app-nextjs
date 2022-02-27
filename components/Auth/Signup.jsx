@@ -62,6 +62,7 @@ export default function Signup() {
     const [loading, setLoading] = useState(false);
 
     const dispatch = useDispatch();
+    const recaptcha = useSelector((state) => state.recaptcha);
 
     const handleClickShowPassword = () => {
         setShowPassword((prev) => !prev);

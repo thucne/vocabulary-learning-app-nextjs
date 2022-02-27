@@ -766,30 +766,6 @@ export default function CreateNewWord({ open = false, setOpen }) {
                 }
                 onSubmit={handleSubmit}
             >
-                <div
-                    style={{
-                        position: "absolute",
-                        top: "50%",
-                        left: "50%",
-                        width: 150,
-                        height: 150,
-                        transform: "translate(-50%, -50%)",
-                        zIndex: loading ? 100 : -1,
-                        opacity: loading ? 1 : 0,
-                    }}
-                >
-                    <div style={{ position: "relative", width: "100%", height: "100%" }}>
-                        <LoadingImage
-                            src="https://res.cloudinary.com/katyperrycbt/image/upload/v1645240546/Dual_Ball-1s-200px_tbjrjw.svg"
-                            alt="Illustration"
-                            objectFit="contain"
-                            priority={true}
-                            draggable={false}
-                            bgColor="transparent"
-                            layout="fill"
-                        />
-                    </div>
-                </div>
                 <DialogTitle
                     id="scroll-dialog-title"
                     sx={{

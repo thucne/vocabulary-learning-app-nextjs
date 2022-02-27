@@ -53,18 +53,18 @@ const Welcome = (props) => {
                                 fontWeight: Fonts.FW_500,
                             }}
                         >
-                            Welcome back, Lucy! We missed you 👋 {User?.name}
+                            Welcome back, {User?.name}! We missed you 👋
                         </Typography>
                         <Typography
                             component="p"
                             sx={{ fontSize: Fonts.FS_15, p: "8px 0px 0px" }}
                         >
-                            It look like you haven&#96;t been revised your words today.
+                            It look like you haven&apos;t been revised your words today.
                             <Button
                                 disabled={!reviewList?.length}
                                 onClick={() => setOpenReviseWordModal(true)}
                             >
-                                Let&#96;s check it out!
+                                Let&apos;s check it out!
                             </Button>
                         </Typography>
                     </Box>

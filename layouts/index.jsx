@@ -92,15 +92,15 @@ const Layout = ({ children, login = false, landing = false }) => {
             />
             <Backdrop
                 sx={{
-                    zIndex: (theme) => theme.zIndex.drawer + 1,
+                    zIndex: (theme) => theme.zIndex.modal + 1,
                     backgroundColor: "#00000090",
                 }}
                 open={backdrop?.show}
             >
                 <div
                     style={{
-                        width: 100,
-                        height: 100,
+                        width: 170,
+                        height: 170,
                         position: "absolute",
                         top: "50%",
                         left: "50%",
@@ -117,12 +117,36 @@ const Layout = ({ children, login = false, landing = false }) => {
                         }}
                     >
                         <Image
-                            src="https://res.cloudinary.com/katyperrycbt/image/upload/v1645242792/Pulse-1s-200px_3_ua99yp.svg"
+                            src="https://res.cloudinary.com/katyperrycbt/image/upload/v1645608152/Double_Ring-1s-200px_nw6bl0.svg"
                             layout="fill"
                             alt="loading"
                             priority={true}
                             draggable={false}
                         />
+                    </div>
+                    <div style={{
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        height: 50,
+                        width: 50,
+                    }}>
+                        <div
+                            style={{
+                                width: "100%",
+                                height: "100%",
+                                position: "relative",
+                                borderRadius: "10px",
+                                overflow: "hidden",
+                            }}
+                        >
+                            <Image
+                                src="/logo.icon.svg"
+                                layout="fill"
+                                alt="Logo"
+                            />
+                        </div>
                     </div>
                 </div>
             </Backdrop>

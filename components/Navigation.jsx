@@ -113,7 +113,7 @@ function ResponsiveDrawer(props) {
 
     // get words
     const { data, error, isValidating } = useSWR(getJWT() ? `${API}/api/users/me` : null, fetcher, {
-        refreshInterval: 500,
+        refreshInterval: 5000,
     });
 
     useEffect(() => {
