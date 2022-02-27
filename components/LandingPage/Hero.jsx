@@ -50,9 +50,12 @@ const Hero = () => {
                 sizes.filter((item) => item.width && item.height).length !==
                 images.length
             ) {
-                images.forEach((image) => {
+                images.forEach((image, index) => {
                     getSizeImage(image, (data) => {
-                        setSizes((prev) => [...prev, data]);
+                        setSizes((prev) => {
+                            prev[index] = data;
+                            return prev;
+                        });
                     });
                 });
             } else {
