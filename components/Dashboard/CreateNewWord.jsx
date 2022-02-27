@@ -77,7 +77,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
     const windowSize = useWindowSize();
     const dispatch = useDispatch();
     const settings = useSettings();
-
+    console.log(settings);
     const photoRef = useRef(null);
     const [photo, setPhoto] = useState(null);
     const [isOver10MB, setIsOver10MB] = useState(false);

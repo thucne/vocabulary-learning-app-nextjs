@@ -199,7 +199,7 @@ export default function SwitchListSecondary() {
                             <PractiseInputNumber
                                 handleChange={handleChange}
                                 isExist={isExist}
-                                name="wordEachtime"
+                                name="wordsPerPractice"
                                 title="Words per practice"
                                 subtitle="(10-50)"
                                 Icon={AutoStoriesIcon}
@@ -210,7 +210,7 @@ export default function SwitchListSecondary() {
                             <PractiseInputNumber
                                 handleChange={handleChange}
                                 isExist={isExist}
-                                name="practiseEachday"
+                                name="practicesPerDay"
                                 title="Practice per day"
                                 subtitle="(1-50)"
                                 Icon={TimelapseIcon}

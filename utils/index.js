@@ -571,10 +571,11 @@ const defaultSettings = {
     english: 1,
     tags: 10,
     publicWords: true,
-    wordEachtime: 20,
-    practiseEachday: 1,
+    wordsPerPractice: 20,
+    practicesPerDay: 1,
     lastReview: 1,
     lastReviewOK: 5,
+    lastPractice: "",
 };
 
 const convertSettingsValue = (value) => {
