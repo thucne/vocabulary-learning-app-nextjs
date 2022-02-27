@@ -140,11 +140,6 @@ export default function SwitchListSecondary() {
                                 isExist={isExist}
                                 {...autoFillLevelsProps.english}
                             />
-                            <AutoFillLevel
-                                handleChange={handleChange}
-                                isExist={isExist}
-                                {...autoFillLevelsProps.tags}
-                            />
                         </List>
                     </Paper>
                 </Grid>
@@ -415,18 +410,6 @@ const autoFillLevelsProps = {
             { value: 100, label: "All" },
         ],
         name: "english",
-    },
-    tags: {
-        title: "Tags",
-        values: [
-            { value: 0, label: "None" },
-            { value: 1, label: "10" },
-            { value: 2, label: "20" },
-            { value: 3, label: "50" },
-            { value: 4, label: "100" },
-            { value: 5, label: "All" },
-        ],
-        name: "tags",
     },
     lastReview: {
         title: "Last review - date",
