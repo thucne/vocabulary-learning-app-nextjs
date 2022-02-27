@@ -160,7 +160,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
                 form.type === "vocab"
                     ? form.clasifyVocab.map((item) => {
                         const findItem = vocabTypes.find((each) => each.value === item);
-                        return vocabTypes.indexOf(findItem);
+                        return vocabTypes.id;
                     })
                     : null,
             examples: form.examples,
@@ -294,11 +294,9 @@ export default function CreateNewWord({ open = false, setOpen }) {
         (form.vip?.length &&
             form.examples?.length &&
             (form.vnMeanings?.length || form.engMeanings?.length) &&
-            form.tags?.length &&
-            !errors?.vip.error?.length &&
+            !errors?.vip?.length &&
             !errors?.examples?.length &&
             !errors?.meanings?.length &&
-            !errors?.tags?.length &&
             !(Math.ceil(isOver10MB / 1024 / 1024) > 10)) ??
         false;
 
@@ -977,7 +975,6 @@ const elementsInputProps = (errors, others) => ({
         error: errors?.tags,
         label: "Tags",
         helperText: "At least one tag",
-        required: true,
         ...others,
     },
 });

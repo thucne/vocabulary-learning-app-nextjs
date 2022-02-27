@@ -117,7 +117,7 @@ function ResponsiveDrawer(props) {
     });
 
     useEffect(() => {
-        if (!error && !isValidating && !isEqual(userData, data)) {
+        if (!error && !isValidating && data && !isEqual(userData, data)) {
             dispatch({
                 type: t.UPDATE_USER_DATA,
                 payload: data,

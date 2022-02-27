@@ -481,7 +481,7 @@ export const handleDictionaryData = (
         ),
     ].filter((item) => item?.length >= 3);
 
-    const { autoFill, examples, english, tags } = settings;
+    const { autoFill, examples, english } = settings;
 
     if (!autoFill) {
         return {
@@ -504,10 +504,7 @@ export const handleDictionaryData = (
                 : english === 100
                     ? highPriorityMeanings
                     : highPriorityMeanings?.slice(0, english);
-
-        const filteredTags =
-            tags === 0 ? undefined : tags === 100 ? allTags : allTags?.slice(0, tags);
-
+                    
         return {
             pronounce: text || altPronounce,
             audio: camAudio ? `${camAudio}<vip>${audio}` : audio,
@@ -515,7 +512,6 @@ export const handleDictionaryData = (
             examples: filteredExamples,
             engMeanings: filteredMeanings,
             synonyms: allSynonyms,
-            tags: filteredTags,
         };
     }
 };
