@@ -124,3 +124,17 @@ export const updateVIP = (data, id) => async (dispatch) => {
         .then((res) => handleCommonResponse(res))
         .catch((err) => handleServerError(err));
 };
+
+export const updateManyVIPs = (data) => async (dispatch) => {
+    if (!data || !getJWT()) {
+        return { error: "Empty body or jwt." };
+    }
+    return await axios
+        .put(`${API}/api/vips`, data, {
+            headers: {
+                Authorization: `Bearer ${getJWT()}`,
+            },
+        })
+        .then((res) => handleCommonResponse(res))
+        .catch((err) => handleServerError(err));
+};

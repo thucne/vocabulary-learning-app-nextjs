@@ -23,13 +23,7 @@ const Welcome = (props) => {
     const [openReviseWordModal, setOpenReviseWordModal] = useState(false);
 
     const User = useSelector((state) => state.userData);
-    const [reviewList, setReviewList] = useState(null);
-
-    useEffect(() => {
-        if (User?.vips && !reviewList?.length) {
-            setReviewList(getLastReviewWord([...User.vips]));
-        }
-    }, [User?.vips, reviewList]);
+    const reviewList = User?.vips ? getLastReviewWord([...User.vips]) : []
 
     return (
         <Container maxWidth="lg" disableGutters>
@@ -97,12 +91,13 @@ const Welcome = (props) => {
                     </Box>
                 </Grid>
             </Grid>
-            <CreateNewWord open={openNewWordForm} setOpen={setOpenNewWordForm} />
+            <CreateNewWord open={openNewWordForm} setOpen={setOpenNewWordForm}  />
             {reviewList?.length && (
                 <WordCard
                     open={openReviseWordModal}
                     setOpen={setOpenReviseWordModal}
                     wordList={reviewList}
+                    
                 />
             )}
         </Container>
