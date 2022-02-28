@@ -78,7 +78,6 @@ const Footer = ({ bottom, landing }) => {
                                         alt="logo"
                                         layout="fill"
                                         objectFit="contain"
-                                        priority={true}
                                         draggable={false}
                                     />
                                 </div>

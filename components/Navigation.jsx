@@ -174,7 +174,6 @@ function ResponsiveDrawer(props) {
                     src={"/logo.full.svg"}
                     layout="fill"
                     objectFit="cover"
-                    priority={true}
                 />
             </Stack>
             {/* </Toolbar> */}

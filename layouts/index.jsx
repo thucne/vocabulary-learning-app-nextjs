@@ -120,7 +120,6 @@ const Layout = ({ children, login = false, landing = false }) => {
                             src="https://res.cloudinary.com/katyperrycbt/image/upload/v1645608152/Double_Ring-1s-200px_nw6bl0.svg"
                             layout="fill"
                             alt="loading"
-                            priority={true}
                             draggable={false}
                         />
                     </div>
@@ -145,6 +144,7 @@ const Layout = ({ children, login = false, landing = false }) => {
                                 src="/logo.icon.svg"
                                 layout="fill"
                                 alt="Logo"
+                                draggable={false}
                             />
                         </div>
                     </div>

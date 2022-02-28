@@ -47,7 +47,7 @@ const Hero = () => {
     useEffect(() => {
         const loop = setInterval(() => {
             if (
-                sizes.filter((item) => item.width && item.height).length !==
+                sizes.filter((item) => item.width > 0 && item.height > 0).length !==
                 images.length
             ) {
                 images.forEach((image, index) => {
@@ -127,29 +127,26 @@ const Hero = () => {
                         overflow: "hidden",
                     }}
                 >
-                    {images?.[0] &&
-                        imageGridSizes?.[0] > 0 &&
-                        sizes?.[0]?.width > 0 &&
-                        sizes?.[0]?.height > 0 && (
-                            <div
-                                style={{
-                                    width: Math.round(imageGridSizes?.[0] * 1.5),
-                                    height: Math.round(heroSizes[1] * 2),
-                                    position: "absolute",
-                                    top: 0,
-                                    left: 0,
-                                }}
-                            >
-                                <Image
-                                    src={images[0]}
-                                    alt="VIP"
-                                    layout="fill"
-                                    objectFit="cover"
-                                    priority={true}
-                                    draggable={false}
-                                />
-                            </div>
-                        )}
+                    <div
+                        style={{
+                            width: Math.round(imageGridSizes?.[0] * 1.5),
+                            height: Math.round(heroSizes?.[1] * 2),
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                        }}
+                    >
+                        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                            <Image
+                                src={images[0]}
+                                alt="VIP"
+                                layout="fill"
+                                objectFit="cover"
+                                priority={true}
+                                draggable={false}
+                            />
+                        </div>
+                    </div>
                 </Grid>
             </Grid>
         </Container>
