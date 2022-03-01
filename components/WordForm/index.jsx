@@ -49,8 +49,8 @@ import { useTheme } from "@mui/material/styles";
 import { useDispatch, useSelector } from "react-redux";
 
 import LoadingImage from "@components/LoadingImage";
-import ListArrayInputs from "./FormComponents/ListArrayInputs";
-import ListInputs from "./FormComponents/ListInputs";
+import ListArrayInputs from "../Dashboard/FormComponents/ListArrayInputs";
+import ListInputs from "../Dashboard/FormComponents/ListInputs";
 
 import { IMAGE_ALT, VIP_TYPES, SHOW_SNACKBAR } from "@consts";
 import { fetcherJWT, createVIP } from "@actions";
@@ -77,7 +77,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
     const windowSize = useWindowSize();
     const dispatch = useDispatch();
     const settings = useSettings();
-    console.log(settings);
+
     const photoRef = useRef(null);
     const [photo, setPhoto] = useState(null);
     const [isOver10MB, setIsOver10MB] = useState(false);
@@ -364,11 +364,9 @@ export default function CreateNewWord({ open = false, setOpen }) {
                                 setOpens((prev) => ({ ...prev, primary: !prev.primary }))
                             }
                             sx={{
-                                ...SXs.COMMON_BUTTON_STYLES,
+                                ...SXs.MUI_NAV_BUTTON,
                                 justifyContent: "space-between",
-                                ml: "-8px",
-                                width: "calc(100% + 16px)",
-                                color: (theme) => theme.palette.text.primary,
+                                // color: (theme) => theme.palette.text.primary,
                             }}
                         >
                             <Typography variant="h6">Primary information</Typography>
@@ -504,7 +502,11 @@ export default function CreateNewWord({ open = false, setOpen }) {
 
                     <Divider sx={{ width: "100%", my: 1 }} />
 
-                    <Grid item xs={12}>
+                    <Grid
+                        item
+                        xs={(opens.secondary || opens.tertiary) ? 12 : 6}
+                        pr={(opens.secondary || opens.tertiary) ? '0px' : '3px'}
+                    >
                         <Button
                             fullWidth
                             disableRipple
@@ -512,19 +514,17 @@ export default function CreateNewWord({ open = false, setOpen }) {
                                 setOpens((prev) => ({ ...prev, secondary: !prev.secondary }))
                             }
                             sx={{
-                                ...SXs.COMMON_BUTTON_STYLES,
+                                ...SXs.MUI_NAV_BUTTON,
                                 justifyContent: "space-between",
-                                ml: "-8px",
-                                width: "calc(100% + 16px)",
-                                color: (theme) => theme.palette.text.primary,
+                                // color: (theme) => theme.palette.text.primary,
                             }}
                         >
-                            <Typography variant="h6">Secondary information</Typography>
+                            <Typography variant={opens?.secondary ? "h6" : "body"}>Secondary</Typography>
                             {opens.secondary ? <ExpandLess /> : <ExpandMore />}
                         </Button>
                     </Grid>
 
-                    <Grid item xs={12} mt={opens.secondary ? 1 : 0}>
+                    <Grid item xs={12} mt={opens.secondary ? 1 : 0} display={opens.secondary ? 'flex' : 'none'}>
                         <Collapse
                             in={opens.secondary}
                             sx={{ width: "100%" }}
@@ -558,24 +558,27 @@ export default function CreateNewWord({ open = false, setOpen }) {
                         </Collapse>
                     </Grid>
 
-                    <Divider sx={{ width: "100%", my: 1 }} />
+                    <Divider sx={{ width: "100%", my: 1, display: (opens.secondary || opens.tertiary) ? 'flex' : 'none' }} />
 
-                    <Grid item xs={12}>
+                    <Grid
+                        item
+                        xs={(opens.secondary || opens.tertiary) ? 12 : 6}
+                        pl={(opens.secondary || opens.tertiary) ? '0px' : '3px'}
+                    >
                         <Button
                             fullWidth
                             disableRipple
+                            variant="outlined"
                             onClick={() =>
                                 setOpens((prev) => ({ ...prev, tertiary: !prev.tertiary }))
                             }
                             sx={{
-                                ...SXs.COMMON_BUTTON_STYLES,
+                                ...SXs.MUI_NAV_BUTTON,
                                 justifyContent: "space-between",
-                                ml: "-8px",
-                                width: "calc(100% + 16px)",
-                                color: (theme) => theme.palette.text.primary,
+                                // color: (theme) => theme.palette.text.primary,
                             }}
                         >
-                            <Typography variant="h6">Tertiary information</Typography>
+                            <Typography variant={opens?.tertiary ? "h6" : "body"}>Tertiary</Typography>
                             {opens.tertiary ? <ExpandLess /> : <ExpandMore />}
                         </Button>
                     </Grid>
@@ -627,11 +630,9 @@ export default function CreateNewWord({ open = false, setOpen }) {
                                 }))
                             }
                             sx={{
-                                ...SXs.COMMON_BUTTON_STYLES,
+                                ...SXs.MUI_NAV_BUTTON,
                                 justifyContent: "space-between",
-                                ml: "-8px",
-                                width: "calc(100% + 16px)",
-                                color: (theme) => theme.palette.text.primary,
+                                // color: (theme) => theme.palette.text.primary,
                             }}
                         >
                             <Typography variant="h6">Illustration</Typography>
@@ -763,6 +764,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
                     windowSize?.width < theme.breakpoints.values.sm ? true : false
                 }
                 onSubmit={handleSubmit}
+                sx={{ '.MuiPaper-root': { borderRadius: '10px' } }}
             >
                 <DialogTitle
                     id="scroll-dialog-title"
@@ -860,7 +862,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
                     <div>
                         <LoadingButton
                             sx={{
-                                ...SXs.LOADING_BUTTON_STYLES,
+                                ...SXs.COMMON_BUTTON_STYLES,
                                 mr: 1,
                             }}
                             onClick={handleClose}
@@ -871,7 +873,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
                             type="submit"
                             variant="contained"
                             loadingPosition="start"
-                            sx={SXs.LOADING_BUTTON_STYLES}
+                            sx={SXs.COMMON_BUTTON_STYLES}
                             disabled={!canSubmit()}
                             loading={loading}
                             onClick={handleSubmit}

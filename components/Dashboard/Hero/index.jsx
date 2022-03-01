@@ -12,21 +12,21 @@ import {
 import CachedIcon from "@mui/icons-material/Cached";
 import AddIcon from "@mui/icons-material/Add";
 
-import CreateNewWord from "./CreateNewWord";
-import WordCard from "./WordCard";
+import WordCard from "@components/PracticeSet";
 
 import { getLastReviewWord } from "@utils";
-import { Colors, Fonts } from "@styles";
+import { Colors, Fonts, SXs } from "@styles";
 
-const Welcome = (props) => {
-    const [openNewWordForm, setOpenNewWordForm] = useState(false);
+const Welcome = () => {
     const [openReviseWordModal, setOpenReviseWordModal] = useState(false);
 
     const User = useSelector((state) => state.userData);
+
     const reviewList = User?.vips ? getLastReviewWord([...User.vips]) : []
 
     return (
         <Container maxWidth="lg" disableGutters>
+
             <Grid container direction="row" mt={[0, 1, 2, 3]}>
                 <Grid
                     item
@@ -57,6 +57,10 @@ const Welcome = (props) => {
                             <Button
                                 disabled={!reviewList?.length}
                                 onClick={() => setOpenReviseWordModal(true)}
+                                sx={{
+                                    ...SXs.COMMON_BUTTON_STYLES,
+                                    ml: 1
+                                }}
                             >
                                 Let&apos;s check it out!
                             </Button>
@@ -82,22 +86,18 @@ const Welcome = (props) => {
                             padding: "10px 0",
                         }}
                     >
-                        <IconButton>
+                        <IconButton sx={SXs.MUI_NAV_ICON_BUTTON} onClick={() => { }}>
                             <CachedIcon sx={{ color: Colors.LOGO_BLUE }} />
-                        </IconButton>
-                        <IconButton onClick={() => setOpenNewWordForm(true)}>
-                            <AddIcon sx={{ color: Colors.LOGO_BLUE }} />
                         </IconButton>
                     </Box>
                 </Grid>
             </Grid>
-            <CreateNewWord open={openNewWordForm} setOpen={setOpenNewWordForm}  />
-            {reviewList?.length && (
+            {reviewList?.length > 0 && (
                 <WordCard
                     open={openReviseWordModal}
                     setOpen={setOpenReviseWordModal}
                     wordList={reviewList}
-                    
+
                 />
             )}
         </Container>

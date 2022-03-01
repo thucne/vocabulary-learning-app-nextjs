@@ -2,24 +2,26 @@ import React, { useEffect, useState } from "react";
 
 import { Container, Divider } from "@mui/material";
 
-import Welcome from "./Welcome";
-import WordListBlock from "./WordListBlock";
-
 import { fetcherJWT } from "@actions";
 import { API } from "@config";
 
-import { useDispatch, useSelector } from "react-redux";
-import * as t from "@consts";
+import Hero from "./Hero";
+import WordList from "./WordList";
 
 const fetcher = async (...args) => await fetcherJWT(...args);
 
 export default function DashboardPage(props) {
+    const [openWordForm, setOpenWordForm] = useState(false);
+
     return (
         <Container maxWidth="lg">
-            <Welcome />
+
+            <Hero open={openWordForm} setOpen={setOpenWordForm}  />
             <Divider sx={{ width: "100%", my: 2 }} />
-            <WordListBlock />
+
+            <WordList open={openWordForm} setOpen={setOpenWordForm} />
             <Divider sx={{ width: "100%", my: 2 }} />
+
         </Container>
     );
 }
