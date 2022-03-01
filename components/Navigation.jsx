@@ -113,10 +113,11 @@ function ResponsiveDrawer(props) {
 
     // get words
     const { data, error, isValidating } = useSWR(getJWT() ? `${API}/api/users/me` : null, fetcher, {
-        refreshInterval: 5000,
+        refreshInterval: 1000,
     });
 
     useEffect(() => {
+
         if (!error && !isValidating && data && !isEqual(userData, data)) {
             dispatch({
                 type: t.UPDATE_USER_DATA,

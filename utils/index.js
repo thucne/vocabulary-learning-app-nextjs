@@ -6,8 +6,9 @@ import {
     useRef,
 } from "react";
 import Router from "next/router";
-import { logout } from "@actions";
-import * as t from "@consts";
+import { logout, updateSettings } from "@actions";
+import { RECAPTCHA } from '@config';
+
 
 export const isAuth = () => {
     if (typeof window !== "undefined") {
@@ -504,7 +505,7 @@ export const handleDictionaryData = (
                 : english === 100
                     ? highPriorityMeanings
                     : highPriorityMeanings?.slice(0, english);
-                    
+
         return {
             pronounce: text || altPronounce,
             audio: camAudio ? `${camAudio}<vip>${audio}` : audio,
@@ -516,7 +517,7 @@ export const handleDictionaryData = (
     }
 };
 
-export const toggleSettings = (value, selectionValue, current, setCurrent) => {
+export const toggleSettings = async (value, selectionValue, current, updateFunction) => {
     const currentIndex = current.findIndex((item) => item?.includes(value));
     const newChecked = [...current];
 
@@ -529,12 +530,29 @@ export const toggleSettings = (value, selectionValue, current, setCurrent) => {
             newChecked[currentIndex] = `${value}/${selectionValue}`;
         }
     }
-    setCurrent(newChecked);
 
-    if (window) {
-        localStorage.setItem("vip-settings", JSON.stringify(newChecked));
+    if (updateFunction && typeof updateFunction === "function") {
+        updateFunction(newChecked);
     }
 };
+
+export const resetSettings = async () => {
+    if (window && JSON.parse(localStorage.getItem("vip-user"))?.id) {
+        await window.grecaptcha.ready(async function () {
+            await window.grecaptcha
+                .execute(`${RECAPTCHA}`, { action: "vip_authentication" })
+                .then(async function (token) {
+                    const formData = new FormData();
+                    let prepareObject = {
+                        token,
+                        settings: [],
+                    }
+                    formData.append("data", JSON.stringify(prepareObject));
+                    await updateSettings(JSON.parse(localStorage.getItem("vip-user"))?.id, formData);
+                });
+        });
+    }
+}
 
 export const getLastReviewWord = (words) => {
     if (!words.length) return null;
@@ -544,12 +562,12 @@ export const getLastReviewWord = (words) => {
     return orderedWords;
 };
 
-export const useSettings = () => {
-    if (window) {
-        const settings = JSON.parse(localStorage.getItem("vip-settings")) || [];
+export const useSettings = (userData, raw = false) => {
+    const settings = userData?.settings || [];
 
-        let response = {};
+    let response = {};
 
+    if (!raw) {
         if (settings?.length) {
             Array.from([...settings]).forEach((item) => {
                 const [value, selectionValue] = item.includes("/")
@@ -560,12 +578,14 @@ export const useSettings = () => {
 
             return { ...defaultSettings, ...response };
         }
-    }
 
-    return defaultSettings;
+        return { ...defaultSettings };
+    } else {
+        return settings || [];
+    }
 };
 
-const defaultSettings = {
+export const defaultSettings = {
     autoFill: true,
     examples: 1,
     english: 1,

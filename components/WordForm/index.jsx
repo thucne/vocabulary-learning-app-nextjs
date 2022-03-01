@@ -76,7 +76,6 @@ export default function CreateNewWord({ open = false, setOpen }) {
     const theme = useTheme();
     const windowSize = useWindowSize();
     const dispatch = useDispatch();
-    const settings = useSettings();
 
     const photoRef = useRef(null);
     const [photo, setPhoto] = useState(null);
@@ -95,6 +94,9 @@ export default function CreateNewWord({ open = false, setOpen }) {
     const [opens, setOpens] = useState(initOpens);
 
     const recaptcha = useSelector((state) => state.recaptcha);
+    const userData = useSelector((state) => state.userData);
+
+    const settings = useSettings(userData);
 
     const resetWhole = () => {
         setTemptInput(initTempInputs);
@@ -364,13 +366,14 @@ export default function CreateNewWord({ open = false, setOpen }) {
                                 setOpens((prev) => ({ ...prev, primary: !prev.primary }))
                             }
                             sx={{
-                                ...SXs.MUI_NAV_BUTTON,
+                                ...SXs.COMMON_BUTTON_STYLES,
                                 justifyContent: "space-between",
                                 // color: (theme) => theme.palette.text.primary,
                             }}
+                            endIcon={opens.primary ? <ExpandLess /> : <ExpandMore />}
+                            size="small"
                         >
-                            <Typography variant="h6">Primary information</Typography>
-                            {opens.primary ? <ExpandLess /> : <ExpandMore />}
+                            Primary information
                         </Button>
                     </Grid>
 
@@ -514,13 +517,14 @@ export default function CreateNewWord({ open = false, setOpen }) {
                                 setOpens((prev) => ({ ...prev, secondary: !prev.secondary }))
                             }
                             sx={{
-                                ...SXs.MUI_NAV_BUTTON,
+                                ...SXs.COMMON_BUTTON_STYLES,
                                 justifyContent: "space-between",
                                 // color: (theme) => theme.palette.text.primary,
                             }}
+                            endIcon={opens.secondary ? <ExpandLess /> : <ExpandMore />}
+                            size="small"
                         >
-                            <Typography variant={opens?.secondary ? "h6" : "body"}>Secondary</Typography>
-                            {opens.secondary ? <ExpandLess /> : <ExpandMore />}
+                            Secondary
                         </Button>
                     </Grid>
 
@@ -568,18 +572,18 @@ export default function CreateNewWord({ open = false, setOpen }) {
                         <Button
                             fullWidth
                             disableRipple
-                            variant="outlined"
                             onClick={() =>
                                 setOpens((prev) => ({ ...prev, tertiary: !prev.tertiary }))
                             }
                             sx={{
-                                ...SXs.MUI_NAV_BUTTON,
+                                ...SXs.COMMON_BUTTON_STYLES,
                                 justifyContent: "space-between",
                                 // color: (theme) => theme.palette.text.primary,
                             }}
+                            endIcon={opens.tertiary ? <ExpandLess /> : <ExpandMore />}
+                            size="small"
                         >
-                            <Typography variant={opens?.tertiary ? "h6" : "body"}>Tertiary</Typography>
-                            {opens.tertiary ? <ExpandLess /> : <ExpandMore />}
+                            Tertiary
                         </Button>
                     </Grid>
 
@@ -630,13 +634,14 @@ export default function CreateNewWord({ open = false, setOpen }) {
                                 }))
                             }
                             sx={{
-                                ...SXs.MUI_NAV_BUTTON,
+                                ...SXs.COMMON_BUTTON_STYLES,
                                 justifyContent: "space-between",
                                 // color: (theme) => theme.palette.text.primary,
                             }}
+                            size="small"
+                            endIcon={opens.illustration ? <ExpandLess /> : <ExpandMore />}
                         >
-                            <Typography variant="h6">Illustration</Typography>
-                            {opens.illustration ? <ExpandLess /> : <ExpandMore />}
+                            Illustration
                         </Button>
                     </Grid>
 

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 
 import {
     Container,
@@ -9,20 +8,24 @@ import {
     IconButton,
     Button,
 } from "@mui/material";
+
 import CachedIcon from "@mui/icons-material/Cached";
-import AddIcon from "@mui/icons-material/Add";
 
 import WordCard from "@components/PracticeSet";
-
-import { getLastReviewWord } from "@utils";
+import { getLastReviewWord, useSettings } from "@utils";
 import { Colors, Fonts, SXs } from "@styles";
+
+import { useSelector } from "react-redux";
 
 const Welcome = () => {
     const [openReviseWordModal, setOpenReviseWordModal] = useState(false);
 
-    const User = useSelector((state) => state.userData);
+    const userData = useSelector((state) => state.userData);
+    const settings = useSettings(userData);
 
-    const reviewList = User?.vips ? getLastReviewWord([...User.vips]) : []
+    const reviewList = userData?.vips ? getLastReviewWord([...userData.vips]) : []
+
+    console.log('settings', settings);
 
     return (
         <Container maxWidth="lg" disableGutters>
@@ -47,7 +50,7 @@ const Welcome = () => {
                                 fontWeight: Fonts.FW_500,
                             }}
                         >
-                            Welcome back, {User?.name}! We missed you 👋
+                            Welcome back, {userData?.name}! We missed you 👋
                         </Typography>
                         <Typography
                             component="p"

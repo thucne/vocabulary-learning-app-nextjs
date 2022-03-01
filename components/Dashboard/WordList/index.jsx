@@ -97,8 +97,6 @@ const EachChild = ({ word, width }) => {
     const theme = useTheme();
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => { console.log('change') }, [])
-
     const photo =
         word?.illustration?.formats?.small?.url ||
         word?.illustration?.url ||

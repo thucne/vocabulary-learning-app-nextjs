@@ -1,29 +1,11 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 
 import {
-    List,
-    ListItem,
-    ListItemIcon,
-    ListItemText,
-    ListSubheader,
-    Switch,
-    Container,
-    Grid,
-    Typography,
-    Divider,
-    Collapse,
-    ToggleButton,
-    ToggleButtonGroup,
-    Slider,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
-    IconButton,
-    Tooltip,
-    Paper,
-    TextField,
-    Stack,
+    List, ListItem, ListItemIcon, ListItemText, ListSubheader,
+    Switch, Container, Grid, Typography, Divider,
+    Collapse, FormControl, InputLabel, Select,
+    MenuItem, IconButton, Tooltip, Paper,
+    TextField, Alert
 } from "@mui/material";
 
 import {
@@ -38,28 +20,66 @@ import {
 } from "@mui/icons-material";
 
 import { Colors, Fonts, SXs } from "@styles";
-import { toggleSettings } from "@utils";
+import { toggleSettings, useSettings, defaultSettings } from "@utils";
+import { updateSettings } from '@actions';
+import { RECAPTCHA } from "@config";
+import * as t from '@consts';
 
 import { debounce } from "lodash";
+import { useSelector, useDispatch } from "react-redux";
 
 export default function SwitchListSecondary() {
-    const [checked, setChecked] = useState([]);
-    const [isSet, setIsSet] = useState(false);
+    const dispatch = useDispatch();
+    const elRefs = useRef([]);
+
+    const userData = useSelector((state) => state?.userData);
+
+    const checked = useSettings(userData, true);
+    const handledChecked = useSettings(userData);
+
+    const [syncing, setSyncing] = useState(false);
 
     useEffect(() => {
-        const loop = setInterval(() => {
-            if (window && !isSet) {
-                setChecked(JSON.parse(localStorage.getItem("vip-settings")) || []);
-                setIsSet(true);
-                clearInterval(loop);
-            }
-        }, 100);
+        setSyncing(false);
+        if (elRefs?.current[0] && elRefs?.current[1]) {
+            elRefs.current[0].value = handledChecked.wordsPerPractice;
+            elRefs.current[1].value = handledChecked.practicesPerDay;
+        }
+    }, [checked]);
 
-        return () => clearInterval(loop);
-    }, [isSet]);
+    const callBackFunction = (dataToUpdate) => {
+        if (window && window.adHocFetch && window.grecaptcha && !syncing) {
+            grecaptcha.ready(function () {
+                grecaptcha
+                    .execute(`${RECAPTCHA}`, { action: "vip_authentication" })
+                    .then(function (token) {
 
-    const handleChange = (value, selectionValue) => () =>
-        toggleSettings(value, selectionValue, checked, setChecked);
+                        const formData = new FormData();
+
+                        let prepareObject = {
+                            token,
+                            settings: dataToUpdate,
+                        }
+
+                        formData.append("data", JSON.stringify(prepareObject));
+
+                        adHocFetch({
+                            dispatch,
+                            action: updateSettings(JSON.parse(localStorage.getItem("vip-user"))?.id, formData),
+                            snackbarMessageOnSuccess: "Update successfully!",
+                            onFinally: () => setSyncing(true),
+                        })
+
+                    });
+            });
+        }
+        if (syncing) {
+            dispatch({ type: t.SHOW_SNACKBAR, payload: { message: "Syncing... Please wait", type: "info" } })
+        }
+    }
+
+    const handleChange = (value, selectionValue) => async () =>
+        await toggleSettings(value, selectionValue, checked, callBackFunction);
 
     const getItem = (name) => checked?.find((item) => item.includes(`${name}`));
 
@@ -73,17 +93,15 @@ export default function SwitchListSecondary() {
     };
 
     const handleReset = () => {
-        window && localStorage.setItem("vip-settings", JSON.stringify([]));
-        setChecked([]);
+        callBackFunction([]);
     };
 
     return (
         <Container maxWidth="lg">
             <Grid container>
-                <Grid item xs={12} mt={[3, 4, 5]}>
+                <Grid item xs={12} sm={6} mt={[3, 4, 5]}>
                     <Typography
                         variant="h5"
-                        gutterBottom
                         sx={{ fontWeight: Fonts.FW_500 }}
                     >
                         Settings
@@ -96,8 +114,16 @@ export default function SwitchListSecondary() {
                             </IconButton>
                         </Tooltip>
                     </Typography>
-                    <Divider sx={{ my: 2 }} />
                 </Grid>
+                <Grid item xs={12} sm={6} mt={[3, 4, 5]} display={[syncing ? "block" : "none", "block"]}>
+                    <Alert variant="outlined" severity="info" sx={{
+                        opacity: syncing ? 1 : 0,
+                        '&.MuiPaper-root': { borderRadius: '10px' }
+                    }}>
+                        Syncing... Please wait to see the changes
+                    </Alert>
+                </Grid>
+                <Divider sx={{ my: 2, width: '100%' }} />
 
                 <Grid item xs={12} sm={6} md={4} my={1} px={[0, 0.5]}>
                     <Paper variant="outlined" sx={gridSX}>
@@ -148,6 +174,57 @@ export default function SwitchListSecondary() {
                     <Paper variant="outlined" sx={gridSX}>
                         <List
                             sx={{ width: "100%", mt: 0 }}
+                            subheader={
+                                <ListHeadings
+                                    title="Practice"
+                                    subtitle="Set level of practice"
+                                />
+                            }
+                        >
+                            <PractiseInputNumber
+                                handleChange={handleChange}
+                                isExist={isExist}
+                                name="wordsPerPractice"
+                                title="Words per practice"
+                                subtitle="(10-50)"
+                                Icon={AutoStoriesIcon}
+                                min={10}
+                                max={50}
+                                defaultValue={defaultSettings?.wordsPerPractice}
+                                elRefs={elRefs}
+                                index={0}
+                            />
+                            <PractiseInputNumber
+                                handleChange={handleChange}
+                                isExist={isExist}
+                                name="practicesPerDay"
+                                title="Practice per day"
+                                subtitle="(1-50)"
+                                Icon={TimelapseIcon}
+                                min={1}
+                                max={50}
+                                defaultValue={defaultSettings?.practicesPerDay}
+                                elRefs={elRefs}
+                                index={1}
+                            />
+                            <AutoFillLevel
+                                handleChange={handleChange}
+                                isExist={isExist}
+                                {...autoFillLevelsProps.lastReview}
+                            />
+                            <AutoFillLevel
+                                handleChange={handleChange}
+                                isExist={isExist}
+                                {...autoFillLevelsProps.lastReviewOK}
+                            />
+                        </List>
+                    </Paper>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={4} my={1} px={[0, 0.5]}>
+                    <Paper variant="outlined" sx={gridSX}>
+                        <List
+                            sx={{ width: "100%", mt: 0 }}
                             subheader={<ListHeadings title="Publicity" />}
                         >
                             <ListItem>
@@ -184,53 +261,6 @@ export default function SwitchListSecondary() {
                         </List>
                     </Paper>
                 </Grid>
-
-                <Grid item xs={12} sm={6} md={4} my={1} px={[0, 0.5]}>
-                    <Paper variant="outlined" sx={gridSX}>
-                        <List
-                            sx={{ width: "100%", mt: 0 }}
-                            subheader={
-                                <ListHeadings
-                                    title="Practice"
-                                    subtitle="Set level of practice"
-                                />
-                            }
-                        >
-                            <PractiseInputNumber
-                                handleChange={handleChange}
-                                isExist={isExist}
-                                name="wordsPerPractice"
-                                title="Words per practice"
-                                subtitle="(10-50)"
-                                Icon={AutoStoriesIcon}
-                                min={10}
-                                max={50}
-                                defaultValue={20}
-                            />
-                            <PractiseInputNumber
-                                handleChange={handleChange}
-                                isExist={isExist}
-                                name="practicesPerDay"
-                                title="Practice per day"
-                                subtitle="(1-50)"
-                                Icon={TimelapseIcon}
-                                min={1}
-                                max={50}
-                                defaultValue={1}
-                            />
-                            <AutoFillLevel
-                                handleChange={handleChange}
-                                isExist={isExist}
-                                {...autoFillLevelsProps.lastReview}
-                            />
-                            <AutoFillLevel
-                                handleChange={handleChange}
-                                isExist={isExist}
-                                {...autoFillLevelsProps.lastReviewOK}
-                            />
-                        </List>
-                    </Paper>
-                </Grid>
             </Grid>
         </Container>
     );
@@ -246,6 +276,8 @@ const PractiseInputNumber = ({
     max,
     min,
     defaultValue,
+    elRefs,
+    index
 }) => {
     const debounceFixValue = useMemo(
         () =>
@@ -279,11 +311,12 @@ const PractiseInputNumber = ({
                 id={`outlined-number-${name}`}
                 label="Max"
                 type="number"
-                value={isExist(name)[0] ? Number(isExist(name)[1]) : defaultValue}
+                defaultValue={defaultValue}
                 onChange={(e) => {
                     debounceFixValue(e);
-                    handleChange(`${name}`, `${e.target.value}`)();
+                    // handleChange(`${name}`, `${e.target.value}`)();
                 }}
+                inputRef={el => elRefs?.current?.[index] = el}
             />
         </ListItem>
     );
