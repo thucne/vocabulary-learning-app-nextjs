@@ -316,7 +316,7 @@ const PractiseInputNumber = ({
                     debounceFixValue(e);
                     // handleChange(`${name}`, `${e.target.value}`)();
                 }}
-                inputRef={el => elRefs?.current?.[index] = el}
+                inputRef={elRefs?.current ? el => elRefs.current[index] = el : null}
             />
         </ListItem>
     );
