@@ -49,8 +49,8 @@ import { useTheme } from "@mui/material/styles";
 import { useDispatch, useSelector } from "react-redux";
 
 import LoadingImage from "@components/LoadingImage";
-import ListArrayInputs from "../Dashboard/FormComponents/ListArrayInputs";
-import ListInputs from "../Dashboard/FormComponents/ListInputs";
+import ListArrayInputs from "./FormComponents/ListArrayInputs";
+import ListInputs from "./FormComponents/ListInputs";
 
 import { IMAGE_ALT, VIP_TYPES, SHOW_SNACKBAR } from "@consts";
 import { fetcherJWT, createVIP } from "@actions";

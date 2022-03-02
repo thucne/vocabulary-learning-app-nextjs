@@ -7,15 +7,42 @@ import { SXs, Fonts } from '@styles';
 
 import ScrollPages from '@tallis/react-mui-scroll-view';
 
-const ScrollableBlock = ({ data }) => {
+const ScrollableBlock = ({ data, word }) => {
+
+    const splitWord = word?.split(" ");
+    const regex = new RegExp(splitWord.join("|"), "gi");
+
     return (
         <div>
-            {
-                data.length > 0 && <ScrollPages {...config}>
-                    {data.map((item, index) => (
-                        <Typography className='overflowTypography' variant='caption' key={`render-${index}`}>{item}</Typography>
+            {data.length > 0 ?
+                <ScrollPages {...config}>
+                    {data.map((each, index) => (
+                        <Typography
+                            className='overflowTypography'
+                            variant='caption'
+                            key={`render-${index}`}
+                            sx={{ py: 1 }}
+                            dangerouslySetInnerHTML={{
+                                __html: each
+                                    ?.split(" ")
+                                    ?.map((item) => {
+                                        if (item?.match(regex)) {
+                                            return `${item.replace(
+                                                regex,
+                                                (matched) =>
+                                                    `<span style="color: #f44336; font-weight: bold; text-decoration: underline;">${matched}</span>`
+                                            )}`;
+                                        } else {
+                                            return item;
+                                        }
+                                    })
+                                    ?.join(" ")
+                                    ?.replace(/\s\s+/g, " "),
+                            }}
+                        ></Typography>
                     ))}
-                </ScrollPages>
+                </ScrollPages> :
+                <Alert severity="info">No data</Alert>
             }
         </div>
     );
@@ -43,6 +70,11 @@ const config = {
         maxWidth: "100%",
         maxHeight: '100px',
         overflow: 'auto',
+        mt: 0,
+        '.MuiGrid-root': {
+            py: 0,
+            my: 0
+        }
     },
     gridItemSize: {
         xs: 12,

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import {
-    Box, Typography
+    Box, Typography,
 } from '@mui/material';
 
 import { SXs } from '@styles';
@@ -39,20 +39,20 @@ const SecondaryBlock = ({ data }) => {
         }
     };
 
-    return <Box sx={{ width: '100%' }}>
+    return <Box sx={{ width: '100%'}}>
 
         <ToggleButtons value={value} onChange={handleChange} />
 
         <TabPanel value={value} index={0}>
-            <ScrollableBlock data={data?.examples} />
+            <ScrollableBlock data={data?.examples} word={data?.vip} />
         </TabPanel>
 
         <TabPanel value={value} index={1}>
-            <ScrollableBlock data={data?.meanings?.english} />
+            <ScrollableBlock data={data?.meanings?.english} word={data?.vip} />
         </TabPanel>
 
         <TabPanel value={value} index={2}>
-            <ScrollableBlock data={data?.meanings?.vietnamese} />
+            <ScrollableBlock data={data?.meanings?.vietnamese} word={data?.vip} />
         </TabPanel>
 
     </Box>

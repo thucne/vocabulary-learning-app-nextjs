@@ -28,13 +28,18 @@ const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
 
 export default function CustomizedDividers({ value, onChange }) {
     return (
-        <div>
+        <div style={{ marginBottom: '10px', width: '100%', display: 'flex', justifyContent: 'center' }}>
             <Paper
                 elevation={0}
                 sx={{
                     display: 'flex',
                     flexWrap: 'wrap',
                     justifyContent: 'center',
+                    width: 'fit-content',
+                    alignItems: 'center',
+                    '&.MuiPaper-root': {
+                        borderRadius: '8px'
+                    }
                 }}
             >
                 <StyledToggleButtonGroup
@@ -43,9 +48,6 @@ export default function CustomizedDividers({ value, onChange }) {
                     exclusive
                     onChange={onChange}
                     aria-label="text alignment"
-                    sx={{
-                        // border: (theme) => `1px solid ${theme.palette.divider}`
-                    }}
                 >
                     <ToggleButton value={0} aria-label="examples tab" sx={SXs.TOGGLE_BUTTON_STYLES}>
                         Examples

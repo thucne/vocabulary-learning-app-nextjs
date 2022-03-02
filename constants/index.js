@@ -24,7 +24,7 @@ export const UPDATE_USER_DATA = "UPDATE_USER_DATA";
 export const IMAGE_ALT =
     "https://res.cloudinary.com/katyperrycbt/image/upload/v1645343005/sammy-blue-mountains-image_einbhn.svg";
 
-export const AUDIO_ALT = "https://res.cloudinary.com/katyperrycbt/video/upload/v1646202684/1646202625414-voicemaker.in-speech_nxdcbt.mp3";
+export const AUDIO_ALT = "https://res.cloudinary.com/katyperrycbt/video/upload/v1646213479/1646213423733-voicemaker.in-speech_sjadtl.mp3";
 
 export const VIP_TYPES = ["vocab", "idiom", "phrase"];
 export const VOCAB_TYPES = ["noun", "verb", "adverb", "adjective", "other"];

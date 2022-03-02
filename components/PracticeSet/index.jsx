@@ -5,6 +5,7 @@ import Image from "next/image";
 import {
     Button, Dialog, DialogContent, DialogContentText, DialogTitle,
     Box, IconButton, Typography, Grow, Grid, Tabs, Tab, TabList,
+    DialogActions
 } from '@mui/material';
 
 import {
@@ -13,16 +14,15 @@ import {
     ArrowDropDownRounded as ArrowDropDownIcon,
     ArrowDropUpRounded as ArrowDropUpIcon,
     CloseRounded as CloseIcon,
-    PlayCircleFilledWhite as PlayCircleFilledWhiteIcon,
-    DoNotDisturb as DoNotDisturbIcon,
-    Done as DoneIcon,
-    VolumeUp as VolumeUpIcon
+    VolumeUpRounded as VolumeUpIcon,
+    ThumbUpRounded as ThumbUpRoundedIcon,
+    ThumbDownRounded as ThumbDownRoundedIcon
 } from '@mui/icons-material';
 
 import { useTheme } from "@mui/material/styles";
 
 import { Colors, Fonts, SXs, Props } from "@styles";
-import { useWindowSize, useThisToGetSizesFromRef, useThisToGetPositionFromRef, getAudioUrl } from "@utils";
+import { useWindowSize, useThisToGetSizesFromRef, getAudioUrl } from "@utils";
 import { RECAPTCHA } from "@config";
 import { updateManyVIPs, updateVIP } from "@actions";
 import { IMAGE_ALT, AUDIO_ALT } from '@consts';
@@ -45,8 +45,6 @@ const WordCard = ({ open, setOpen, wordList }) => {
 
     const audioRef = useRef(null);
     const photoRef = useRef(null);
-    const pronounceRef = useRef(null);
-    const pronounceGridRef = useRef(null);
 
     const dispatch = useDispatch();
     const recaptcha = useSelector((state) => state.recaptcha);
@@ -58,17 +56,23 @@ const WordCard = ({ open, setOpen, wordList }) => {
     const [loadingAudio, setLoadingAudio] = useState(false);
 
     useEffect(() => {
+        setWordIndex(0);
+    }, [wordList.length, open]);
+
+    useEffect(() => {
         const run = async () => {
-            setLoadingAudio(true);
-            setAudioUrl("");
-            getAudioUrl(wordList[wordIndex].audio, (url) => {
-                setAudioUrl(url);
-                if (audioRef.current) {
-                    audioRef.current.pause();
-                    audioRef.current.load();
-                }
-                setLoadingAudio(false);
-            });
+            if (wordIndex < wordList.length && wordIndex >= 0) {
+                setLoadingAudio(true);
+                setAudioUrl("");
+                getAudioUrl(wordList[wordIndex].audio, (url) => {
+                    setAudioUrl(url);
+                    if (audioRef.current) {
+                        audioRef.current.pause();
+                        audioRef.current.load();
+                    }
+                    setLoadingAudio(false);
+                });
+            }
         }
         run();
     }, [wordIndex, wordList]);
@@ -77,23 +81,24 @@ const WordCard = ({ open, setOpen, wordList }) => {
         setOpen(false);
     };
 
-    const handleFowardbutton = () => {
-        let nextIndex = wordIndex + 1;
-        setWordIndex(nextIndex);
+    const handleNext = () => {
+        setWordIndex(prev => prev + 1);
     };
 
-    const handleBackbutton = () => {
-        let prevIndex =
-            wordIndex === 0
-                ? 0
-                : wordIndex >= wordList.length
-                    ? wordList.length - 1
-                    : wordIndex - 1;
-        setWordIndex(prevIndex);
+    const handlePrevious = () => {
+        setWordIndex(prev => {
+            if (prev === 0) {
+                return 0;
+            } else {
+                return prev > wordList.length ? wordList.length - 1 : prev - 1;
+            }
+        });
     };
 
     const handleUpdateVIP = () => {
-        let data = [...learnStatus];
+        const now = new Date();
+
+        let data = [...learnStatus].map(item => ({}))
 
         if (window?.adHocFetch && recaptcha === true && window?.grecaptcha) {
             grecaptcha.ready(function () {
@@ -115,44 +120,23 @@ const WordCard = ({ open, setOpen, wordList }) => {
         }
     };
 
-    const adToLearnStatus = (status) => {
-        const { lastReviewOK, lastReview } = status;
+    const updateWordStatus = (value) => {
+        setLearnStatus((prev) => {
+            const findIndex = prev.findIndex((item) => item.id === wordList[wordIndex].id);
 
-        //lastReview is in seconds
-        const lastReviewDate = new Date(lastReview);
-
-        setLearnStatus((state) => [
-            ...state,
-            {
-                id: wordList[wordIndex].id,
-                lastReviewOK,
-                lastReview: lastReviewDate,
-            },
-        ]);
-    };
-
-    const handleOkRate = () => {
-        let updatedField = {
-            lastReview: Date.now(),
-            lastReviewOK: true,
-        };
-
-        // add to learn status
-        adToLearnStatus(updatedField);
-
-        handleFowardbutton()
-    };
-
-    const handleNotOkRate = () => {
-        let updatedField = {
-            lastReview: Date.now(),
-            lastReviewOK: false,
-        };
-
-        // add to learn status
-        adToLearnStatus(updatedField);
-
-        handleFowardbutton()
+            if (findIndex !== -1) {
+                prev[findIndex].lastReviewOK = Boolean(value);
+                return [...prev];
+            } else {
+                return [
+                    ...prev,
+                    {
+                        id: wordList?.[wordIndex]?.id,
+                        lastReviewOK: Boolean(value),
+                    },
+                ];
+            }
+        });
     };
 
     const photoSizes = useThisToGetSizesFromRef(photoRef, {
@@ -160,18 +144,6 @@ const WordCard = ({ open, setOpen, wordList }) => {
         terminalCondition: ({ width }) => width !== 0,
         falseCondition: ({ width }) => width === 0,
     });
-
-    const pronouncePositions = useThisToGetPositionFromRef(pronounceRef, {
-        revalidate: 1000,
-        terminalCondition: ({ left, top }) => Number(left) > 0 && Number(top) > 0,
-        falseCondition: ({ left, top }) => !left || !top,
-    })
-
-    const pronounceGridPositions = useThisToGetPositionFromRef(pronounceGridRef, {
-        revalidate: 1000,
-        terminalCondition: ({ left, top }) => Number(left) > 0 && Number(top) > 0,
-        falseCondition: ({ left, top }) => !left || !top,
-    })
 
     return (
         <div>
@@ -183,38 +155,63 @@ const WordCard = ({ open, setOpen, wordList }) => {
                 aria-describedby="scroll-dialog-description"
                 fullScreen={windowSize?.width < theme.breakpoints.values.sm ? true : false}
                 maxWidth="xs"
-                sx={{ '.MuiPaper-root': { borderRadius: '10px' } }}
+                sx={{
+                    '.MuiPaper-root': {
+                        borderRadius: '10px',
+                        maxWidth: windowSize?.width > theme.breakpoints.values.sm && 390,
+                        width: '100%',
+                        height: '100%'
+                    }
+                }}
             >
-                <DialogContent dividers>
-                    <IconButton
-                        sx={{
-                            ...SXs.MUI_NAV_ICON_BUTTON
-                        }}
-                        onClick={loading ? null : handleClose}
-                    >
-                        <CloseIcon />
-                    </IconButton>
+                <DialogTitle sx={{ py: 1 }}>
+                    <Grid item xs={12} {...Props.GIRBC}>
+                        <IconButton
+                            sx={{
+                                ...SXs.MUI_NAV_ICON_BUTTON,
+                                width: '30px',
+                                height: '30px',
+                                fontSize: '25px',
+                                borderRadius: '5px',
+                            }}
+                            onClick={loading ? null : handleClose}
+                        >
+                            <CloseIcon fontSize='inherit' />
+                        </IconButton>
+                        <Typography variant="h6" sx={{
+                            display: 'inline',
+                            fontWeight: Fonts.FW_500,
+                        }}>
+                            Practice Set
+                        </Typography>
+                        <Typography variant="caption" sx={{ display: 'inline' }}>
+                            Words: {(wordIndex + 1) < wordList.length ? (wordIndex + 1) : wordList.length}/{wordList.length}
+                        </Typography>
+                    </Grid>
+                </DialogTitle>
+
+                <DialogContent dividers sx={{
+                    position: 'relative',
+                }}>
+                    {/* <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
+                        <div style={{ position: 'relative', width: '100%', height: '100%', opacity: 0.1 }}>
+                            <Image
+                                src="/logo.icon.svg"
+                                alt="Logo"
+                                layout='fill'
+                                draggable={false}
+                                objectFit='contain'
+                            />
+                        </div>
+                    </div> */}
                     {
                         wordIndex === wordList.length
                             ? <FinishDialog
-                                handleBackbutton={handleBackbutton}
+                                handleBackbutton={handlePrevious}
                                 handleUpdateVIP={handleUpdateVIP}
                                 loading={loading}
                             />
                             : <Grid container {...Props.GCRCC} sx={{ overflow: 'hidden' }}>
-
-                                <Grid item xs={12} {...Props.GIRBC} mt={2}>
-                                    <Typography variant="h5" gutterBottom sx={{
-                                        display: 'inline',
-                                        fontWeight: Fonts.FW_600,
-                                        // fontSize: Fonts.FS_18,
-                                    }}>
-                                        Practice Set
-                                    </Typography>
-                                    <Typography variant="caption" gutterBottom sx={{ display: 'inline' }}>
-                                        Words: {wordIndex + 1}/{wordList.length}
-                                    </Typography>
-                                </Grid>
 
                                 <Grid ref={photoRef} item xs={12} {...Props.GIRCC}>
                                     <div style={{
@@ -227,17 +224,20 @@ const WordCard = ({ open, setOpen, wordList }) => {
                                     }}>
                                         <LoadingImage
                                             src={
-                                                wordList[wordIndex]?.illustration?.formats?.small?.url ||
+                                                wordList?.[wordIndex]?.illustration?.formats?.large?.url ||
+                                                wordList?.[wordIndex]?.illustration?.url ||
                                                 IMAGE_ALT
                                             }
                                             alt="something"
                                             objectFit="contain"
                                             layout='fill'
+                                            quality={100}
+                                            draggable={false}
                                         />
                                     </div>
                                 </Grid>
                                 <Grid item xs={12} {...Props.GIRBC} mt={3}>
-                                    <IconButton onClick={handleBackbutton} disabled={wordIndex === 0}>
+                                    <IconButton onClick={handlePrevious} disabled={wordIndex === 0}>
                                         <ArrowBackIosIcon sx={{ fontSize: Fonts.FS_16 }} />
                                     </IconButton>
 
@@ -249,38 +249,28 @@ const WordCard = ({ open, setOpen, wordList }) => {
                                         {wordList[wordIndex].vip}
                                     </Typography>
 
-                                    <IconButton onClick={handleFowardbutton}>
+                                    <IconButton onClick={handleNext}>
                                         <ArrowForwardIosIcon sx={{ fontSize: Fonts.FS_16 }} />
                                     </IconButton>
 
                                 </Grid>
 
-                                <Grid ref={pronounceGridRef} item xs={12} {...Props.GIRCC} mt={1.5}
-                                    sx={{ position: 'relative' }}
-                                >
-
-                                    <Typography ref={pronounceRef} sx={{
-                                        color: (theme) => theme.palette.action.main
-                                    }}>
-                                        {wordList[wordIndex].pronounce}
-                                    </Typography>
+                                <Grid item xs={12} {...Props.GIRCC} mt={1.5} sx={{ position: 'relative' }} >
 
                                     {
                                         !loadingAudio && <IconButton
-                                            disabled={!wordList[wordIndex].audio}
+                                            disabled={!wordList?.[wordIndex]?.audio}
                                             onClick={() => audioRef.current.play()}
-                                            sx={{
-                                                position: 'absolute',
-                                                // top: pronouncePositions?.top,
-                                                left: pronouncePositions?.left - pronouncePositions?.height - 10 - pronounceGridPositions?.left,
-                                                height: pronouncePositions?.height,
-                                                width: pronouncePositions?.height,
-                                                fontSize: pronouncePositions?.height * 0.9
-                                            }}
+                                            sx={{ fontSize: Fonts.FS_16 }}
                                         >
                                             <VolumeUpIcon fontSize='inherit' />
                                         </IconButton>
                                     }
+
+                                    <Typography sx={{ color: (theme) => theme.palette.action.main }}>
+                                        {wordList[wordIndex].pronounce}
+                                    </Typography>
+
                                     <audio ref={audioRef}>
                                         <source src={audioUrl || AUDIO_ALT} />
                                     </audio>
@@ -288,34 +278,42 @@ const WordCard = ({ open, setOpen, wordList }) => {
                                 </Grid>
 
                                 <Grid item xs={12} {...Props.GICCC} mt={1.5}>
-                                    <SecondaryBlock data={wordList[wordIndex]}/>
+                                    <SecondaryBlock data={wordList[wordIndex]} />
                                 </Grid>
 
-                                {/* Rating section */}
-                                <Box sx={{ textAlign: "center", mt: [0, 3] }}>
-                                    <Typography sx={style.text}>Rate this word</Typography>
-                                    <Box>
-                                        <Button
-                                            onClick={handleNotOkRate}
-                                            variant="outlined"
-                                            sx={{ m: 2 }}
-                                            startIcon={<DoNotDisturbIcon />}
-                                        >
-                                            Not Ok
-                                        </Button>
-                                        <Button
-                                            onClick={handleOkRate}
-                                            variant="contained"
-                                            sx={{ m: 2 }}
-                                            endIcon={<DoneIcon />}
-                                        >
-                                            Ok
-                                        </Button>
-                                    </Box>
-                                </Box>
                             </Grid>
                     }
                 </DialogContent>
+
+                {
+                    wordIndex < wordList.length && wordIndex >= 0 && <DialogActions>
+                        <Grid container {...Props.GCRCC} spacing={1}>
+                            <Grid item>
+                                <Typography>Remember this word?</Typography>
+                            </Grid>
+
+                            <Grid item>
+                                <IconButton
+                                    onClick={() => updateWordStatus(false)}
+                                    variant="outlined"
+                                    sx={SXs.MUI_NAV_ICON_BUTTON}
+                                >
+                                    <ThumbDownRoundedIcon />
+                                </IconButton>
+                            </Grid>
+
+                            <Grid item>
+                                <IconButton
+                                    onClick={() => updateWordStatus(true)}
+                                    variant="outlined"
+                                    sx={SXs.MUI_NAV_ICON_BUTTON}
+                                >
+                                    <ThumbUpRoundedIcon />
+                                </IconButton>
+                            </Grid>
+                        </Grid>
+                    </DialogActions>
+                }
             </Dialog>
         </div>
     );
