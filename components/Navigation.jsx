@@ -405,6 +405,7 @@ function ResponsiveDrawer(props) {
                                                                 theme.palette[bgColor].main,
                                                             filter: "brightness(1.1)",
                                                         },
+                                                        ml: 1
                                                     }}
                                                     startIcon={<LogoutIcon />}
                                                     disableElevation
@@ -418,6 +419,12 @@ function ResponsiveDrawer(props) {
                                                         width: "40px",
                                                         height: "40px",
                                                         display: ["block", "none"],
+                                                        ml: 1,
+                                                        ...SXs.MUI_NAV_ICON_BUTTON,
+                                                        borderColor: (theme) =>
+                                                            `${theme.palette[bgColor].contrastText}5`,
+                                                        backgroundColor: (theme) =>
+                                                            theme.palette[bgColor].main,
                                                     }}
                                                     onClick={() =>
                                                         logout(() => {

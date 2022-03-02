@@ -1,5 +1,4 @@
 export const MUI_NAV_ICON_BUTTON = {
-    mr: 1,
     width: "40px",
     height: "40px",
     borderRadius: "10px",
@@ -14,6 +13,7 @@ export const MUI_NAV_ICON_BUTTON = {
         textTransform: "none !important",
     },
 };
+
 
 export const MUI_NAV_BUTTON = {
     mr: 1,
@@ -55,6 +55,16 @@ export const MUI_NAV_BUTTON_NO_MARGIN = {
 export const COMMON_BUTTON_STYLES = {
     "&.MuiButton-root": {
         textTransform: "none !important",
+    },
+};
+
+export const BASE_BUTTON_STYLES = {
+    "&.MuiButtonBase-root": {
+        textTransform: "none !important",
+        height: '15px',
+        '&.MuiTouchRipple-root': {
+            display: 'none'
+        }
     },
 };
 

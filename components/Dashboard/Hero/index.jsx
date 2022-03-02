@@ -25,11 +25,8 @@ const Welcome = () => {
 
     const reviewList = userData?.vips ? getLastReviewWord([...userData.vips]) : []
 
-    console.log('settings', settings);
-
     return (
         <Container maxWidth="lg" disableGutters>
-
             <Grid container direction="row" mt={[0, 1, 2, 3]}>
                 <Grid
                     item

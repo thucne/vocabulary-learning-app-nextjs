@@ -9,6 +9,7 @@ import Router from "next/router";
 import { logout, updateSettings } from "@actions";
 import { RECAPTCHA } from '@config';
 
+import axios from 'axios';
 
 export const isAuth = () => {
     if (typeof window !== "undefined") {
@@ -645,5 +646,38 @@ const generateAudioLink = (words) => {
         return `https://dictionary.cambridge.org/vi/media/english/us_pron/${filesLink}`;
     } else {
         return "";
+    }
+}
+
+export const getAudioUrl = async (raw, callback) => {
+    if (raw) {
+        const links = raw.split("<vip>");
+
+        checkIfAudioIsValid(links[0], (isValid) => {
+            if (isValid) {
+                callback(links[0]);
+            } else {
+                checkIfAudioIsValid(links[1], (isValid) => {
+                    if (isValid) {
+                        callback(links[1]);
+                    } else {
+                        callback("");
+                    }
+                })
+            }
+        });
+
+    } else {
+        callback("");
+    }
+}
+
+export const checkIfAudioIsValid = async (link, callback) => {
+    if (isValidHttpUrl(link)) {
+        let newSound = new Audio(link);
+        newSound.onerror = () => callback(false);
+        newSound.oncanplaythrough = () => callback(true);
+    } else {
+        return false;
     }
 }

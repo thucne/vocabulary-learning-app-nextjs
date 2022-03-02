@@ -1,35 +1,36 @@
 import React, { useEffect, useRef, useState } from "react";
 
-import { 
+import Image from "next/image";
+
+import {
     Button, Dialog, DialogContent, DialogContentText, DialogTitle,
-    Box, IconButton, Typography, Grow
+    Box, IconButton, Typography, Grow, Grid, Tabs, Tab, TabList,
 } from '@mui/material';
 
 import {
-    ArrowBackIos as ArrowBackIosIcon,
-    ArrowForwardIos as ArrowForwardIosIcon,
-    ArrowDropDown as ArrowDropDownIcon,
-    ArrowDropUp as ArrowDropUpIcon,
-    Close as CloseIcon,
+    ArrowBackIosNewRounded as ArrowBackIosIcon,
+    ArrowForwardIosRounded as ArrowForwardIosIcon,
+    ArrowDropDownRounded as ArrowDropDownIcon,
+    ArrowDropUpRounded as ArrowDropUpIcon,
+    CloseRounded as CloseIcon,
     PlayCircleFilledWhite as PlayCircleFilledWhiteIcon,
     DoNotDisturb as DoNotDisturbIcon,
     Done as DoneIcon,
+    VolumeUp as VolumeUpIcon
 } from '@mui/icons-material';
 
 import { useTheme } from "@mui/material/styles";
 
-import Image from "next/image";
-
-import { Colors, Fonts } from "@styles";
-import { useWindowSize } from "@utils";
-
+import { Colors, Fonts, SXs, Props } from "@styles";
+import { useWindowSize, useThisToGetSizesFromRef, useThisToGetPositionFromRef, getAudioUrl } from "@utils";
 import { RECAPTCHA } from "@config";
+import { updateManyVIPs, updateVIP } from "@actions";
+import { IMAGE_ALT, AUDIO_ALT } from '@consts';
 
 import { useDispatch, useSelector } from "react-redux";
-import { updateManyVIPs, updateVIP } from "@actions";
 
-const dummyImage =
-    "https://res.cloudinary.com/katyperrycbt/image/upload/v1645500815/djztmy2bmxvsywe1l8zx.png";
+import LoadingImage from '@components/LoadingImage';
+import SecondaryBlock from "./SecondaryBlock";
 
 const showTypes = {
     ONLY_ONE: "ONLY_ONE",
@@ -38,9 +39,14 @@ const showTypes = {
 };
 
 const WordCard = ({ open, setOpen, wordList }) => {
+
     const windowSize = useWindowSize();
     const theme = useTheme();
-    const audioRef = React.createRef(null);
+
+    const audioRef = useRef(null);
+    const photoRef = useRef(null);
+    const pronounceRef = useRef(null);
+    const pronounceGridRef = useRef(null);
 
     const dispatch = useDispatch();
     const recaptcha = useSelector((state) => state.recaptcha);
@@ -48,6 +54,24 @@ const WordCard = ({ open, setOpen, wordList }) => {
     const [loading, setLoading] = useState(false);
     const [wordIndex, setWordIndex] = useState(0);
     const [learnStatus, setLearnStatus] = useState([]);
+    const [audioUrl, setAudioUrl] = useState("");
+    const [loadingAudio, setLoadingAudio] = useState(false);
+
+    useEffect(() => {
+        const run = async () => {
+            setLoadingAudio(true);
+            setAudioUrl("");
+            getAudioUrl(wordList[wordIndex].audio, (url) => {
+                setAudioUrl(url);
+                if (audioRef.current) {
+                    audioRef.current.pause();
+                    audioRef.current.load();
+                }
+                setLoadingAudio(false);
+            });
+        }
+        run();
+    }, [wordIndex, wordList]);
 
     const handleClose = () => {
         setOpen(false);
@@ -71,7 +95,7 @@ const WordCard = ({ open, setOpen, wordList }) => {
     const handleUpdateVIP = () => {
         let data = [...learnStatus];
 
-        if (window?.adHocFetch && recaptcha === true && window.grecaptcha) {
+        if (window?.adHocFetch && recaptcha === true && window?.grecaptcha) {
             grecaptcha.ready(function () {
                 grecaptcha
                     .execute(`${RECAPTCHA}`, { action: "vip_authentication" })
@@ -106,6 +130,7 @@ const WordCard = ({ open, setOpen, wordList }) => {
             },
         ]);
     };
+
     const handleOkRate = () => {
         let updatedField = {
             lastReview: Date.now(),
@@ -129,6 +154,25 @@ const WordCard = ({ open, setOpen, wordList }) => {
 
         handleFowardbutton()
     };
+
+    const photoSizes = useThisToGetSizesFromRef(photoRef, {
+        revalidate: 1000,
+        terminalCondition: ({ width }) => width !== 0,
+        falseCondition: ({ width }) => width === 0,
+    });
+
+    const pronouncePositions = useThisToGetPositionFromRef(pronounceRef, {
+        revalidate: 1000,
+        terminalCondition: ({ left, top }) => Number(left) > 0 && Number(top) > 0,
+        falseCondition: ({ left, top }) => !left || !top,
+    })
+
+    const pronounceGridPositions = useThisToGetPositionFromRef(pronounceGridRef, {
+        revalidate: 1000,
+        terminalCondition: ({ left, top }) => Number(left) > 0 && Number(top) > 0,
+        falseCondition: ({ left, top }) => !left || !top,
+    })
+
     return (
         <div>
             <Dialog
@@ -137,102 +181,115 @@ const WordCard = ({ open, setOpen, wordList }) => {
                 scroll="paper"
                 aria-labelledby="scroll-dialog-title"
                 aria-describedby="scroll-dialog-description"
-                fullScreen={
-                    windowSize?.width < theme.breakpoints.values.sm ? true : false
-                }
-                maxWidth="sm"
+                fullScreen={windowSize?.width < theme.breakpoints.values.sm ? true : false}
+                maxWidth="xs"
+                sx={{ '.MuiPaper-root': { borderRadius: '10px' } }}
             >
-                <DialogContent
-                    sx={{
-                        position: "relative",
-                        overflowX: "hidden",
-                        width: ["full", "565px"],
-                        height: ["100%", "680px"],
-                    }}
-                >
+                <DialogContent dividers>
                     <IconButton
-                        sx={{ position: "absolute", top: 10, left: 10 }}
+                        sx={{
+                            ...SXs.MUI_NAV_ICON_BUTTON
+                        }}
                         onClick={loading ? null : handleClose}
                     >
                         <CloseIcon />
                     </IconButton>
-                    {wordIndex === wordList.length ? (
-                        <FinishDialog
-                            handleBackbutton={handleBackbutton}
-                            handleUpdateVIP={handleUpdateVIP}
-                            loading={loading}
-                        />
-                    ) : (
-                        <Box>
-                            <Box>
-                                <Box sx={{ ...style.flexCenter, flexDirection: "column" }}>
-                                    <Image
-                                        width={150}
-                                        height={150}
-                                        src={
-                                            wordList[wordIndex]?.illustration?.formats?.small?.url ??
-                                            dummyImage
-                                        }
-                                        alt="something"
-                                    />
-                                    <Box sx={style.flexCenter}>
-                                        <IconButton onClick={handleBackbutton} disabled={wordIndex === 0}>
-                                            <ArrowBackIosIcon
-                                                sx={{ fontSize: Fonts.FS_16 }}
-                                            />
-                                        </IconButton>
+                    {
+                        wordIndex === wordList.length
+                            ? <FinishDialog
+                                handleBackbutton={handleBackbutton}
+                                handleUpdateVIP={handleUpdateVIP}
+                                loading={loading}
+                            />
+                            : <Grid container {...Props.GCRCC} sx={{ overflow: 'hidden' }}>
 
-                                        <Typography
+                                <Grid item xs={12} {...Props.GIRBC} mt={2}>
+                                    <Typography variant="h5" gutterBottom sx={{
+                                        display: 'inline',
+                                        fontWeight: Fonts.FW_600,
+                                        // fontSize: Fonts.FS_18,
+                                    }}>
+                                        Practice Set
+                                    </Typography>
+                                    <Typography variant="caption" gutterBottom sx={{ display: 'inline' }}>
+                                        Words: {wordIndex + 1}/{wordList.length}
+                                    </Typography>
+                                </Grid>
+
+                                <Grid ref={photoRef} item xs={12} {...Props.GIRCC}>
+                                    <div style={{
+                                        width: photoSizes?.width,
+                                        height: photoSizes?.width,
+                                        position: 'relative',
+                                        borderRadius: '10px',
+                                        overflow: 'hidden',
+                                        marginTop: '5px'
+                                    }}>
+                                        <LoadingImage
+                                            src={
+                                                wordList[wordIndex]?.illustration?.formats?.small?.url ||
+                                                IMAGE_ALT
+                                            }
+                                            alt="something"
+                                            objectFit="contain"
+                                            layout='fill'
+                                        />
+                                    </div>
+                                </Grid>
+                                <Grid item xs={12} {...Props.GIRBC} mt={3}>
+                                    <IconButton onClick={handleBackbutton} disabled={wordIndex === 0}>
+                                        <ArrowBackIosIcon sx={{ fontSize: Fonts.FS_16 }} />
+                                    </IconButton>
+
+                                    <Typography
+                                        variant='h5'
+                                        sx={{ fontWeight: Fonts.FW_600, mx: 3 }}
+                                        className='overflowTypography'
+                                    >
+                                        {wordList[wordIndex].vip}
+                                    </Typography>
+
+                                    <IconButton onClick={handleFowardbutton}>
+                                        <ArrowForwardIosIcon sx={{ fontSize: Fonts.FS_16 }} />
+                                    </IconButton>
+
+                                </Grid>
+
+                                <Grid ref={pronounceGridRef} item xs={12} {...Props.GIRCC} mt={1.5}
+                                    sx={{ position: 'relative' }}
+                                >
+
+                                    <Typography ref={pronounceRef} sx={{
+                                        color: (theme) => theme.palette.action.main
+                                    }}>
+                                        {wordList[wordIndex].pronounce}
+                                    </Typography>
+
+                                    {
+                                        !loadingAudio && <IconButton
+                                            disabled={!wordList[wordIndex].audio}
+                                            onClick={() => audioRef.current.play()}
                                             sx={{
-                                                fontSize: Fonts.FS_18,
-                                                fontWeight: Fonts.FW_600,
-                                                mx: 3,
+                                                position: 'absolute',
+                                                // top: pronouncePositions?.top,
+                                                left: pronouncePositions?.left - pronouncePositions?.height - 10 - pronounceGridPositions?.left,
+                                                height: pronouncePositions?.height,
+                                                width: pronouncePositions?.height,
+                                                fontSize: pronouncePositions?.height * 0.9
                                             }}
                                         >
-                                            {wordList[wordIndex].vip}
-                                        </Typography>
-
-                                        <IconButton onClick={handleFowardbutton}>
-                                            <ArrowForwardIosIcon sx={{ fontSize: Fonts.FS_16 }} />
+                                            <VolumeUpIcon fontSize='inherit' />
                                         </IconButton>
-                                    </Box>
-
-                                    <Box sx={{ height: "20px" }}>
-                                        <Typography sx={{ color: Colors.GRAY_5 }}>
-                                            {wordList[wordIndex].pronounce}
-                                        </Typography>
-                                    </Box>
-
-                                    {/* Audio  Section*/}
-                                    <IconButton
-                                        disabled={!wordList[wordIndex].audio}
-                                        onClick={() => audioRef.current.play()}
-                                    >
-                                        <PlayCircleFilledWhiteIcon sx={{ fontSize: Fonts.FS_16 }} />
-                                    </IconButton>
+                                    }
                                     <audio ref={audioRef}>
-                                        <source src={wordList[wordIndex].audio} type="audio/mpeg" />
+                                        <source src={audioUrl || AUDIO_ALT} />
                                     </audio>
-                                </Box>
 
-                                {/* Meaningis & example section */}
-                                <Box sx={{ height: ["300px", "280px"] }}>
-                                    <DynamicListContent
-                                        {...listContentProps(
-                                            wordList[wordIndex],
-                                            showTypes.ONLY_ONE
-                                        ).example}
-                                    />
-                                    <DynamicListContent
-                                        {...listContentProps(wordList[wordIndex], showTypes.HIDE)
-                                            .english}
-                                    />
+                                </Grid>
 
-                                    <DynamicListContent
-                                        {...listContentProps(wordList[wordIndex], showTypes.HIDE)
-                                            .vietnamese}
-                                    />
-                                </Box>
+                                <Grid item xs={12} {...Props.GICCC} mt={1.5}>
+                                    <SecondaryBlock data={wordList[wordIndex]}/>
+                                </Grid>
 
                                 {/* Rating section */}
                                 <Box sx={{ textAlign: "center", mt: [0, 3] }}>
@@ -256,9 +313,8 @@ const WordCard = ({ open, setOpen, wordList }) => {
                                         </Button>
                                     </Box>
                                 </Box>
-                            </Box>
-                        </Box>
-                    )}
+                            </Grid>
+                    }
                 </DialogContent>
             </Dialog>
         </div>
@@ -358,24 +414,6 @@ const DynamicListContent = ({ title, content, defaultShowType }) => {
     );
 };
 
-const listContentProps = (form, showType) => ({
-    vietnamese: {
-        title: "Vietnamese Meanings",
-        content: form.meanings.vietnamese,
-        defaultShowType: showType,
-    },
-    english: {
-        title: "English Meanings",
-        content: form.meanings.english,
-        defaultShowType: showType,
-    },
-    example: {
-        title: "Example",
-        content: form.examples,
-        defaultShowType: showType,
-    },
-});
-
 const style = {
     flexCenter: {
         display: "flex",
@@ -394,5 +432,6 @@ const style = {
         borderRadius: "5px",
     },
 };
+
 
 export default React.memo(WordCard);
