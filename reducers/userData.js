@@ -11,8 +11,7 @@ const userData = (state = {}, action) => {
             const oldState = cloneDeep(state);
             const newState = cloneDeep(action.payload);
 
-            return !isEqual(oldState, newState) &&
-                JSON.stringify(oldState)?.length !== JSON.stringify(newState)?.length
+            return !isEqual(oldState, newState)
                 ? { ...state, ...action.payload }
                 : state;
 

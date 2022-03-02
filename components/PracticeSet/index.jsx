@@ -1,397 +1,411 @@
 import React, { useEffect, useRef, useState } from "react";
 
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import { Box, IconButton, Typography } from "@mui/material";
-import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import CloseIcon from "@mui/icons-material/Close";
-import PlayCircleFilledWhiteIcon from "@mui/icons-material/PlayCircleFilledWhite";
-import Grow from "@mui/material/Grow";
-import DoNotDisturbIcon from "@mui/icons-material/DoNotDisturb";
-import DoneIcon from "@mui/icons-material/Done";
+import Image from "next/image";
+
+import {
+    Button, Dialog, DialogContent, DialogContentText, DialogTitle,
+    Box, IconButton, Typography, Grow, Grid, Tabs, Tab, TabList,
+    DialogActions
+} from '@mui/material';
+
+import {
+    ArrowBackIosNewRounded as ArrowBackIosIcon,
+    ArrowForwardIosRounded as ArrowForwardIosIcon,
+    ArrowDropDownRounded as ArrowDropDownIcon,
+    ArrowDropUpRounded as ArrowDropUpIcon,
+    CloseRounded as CloseIcon,
+    VolumeUpRounded as VolumeUpIcon,
+    ThumbUpRounded as ThumbUpRoundedIcon,
+    ThumbDownRounded as ThumbDownRoundedIcon
+} from '@mui/icons-material';
 
 import { useTheme } from "@mui/material/styles";
 
-import Image from "next/image";
-
-import { Colors, Fonts } from "@styles";
-import { useWindowSize } from "@utils";
-
+import { Colors, Fonts, SXs, Props } from "@styles";
+import { useWindowSize, useThisToGetSizesFromRef, getAudioUrl } from "@utils";
 import { RECAPTCHA } from "@config";
+import { updateManyVIPs, updateVIP } from "@actions";
+import { IMAGE_ALT, AUDIO_ALT } from '@consts';
 
 import { useDispatch, useSelector } from "react-redux";
-import { updateManyVIPs, updateVIP } from "@actions";
+import moment from "moment";
 
-const dummyImage =
-  "https://res.cloudinary.com/katyperrycbt/image/upload/v1645500815/djztmy2bmxvsywe1l8zx.png";
+import LoadingImage from '@components/LoadingImage';
+import SecondaryBlock from "./SecondaryBlock";
 
 const showTypes = {
-  ONLY_ONE: "ONLY_ONE",
-  ALL: "ALL",
-  HIDE: "HIDE",
+    ONLY_ONE: "ONLY_ONE",
+    ALL: "ALL",
+    HIDE: "HIDE",
 };
 
 const WordCard = ({ open, setOpen, wordList }) => {
-  const windowSize = useWindowSize();
-  const theme = useTheme();
-  const audioRef = React.createRef(null);
 
-  const dispatch = useDispatch();
-  const recaptcha = useSelector((state) => state.recaptcha);
+    const windowSize = useWindowSize();
+    const theme = useTheme();
 
-  const [loading, setLoading] = useState(false);
-  const [wordIndex, setWordIndex] = useState(0);
-  const [learnStatus, setLearnStatus] = useState([]);
+    const audioRef = useRef(null);
+    const photoRef = useRef(null);
 
-  const handleClose = () => {
-    setOpen(false);
-  };
+    const dispatch = useDispatch();
+    const recaptcha = useSelector((state) => state.recaptcha);
 
-  const handleFowardbutton = () => {
-    let nextIndex = wordIndex + 1;
-    setWordIndex(nextIndex);
-  };
+    const [loading, setLoading] = useState(false);
+    const [wordIndex, setWordIndex] = useState(0);
+    const [learnStatus, setLearnStatus] = useState([]);
+    const [audioUrl, setAudioUrl] = useState("");
+    const [loadingAudio, setLoadingAudio] = useState(false);
 
-  const handleBackbutton = () => {
-    let prevIndex =
-      wordIndex === 0
-        ? 0
-        : wordIndex >= wordList.length
-        ? wordList.length - 1
-        : wordIndex - 1;
-    setWordIndex(prevIndex);
-  };
+    useEffect(() => {
+        setWordIndex(0);
+    }, [wordList.length, open]);
 
-  const handleUpdateVIP = () => {
-    let data = [...learnStatus];
-
-    if (window?.adHocFetch && recaptcha === true && window.grecaptcha) {
-      grecaptcha.ready(function () {
-        grecaptcha
-          .execute(`${RECAPTCHA}`, { action: "vip_authentication" })
-          .then(function (token) {
-
-            adHocFetch({
-              dispatch,
-              action: updateManyVIPs({data, token }),
-              onSuccess: (res) => {setWordIndex(0);handleClose()},
-              onError: (error) => console.log(error),
-              onStarting: () => setLoading(true),
-              onFinally: () => setLoading(false),
-              snackbarMessageOnSuccess: "Updated!",
-            });
-          });
-      });
-    }
-  };
-
-  const adToLearnStatus = (status) => {
-    const { lastReviewOK, lastReview } = status;
-
-    //lastReview is in seconds
-    const lastReviewDate = new Date(lastReview);
-
-    setLearnStatus((state) => [
-      ...state,
-      {
-        id: wordList[wordIndex].id,
-        lastReviewOK,
-        lastReview: lastReviewDate,
-      },
-    ]);
-  };
-  const handleOkRate = () => {
-    let updatedField = {
-      lastReview: Date.now(),
-      lastReviewOK: true,
-    };
-
-    // add to learn status
-    adToLearnStatus(updatedField);
-
-    handleFowardbutton()
-  };
-
-  const handleNotOkRate = () => {
-    let updatedField = {
-      lastReview: Date.now(),
-      lastReviewOK: false,
-    };
-
-    // add to learn status
-    adToLearnStatus(updatedField);
-
-    handleFowardbutton()
-  };
-  return (
-    <div>
-      <Dialog
-        open={open}
-        onClose={loading ? null : handleClose}
-        scroll="paper"
-        aria-labelledby="scroll-dialog-title"
-        aria-describedby="scroll-dialog-description"
-        fullScreen={
-          windowSize?.width < theme.breakpoints.values.sm ? true : false
-        }
-        maxWidth="sm"
-      >
-        <DialogContent
-          sx={{
-            position: "relative",
-            overflowX: "hidden",
-            width: ["full", "565px"],
-            height: ["100%", "680px"],
-          }}
-        >
-          <IconButton
-            sx={{ position: "absolute", top: 10, left: 10 }}
-            onClick={loading ? null : handleClose}
-          >
-            <CloseIcon />
-          </IconButton>
-          {wordIndex === wordList.length ? (
-            <FinishDialog
-              handleBackbutton={handleBackbutton}
-              handleUpdateVIP={handleUpdateVIP}
-              loading={loading}
-            />
-          ) : (
-            <Box>
-              <Box>
-                <Box sx={{ ...style.flexCenter, flexDirection: "column" }}>
-                  <Image
-                    width={150}
-                    height={150}
-                    src={
-                      wordList[wordIndex]?.illustration?.formats?.small?.url ??
-                      dummyImage
+    useEffect(() => {
+        const run = async () => {
+            if (wordIndex < wordList.length && wordIndex >= 0) {
+                setLoadingAudio(true);
+                setAudioUrl("");
+                getAudioUrl(wordList[wordIndex].audio, (url) => {
+                    setAudioUrl(url);
+                    if (audioRef.current) {
+                        audioRef.current.pause();
+                        audioRef.current.load();
                     }
-                    alt="something"
-                  />
-                  <Box sx={style.flexCenter}>
-                    <IconButton onClick={handleBackbutton} disabled={wordIndex === 0}>
-                      <ArrowBackIosIcon 
-                      sx={{ fontSize: Fonts.FS_16 }} 
-                      />
-                    </IconButton>
+                    setLoadingAudio(false);
+                });
+            }
+        }
+        run();
+    }, [wordIndex, wordList]);
 
-                    <Typography
-                      sx={{
-                        fontSize: Fonts.FS_18,
-                        fontWeight: Fonts.FW_600,
-                        mx: 3,
-                      }}
-                    >
-                      {wordList[wordIndex].vip}
-                    </Typography>
+    const handleClose = () => {
+        setOpen(false);
+    };
 
-                    <IconButton onClick={handleFowardbutton}>
-                      <ArrowForwardIosIcon sx={{ fontSize: Fonts.FS_16 }} />
-                    </IconButton>
-                  </Box>
+    const handleUpdateVIP = () => {
+        const now = new Date();
 
-                  <Box sx={{ height: "20px" }}>
-                    <Typography sx={{ color: Colors.GRAY_5 }}>
-                      {wordList[wordIndex].pronounce}
-                    </Typography>
-                  </Box>
+        let data = [...learnStatus].map(item => ({
+            ...item,
+            lastReview: now.toISOString(),
+        })).sort((a, b) => a.id - b.id);
 
-                  {/* Audio  Section*/}
-                  <IconButton
-                    disabled={!wordList[wordIndex].audio}
-                    onClick={() => audioRef.current.play()}
-                  >
-                    <PlayCircleFilledWhiteIcon sx={{ fontSize: Fonts.FS_16 }} />
-                  </IconButton>
-                  <audio ref={audioRef}>
-                    <source src={wordList[wordIndex].audio} type="audio/mpeg" />
-                  </audio>
-                </Box>
+        if (window?.adHocFetch && recaptcha === true && window?.grecaptcha) {
+            grecaptcha.ready(function () {
+                grecaptcha
+                    .execute(`${RECAPTCHA}`, { action: "vip_authentication" })
+                    .then(function (token) {
 
-                {/* Meaningis & example section */}
-                <Box sx={{ height: ["300px", "280px"] }}>
-                  <DynamicListContent
-                    {...listContentProps(
-                      wordList[wordIndex],
-                      showTypes.ONLY_ONE
-                    ).example}
-                  />
-                  <DynamicListContent
-                    {...listContentProps(wordList[wordIndex], showTypes.HIDE)
-                      .english}
-                  />
+                        adHocFetch({
+                            dispatch,
+                            action: updateManyVIPs({ data, token }),
+                            onSuccess: (res) => { setWordIndex(0); handleClose() },
+                            onError: (error) => console.log(error),
+                            onStarting: () => setLoading(true),
+                            onFinally: () => setLoading(false),
+                            snackbarMessageOnSuccess: "Updated!",
+                        });
+                    });
+            });
+        }
+    };
 
-                  <DynamicListContent
-                    {...listContentProps(wordList[wordIndex], showTypes.HIDE)
-                      .vietnamese}
-                  />
-                </Box>
+    const handleNext = () => {
+        setWordIndex(prev => prev + 1);
+    };
 
-                {/* Rating section */}
-                <Box sx={{ textAlign: "center", mt: [0, 3] }}>
-                  <Typography sx={style.text}>Rate this word</Typography>
-                  <Box>
-                    <Button
-                      onClick={handleNotOkRate}
-                      variant="outlined"
-                      sx={{ m: 2 }}
-                      startIcon={<DoNotDisturbIcon />}
-                    >
-                      Not Ok
-                    </Button>
-                    <Button
-                      onClick={handleOkRate}
-                      variant="contained"
-                      sx={{ m: 2 }}
-                      endIcon={<DoneIcon />}
-                    >
-                      Ok
-                    </Button>
-                  </Box>
-                </Box>
-              </Box>
-            </Box>
-          )}
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-};
+    const handlePrevious = () => {
+        setWordIndex(prev => {
+            if (prev === 0) {
+                return 0;
+            } else {
+                return prev > wordList.length ? wordList.length - 1 : prev - 1;
+            }
+        });
+    };
 
-const FinishDialog = ({ handleBackbutton, handleUpdateVIP,loading }) => {
-  return (
-    <Box sx={{ ...style.flexCenter, flexDirection: "column", height: "100%" }}>
-        <Image src="https://res.cloudinary.com/katyperrycbt/image/upload/v1645968644/n9y7xgh5qr8ohlvibet0.png"
-      alt="finish-img" width={200} height={200}/>
-      <Typography
-        component="h1"
-        sx={{
-          fontSize: Fonts.FS_24,
-          p: "16px 0px 0px",
-          fontWeight: Fonts.FW_500,
-        }}
-      >
-        You have review all words.
-      </Typography>
-      
-      <Typography
-        component="p"
-        sx={{ fontSize: Fonts.FS_15, p: "8px 0px 0px" }}
-      >
-        Let&apos;s update your words status
-        <Button onClick={handleUpdateVIP}>update</Button>
-      </Typography>
 
-      <Button
-        onClick={handleBackbutton}
-        variant="contained"
-        sx={{ m: 2 }}
-        disabled={loading}
-        startIcon={<ArrowBackIosIcon />}
-      >
-        Go back
-      </Button>
-    </Box>
-  );
-};
+    const updateWordStatus = (value) => {
+        setLearnStatus((prev) => {
+            const findIndex = prev.findIndex((item) => item.id === wordList[wordIndex].id);
 
-const DynamicListContent = ({ title, content, defaultShowType }) => {
-  const style = {
-    bubbleText: {
-      color: Colors.BLACK,
-      bgcolor: Colors.GRAY_2,
-      px: 2,
-      py: 1,
-      mb: 2,
-      borderRadius: "5px",
-    },
-  };
-  const showOrder = [showTypes.HIDE, showTypes.ONLY_ONE];
-  const [showType, setShowType] = useState(defaultShowType);
+            if (findIndex !== -1) {
+                prev[findIndex].lastReviewOK = Boolean(value);
+                return [...prev];
+            } else {
+                return [
+                    ...prev,
+                    {
+                        id: wordList?.[wordIndex]?.id,
+                        lastReviewOK: Boolean(value),
+                    },
+                ];
+            }
+        });
+        handleNext();
+    };
 
-  const handleChangeShowType = () => {
-    let index = showOrder.indexOf(showType);
-    let tempt = index === showOrder.length - 1 ? 0 : index + 1;
-    setShowType(showOrder[tempt]);
-  };
+    const photoSizes = useThisToGetSizesFromRef(photoRef, {
+        revalidate: 1000,
+        terminalCondition: ({ width }) => width !== 0,
+        falseCondition: ({ width }) => width === 0,
+    });
 
-  const renderFormType = () => {
     return (
-      <Grow in={showType === "ONLY_ONE"} style={{ transformOrigin: "0 0 0" }}>
-        <Box sx={{ overflowY: "auto", maxHeight: "60px" }}>
-          <Typography sx={style.bubbleText}>{content[0]}</Typography>
-        </Box>
-      </Grow>
-    );
-  };
-
-  if (!content.length) return <div></div>;
-  return (
-    <Box sx={{ height: ["100px", "100px"] }}>
-      <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
         <div>
-          <Typography
-            sx={{
-              fontSize: Fonts.FS_16,
-              fontWeight: Fonts.FW_500,
-              display: "inline-block",
-            }}
-          >
-            {title}
-          </Typography>
+            <Dialog
+                open={open}
+                onClose={loading ? null : handleClose}
+                scroll="paper"
+                aria-labelledby="scroll-dialog-title"
+                aria-describedby="scroll-dialog-description"
+                fullScreen={windowSize?.width < theme.breakpoints.values.sm ? true : false}
+                maxWidth="xs"
+                sx={{
+                    '.MuiPaper-root': {
+                        borderRadius: '10px',
+                        maxWidth: windowSize?.width > theme.breakpoints.values.sm && 390,
+                        width: '100%',
+                        height: '100%'
+                    }
+                }}
+            >
+                <DialogTitle sx={{ py: 1 }}>
+                    <Grid item xs={12} {...Props.GIRBC}>
+                        <IconButton
+                            sx={{
+                                ...SXs.MUI_NAV_ICON_BUTTON,
+                                width: '30px',
+                                height: '30px',
+                                fontSize: '25px',
+                                borderRadius: '5px',
+                            }}
+                            onClick={loading ? null : handleClose}
+                        >
+                            <CloseIcon fontSize='inherit' />
+                        </IconButton>
+                        <Typography variant="h6" sx={{
+                            display: 'inline',
+                            fontWeight: Fonts.FW_500,
+                        }}>
+                            Practice Set
+                        </Typography>
+                        <Typography variant="caption" sx={{ display: 'inline' }}>
+                            Words: {(wordIndex + 1) < wordList.length ? (wordIndex + 1) : wordList.length}/{wordList.length}
+                        </Typography>
+                    </Grid>
+                </DialogTitle>
+
+                <DialogContent dividers sx={{
+                    position: 'relative',
+                }}>
+                    {/* <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
+                        <div style={{ position: 'relative', width: '100%', height: '100%', opacity: 0.1 }}>
+                            <Image
+                                src="/logo.icon.svg"
+                                alt="Logo"
+                                layout='fill'
+                                draggable={false}
+                                objectFit='contain'
+                            />
+                        </div>
+                    </div> */}
+                    {
+                        wordIndex === wordList.length
+                            ? <FinishDialog
+                                handleBackbutton={handlePrevious}
+                                handleUpdateVIP={handleUpdateVIP}
+                                loading={loading}
+                            />
+                            : <Grid container {...Props.GCRCC} sx={{ overflow: 'hidden' }}>
+
+                                <Grid ref={photoRef} item xs={12} {...Props.GIRCC}>
+                                    <div style={{
+                                        width: photoSizes?.width,
+                                        height: photoSizes?.width,
+                                        position: 'relative',
+                                        borderRadius: '10px',
+                                        overflow: 'hidden',
+                                        marginTop: '5px'
+                                    }}>
+                                        <LoadingImage
+                                            src={
+                                                wordList?.[wordIndex]?.illustration?.formats?.large?.url ||
+                                                wordList?.[wordIndex]?.illustration?.url ||
+                                                IMAGE_ALT
+                                            }
+                                            alt="something"
+                                            objectFit="contain"
+                                            layout='fill'
+                                            quality={100}
+                                            draggable={false}
+                                        />
+                                    </div>
+                                </Grid>
+                                <Grid item xs={12} {...Props.GIRBC}>
+                                    <Typography variant="caption">
+                                        Last review: {moment(wordList?.[wordIndex]?.lastReview).fromNow()}.
+                                        Status: {wordList?.[wordIndex]?.lastReviewOK ? 'remember' : 'don\'t remember'}.
+                                    </Typography>
+                                </Grid>
+                                <Grid item xs={12} {...Props.GIRBC} mt={3}>
+                                    <IconButton onClick={handlePrevious} disabled={wordIndex === 0}>
+                                        <ArrowBackIosIcon sx={{ fontSize: Fonts.FS_16 }} />
+                                    </IconButton>
+
+                                    <Typography
+                                        variant='h5'
+                                        sx={{ fontWeight: Fonts.FW_600, mx: 3 }}
+                                        className='overflowTypography'
+                                    >
+                                        {wordList[wordIndex].vip}
+                                    </Typography>
+
+                                    <IconButton onClick={handleNext}>
+                                        <ArrowForwardIosIcon sx={{ fontSize: Fonts.FS_16 }} />
+                                    </IconButton>
+
+                                </Grid>
+
+                                <Grid item xs={12} {...Props.GIRCC} mt={1} sx={{ position: 'relative' }} >
+
+                                    <Typography sx={{ color: (theme) => theme.palette.action.main }}>
+                                        {wordList[wordIndex].pronounce}
+                                    </Typography>
+
+                                    {
+                                        !loadingAudio && <IconButton
+                                            disabled={!wordList?.[wordIndex]?.audio}
+                                            onClick={() => audioRef.current.play()}
+                                            sx={{ fontSize: Fonts.FS_16, height: '25px', width: '25px', ml: 1 }}
+                                        >
+                                            <VolumeUpIcon fontSize='inherit' />
+                                        </IconButton>
+                                    }
+
+                                    <audio ref={audioRef}>
+                                        <source src={audioUrl || AUDIO_ALT} />
+                                    </audio>
+
+                                </Grid>
+
+                                <Grid item xs={12} {...Props.GICCC} mt={1.5}>
+                                    <SecondaryBlock data={wordList[wordIndex]} />
+                                </Grid>
+
+                            </Grid>
+                    }
+                </DialogContent>
+
+                {
+                    wordIndex < wordList.length && wordIndex >= 0 && <DialogActions>
+                        <Grid container {...Props.GCRCC} spacing={1}>
+                            <Grid item>
+                                <Typography>Remember this word?</Typography>
+                            </Grid>
+
+                            <Grid item>
+                                <IconButton
+                                    onClick={() => updateWordStatus(false)}
+                                    variant="outlined"
+                                    sx={SXs.MUI_NAV_ICON_BUTTON}
+                                >
+                                    <ThumbDownRoundedIcon />
+                                </IconButton>
+                            </Grid>
+
+                            <Grid item>
+                                <IconButton
+                                    onClick={() => updateWordStatus(true)}
+                                    variant="outlined"
+                                    sx={SXs.MUI_NAV_ICON_BUTTON}
+                                >
+                                    <ThumbUpRoundedIcon />
+                                </IconButton>
+                            </Grid>
+                        </Grid>
+                    </DialogActions>
+                }
+            </Dialog>
         </div>
-        {showType === "ONLY_ONE" ? (
-          <ArrowDropUpIcon onClick={handleChangeShowType} />
-        ) : (
-          <ArrowDropDownIcon onClick={handleChangeShowType} />
-        )}
-      </Box>
-      <Box sx={{ maxHeight: "100px", width: "100%" }}>{renderFormType()}</Box>
-    </Box>
-  );
+    );
 };
 
-const listContentProps = (form, showType) => ({
-  vietnamese: {
-    title: "Vietnamese Meanings",
-    content: form.meanings.vietnamese,
-    defaultShowType: showType,
-  },
-  english: {
-    title: "English Meanings",
-    content: form.meanings.english,
-    defaultShowType: showType,
-  },
-  example: {
-    title: "Example",
-    content: form.examples,
-    defaultShowType: showType,
-  },
-});
+const FinishDialog = ({ handleBackbutton, handleUpdateVIP, loading }) => {
+    return (
+        <Grid container {...Props.GCCBC} sx={{ height: "100%" }}>
+            <Grid item {...Props.GICCC}>
+                <div style={{ width: 200, height: 200, borderRadius: '10px', overflow: 'hidden', position: 'relative' }}>
+                    <LoadingImage
+                        src="https://res.cloudinary.com/katyperrycbt/image/upload/v1646233521/imageedit_7_8841258520_qlcyao.gif"
+                        alt="finish-img"
+                        layout='fill'
+                        draggable={false}
+                    />
+                </div>
+                <Typography
+                    component="h1"
+                    sx={{
+                        fontSize: Fonts.FS_20,
+                        p: "16px 0px 0px",
+                        fontWeight: Fonts.FW_500,
+                    }}
+                >
+                    Well done! You finished the quiz!
+                </Typography>
+
+                <Typography
+                    component="p"
+                    sx={{ fontSize: Fonts.FS_15, p: "8px 0px 0px" }}
+                    align="center"
+                >
+                    Save the progress so next time you can start with more optimized word list
+                </Typography>
+
+                <Button
+                    sx={{ ...SXs.COMMON_BUTTON_STYLES, mt: 1 }}
+                    onClick={handleUpdateVIP}
+                    size="small"
+                    variant="text"
+                >
+                    Update
+                </Button>
+            </Grid>
+
+            <Grid item {...Props.GIRCC}>
+                <Button
+                    onClick={handleBackbutton}
+                    variant="outlined"
+                    sx={{ ...SXs.COMMON_BUTTON_STYLES }}
+                    disabled={loading}
+                    startIcon={<ArrowBackIosIcon />}
+                    size="small"
+                >
+                    Go back
+                </Button>
+            </Grid>
+        </Grid>
+    );
+};
 
 const style = {
-  flexCenter: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  text: {
-    fontSize: Fonts.FS_16,
-    fontWeight: Fonts.FW_600,
-  },
-  bubbleText: {
-    color: Colors.BLACK,
-    bgcolor: Colors.GRAY_3,
-    px: 2,
-    py: 1,
-    borderRadius: "5px",
-  },
+    flexCenter: {
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+    },
+    text: {
+        fontSize: Fonts.FS_16,
+        fontWeight: Fonts.FW_600,
+    },
+    bubbleText: {
+        color: Colors.BLACK,
+        bgcolor: Colors.GRAY_3,
+        px: 2,
+        py: 1,
+        borderRadius: "5px",
+    },
 };
+
 
 export default React.memo(WordCard);

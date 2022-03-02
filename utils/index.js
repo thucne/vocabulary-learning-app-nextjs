@@ -6,8 +6,10 @@ import {
     useRef,
 } from "react";
 import Router from "next/router";
-import { logout } from "@actions";
-import * as t from "@consts";
+import { logout, updateSettings } from "@actions";
+import { RECAPTCHA } from '@config';
+
+import axios from 'axios';
 
 export const isAuth = () => {
     if (typeof window !== "undefined") {
@@ -504,7 +506,7 @@ export const handleDictionaryData = (
                 : english === 100
                     ? highPriorityMeanings
                     : highPriorityMeanings?.slice(0, english);
-                    
+
         return {
             pronounce: text || altPronounce,
             audio: camAudio ? `${camAudio}<vip>${audio}` : audio,
@@ -516,7 +518,7 @@ export const handleDictionaryData = (
     }
 };
 
-export const toggleSettings = (value, selectionValue, current, setCurrent) => {
+export const toggleSettings = async (value, selectionValue, current, updateFunction) => {
     const currentIndex = current.findIndex((item) => item?.includes(value));
     const newChecked = [...current];
 
@@ -529,12 +531,29 @@ export const toggleSettings = (value, selectionValue, current, setCurrent) => {
             newChecked[currentIndex] = `${value}/${selectionValue}`;
         }
     }
-    setCurrent(newChecked);
 
-    if (window) {
-        localStorage.setItem("vip-settings", JSON.stringify(newChecked));
+    if (updateFunction && typeof updateFunction === "function") {
+        updateFunction(newChecked);
     }
 };
+
+export const resetSettings = async () => {
+    if (window && JSON.parse(localStorage.getItem("vip-user"))?.id) {
+        await window.grecaptcha.ready(async function () {
+            await window.grecaptcha
+                .execute(`${RECAPTCHA}`, { action: "vip_authentication" })
+                .then(async function (token) {
+                    const formData = new FormData();
+                    let prepareObject = {
+                        token,
+                        settings: [],
+                    }
+                    formData.append("data", JSON.stringify(prepareObject));
+                    await updateSettings(JSON.parse(localStorage.getItem("vip-user"))?.id, formData);
+                });
+        });
+    }
+}
 
 export const getLastReviewWord = (words) => {
     if (!words.length) return null;
@@ -544,12 +563,12 @@ export const getLastReviewWord = (words) => {
     return orderedWords;
 };
 
-export const useSettings = () => {
-    if (window) {
-        const settings = JSON.parse(localStorage.getItem("vip-settings")) || [];
+export const useSettings = (userData, raw = false) => {
+    const settings = userData?.settings || [];
 
-        let response = {};
+    let response = {};
 
+    if (!raw) {
         if (settings?.length) {
             Array.from([...settings]).forEach((item) => {
                 const [value, selectionValue] = item.includes("/")
@@ -560,12 +579,14 @@ export const useSettings = () => {
 
             return { ...defaultSettings, ...response };
         }
-    }
 
-    return defaultSettings;
+        return { ...defaultSettings };
+    } else {
+        return settings || [];
+    }
 };
 
-const defaultSettings = {
+export const defaultSettings = {
     autoFill: true,
     examples: 1,
     english: 1,
@@ -625,5 +646,38 @@ const generateAudioLink = (words) => {
         return `https://dictionary.cambridge.org/vi/media/english/us_pron/${filesLink}`;
     } else {
         return "";
+    }
+}
+
+export const getAudioUrl = async (raw, callback) => {
+    if (raw) {
+        const links = raw.split("<vip>");
+
+        checkIfAudioIsValid(links[0], (isValid) => {
+            if (isValid) {
+                callback(links[0]);
+            } else {
+                checkIfAudioIsValid(links[1], (isValid) => {
+                    if (isValid) {
+                        callback(links[1]);
+                    } else {
+                        callback("");
+                    }
+                })
+            }
+        });
+
+    } else {
+        callback("");
+    }
+}
+
+export const checkIfAudioIsValid = async (link, callback) => {
+    if (isValidHttpUrl(link)) {
+        let newSound = new Audio(link);
+        newSound.onerror = () => callback(false);
+        newSound.oncanplaythrough = () => callback(true);
+    } else {
+        return false;
     }
 }

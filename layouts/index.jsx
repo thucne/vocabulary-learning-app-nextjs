@@ -28,7 +28,7 @@ const TransitionRight = (props) => {
 };
 
 const Alert = React.forwardRef(function Alert(props, ref) {
-    return <MuiAlert elevation={6} ref={ref} variant="outlined" {...props} />;
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
 const StyledProgess = styled(LinearProgress)({
@@ -46,19 +46,12 @@ const Layout = ({ children, login = false, landing = false }) => {
     const snackbar = useSelector((state) => state.snackbar);
     const linear = useSelector((state) => state.linear);
     const backdrop = useSelector((state) => state.backdrop);
-    const recaptcha = useSelector((state) => state.recaptcha);
 
     useEffect(() => {
         if (router?.query?.message) {
             setOpenMessage(true);
         }
     }, [router]);
-
-    useEffect(() => {
-        if (!recaptcha) {
-            dispatch({ type: t.RELOAD_RECAPTCHA });
-        }
-    }, [recaptcha, dispatch]);
 
     const handleClose = async (event, reason) => {
         if (reason === "clickaway") {
@@ -177,7 +170,7 @@ const Layout = ({ children, login = false, landing = false }) => {
                     <Alert
                         onClose={handleClose}
                         severity={snackbar?.type ? snackbar.type : "success"}
-                        sx={{ width: "100%" }}
+                        sx={{ width: "100%", "&.MuiPaper-root": { borderRadius: '10px' } }}
                     >
                         {snackbar?.message}
                     </Alert>

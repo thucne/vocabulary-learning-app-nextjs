@@ -113,10 +113,11 @@ function ResponsiveDrawer(props) {
 
     // get words
     const { data, error, isValidating } = useSWR(getJWT() ? `${API}/api/users/me` : null, fetcher, {
-        refreshInterval: 5000,
+        refreshInterval: 1000,
     });
 
     useEffect(() => {
+
         if (!error && !isValidating && data && !isEqual(userData, data)) {
             dispatch({
                 type: t.UPDATE_USER_DATA,
@@ -404,6 +405,7 @@ function ResponsiveDrawer(props) {
                                                                 theme.palette[bgColor].main,
                                                             filter: "brightness(1.1)",
                                                         },
+                                                        ml: 1
                                                     }}
                                                     startIcon={<LogoutIcon />}
                                                     disableElevation
@@ -417,6 +419,12 @@ function ResponsiveDrawer(props) {
                                                         width: "40px",
                                                         height: "40px",
                                                         display: ["block", "none"],
+                                                        ml: 1,
+                                                        ...SXs.MUI_NAV_ICON_BUTTON,
+                                                        borderColor: (theme) =>
+                                                            `${theme.palette[bgColor].contrastText}5`,
+                                                        backgroundColor: (theme) =>
+                                                            theme.palette[bgColor].main,
                                                     }}
                                                     onClick={() =>
                                                         logout(() => {
@@ -456,7 +464,10 @@ function ResponsiveDrawer(props) {
                                 <Grid item>
                                     <Stack direction="row">
                                         <IconButton
-                                            sx={SXs.MUI_NAV_ICON_BUTTON}
+                                            sx={{
+                                                ...SXs.MUI_NAV_ICON_BUTTON,
+                                                mr: 1
+                                            }}
                                             onClick={colorMode.toggleColorMode}
                                             color="mui_button_inner"
                                         >
