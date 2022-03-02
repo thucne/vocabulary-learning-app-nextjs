@@ -21,6 +21,8 @@ import {
 
 import { Fonts, SXs, Colors } from "@styles";
 
+import parser from 'html-react-parser';
+
 const ListContent = ({ form, formField, label, handleDeleteItem }) => {
     const myRef = useRef(null);
     const [overflow, setOverflow] = useState(false);
@@ -104,8 +106,9 @@ const ListContent = ({ form, formField, label, handleDeleteItem }) => {
                                             <Typography
                                                 style={styles(overflow).typography}
                                                 className="overflowTypography"
-                                                dangerouslySetInnerHTML={{
-                                                    __html: eachItem
+                                            >
+                                                {
+                                                    parser(eachItem
                                                         ?.split(" ")
                                                         ?.map((item) => {
                                                             if (item?.match(regex)) {
@@ -119,9 +122,9 @@ const ListContent = ({ form, formField, label, handleDeleteItem }) => {
                                                             }
                                                         })
                                                         ?.join(" ")
-                                                        ?.replace(/\s\s+/g, " "),
-                                                }}
-                                            ></Typography>
+                                                        ?.replace(/\s\s+/g, " "))
+                                                }
+                                            </Typography>
                                             <Tooltip title="Delete">
                                                 <IconButton
                                                     onClick={() => handleDeleteItem(formField, index)}

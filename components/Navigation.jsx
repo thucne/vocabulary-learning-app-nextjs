@@ -464,7 +464,10 @@ function ResponsiveDrawer(props) {
                                 <Grid item>
                                     <Stack direction="row">
                                         <IconButton
-                                            sx={SXs.MUI_NAV_ICON_BUTTON}
+                                            sx={{
+                                                ...SXs.MUI_NAV_ICON_BUTTON,
+                                                mr: 1
+                                            }}
                                             onClick={colorMode.toggleColorMode}
                                             color="mui_button_inner"
                                         >

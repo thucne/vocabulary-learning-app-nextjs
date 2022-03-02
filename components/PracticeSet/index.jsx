@@ -28,6 +28,7 @@ import { updateManyVIPs, updateVIP } from "@actions";
 import { IMAGE_ALT, AUDIO_ALT } from '@consts';
 
 import { useDispatch, useSelector } from "react-redux";
+import moment from "moment";
 
 import LoadingImage from '@components/LoadingImage';
 import SecondaryBlock from "./SecondaryBlock";
@@ -81,24 +82,13 @@ const WordCard = ({ open, setOpen, wordList }) => {
         setOpen(false);
     };
 
-    const handleNext = () => {
-        setWordIndex(prev => prev + 1);
-    };
-
-    const handlePrevious = () => {
-        setWordIndex(prev => {
-            if (prev === 0) {
-                return 0;
-            } else {
-                return prev > wordList.length ? wordList.length - 1 : prev - 1;
-            }
-        });
-    };
-
     const handleUpdateVIP = () => {
         const now = new Date();
 
-        let data = [...learnStatus].map(item => ({}))
+        let data = [...learnStatus].map(item => ({
+            ...item,
+            lastReview: now.toISOString(),
+        })).sort((a, b) => a.id - b.id);
 
         if (window?.adHocFetch && recaptcha === true && window?.grecaptcha) {
             grecaptcha.ready(function () {
@@ -120,6 +110,21 @@ const WordCard = ({ open, setOpen, wordList }) => {
         }
     };
 
+    const handleNext = () => {
+        setWordIndex(prev => prev + 1);
+    };
+
+    const handlePrevious = () => {
+        setWordIndex(prev => {
+            if (prev === 0) {
+                return 0;
+            } else {
+                return prev > wordList.length ? wordList.length - 1 : prev - 1;
+            }
+        });
+    };
+
+
     const updateWordStatus = (value) => {
         setLearnStatus((prev) => {
             const findIndex = prev.findIndex((item) => item.id === wordList[wordIndex].id);
@@ -137,6 +142,7 @@ const WordCard = ({ open, setOpen, wordList }) => {
                 ];
             }
         });
+        handleNext();
     };
 
     const photoSizes = useThisToGetSizesFromRef(photoRef, {
@@ -236,6 +242,12 @@ const WordCard = ({ open, setOpen, wordList }) => {
                                         />
                                     </div>
                                 </Grid>
+                                <Grid item xs={12} {...Props.GIRBC}>
+                                    <Typography variant="caption">
+                                        Last review: {moment(wordList?.[wordIndex]?.lastReview).fromNow()}.
+                                        Status: {wordList?.[wordIndex]?.lastReviewOK ? 'remember' : 'don\'t remember'}.
+                                    </Typography>
+                                </Grid>
                                 <Grid item xs={12} {...Props.GIRBC} mt={3}>
                                     <IconButton onClick={handlePrevious} disabled={wordIndex === 0}>
                                         <ArrowBackIosIcon sx={{ fontSize: Fonts.FS_16 }} />
@@ -255,21 +267,21 @@ const WordCard = ({ open, setOpen, wordList }) => {
 
                                 </Grid>
 
-                                <Grid item xs={12} {...Props.GIRCC} mt={1.5} sx={{ position: 'relative' }} >
+                                <Grid item xs={12} {...Props.GIRCC} mt={1} sx={{ position: 'relative' }} >
+
+                                    <Typography sx={{ color: (theme) => theme.palette.action.main }}>
+                                        {wordList[wordIndex].pronounce}
+                                    </Typography>
 
                                     {
                                         !loadingAudio && <IconButton
                                             disabled={!wordList?.[wordIndex]?.audio}
                                             onClick={() => audioRef.current.play()}
-                                            sx={{ fontSize: Fonts.FS_16 }}
+                                            sx={{ fontSize: Fonts.FS_16, height: '25px', width: '25px', ml: 1 }}
                                         >
                                             <VolumeUpIcon fontSize='inherit' />
                                         </IconButton>
                                     }
-
-                                    <Typography sx={{ color: (theme) => theme.palette.action.main }}>
-                                        {wordList[wordIndex].pronounce}
-                                    </Typography>
 
                                     <audio ref={audioRef}>
                                         <source src={audioUrl || AUDIO_ALT} />
@@ -321,101 +333,65 @@ const WordCard = ({ open, setOpen, wordList }) => {
 
 const FinishDialog = ({ handleBackbutton, handleUpdateVIP, loading }) => {
     return (
-        <Box sx={{ ...style.flexCenter, flexDirection: "column", height: "100%" }}>
-            <Image src="https://res.cloudinary.com/katyperrycbt/image/upload/v1645968644/n9y7xgh5qr8ohlvibet0.png"
-                alt="finish-img" width={200} height={200} />
-            <Typography
-                component="h1"
-                sx={{
-                    fontSize: Fonts.FS_24,
-                    p: "16px 0px 0px",
-                    fontWeight: Fonts.FW_500,
-                }}
-            >
-                You have review all words.
-            </Typography>
-
-            <Typography
-                component="p"
-                sx={{ fontSize: Fonts.FS_15, p: "8px 0px 0px" }}
-            >
-                Let&apos;s update your words status
-                <Button onClick={handleUpdateVIP}>update</Button>
-            </Typography>
-
-            <Button
-                onClick={handleBackbutton}
-                variant="contained"
-                sx={{ m: 2 }}
-                disabled={loading}
-                startIcon={<ArrowBackIosIcon />}
-            >
-                Go back
-            </Button>
-        </Box>
-    );
-};
-
-const DynamicListContent = ({ title, content, defaultShowType }) => {
-    const style = {
-        bubbleText: {
-            color: Colors.BLACK,
-            bgcolor: Colors.GRAY_2,
-            px: 2,
-            py: 1,
-            mb: 2,
-            borderRadius: "5px",
-        },
-    };
-    const showOrder = [showTypes.HIDE, showTypes.ONLY_ONE];
-    const [showType, setShowType] = useState(defaultShowType);
-
-    const handleChangeShowType = () => {
-        let index = showOrder.indexOf(showType);
-        let tempt = index === showOrder.length - 1 ? 0 : index + 1;
-        setShowType(showOrder[tempt]);
-    };
-
-    const renderFormType = () => {
-        return (
-            <Grow in={showType === "ONLY_ONE"} style={{ transformOrigin: "0 0 0" }}>
-                <Box sx={{ overflowY: "auto", maxHeight: "60px" }}>
-                    <Typography sx={style.bubbleText}>{content[0]}</Typography>
-                </Box>
-            </Grow>
-        );
-    };
-
-    if (!content.length) return <div></div>;
-    return (
-        <Box sx={{ height: ["100px", "100px"] }}>
-            <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                <div>
-                    <Typography
-                        sx={{
-                            fontSize: Fonts.FS_16,
-                            fontWeight: Fonts.FW_500,
-                            display: "inline-block",
-                        }}
-                    >
-                        {title}
-                    </Typography>
+        <Grid container {...Props.GCCBC} sx={{ height: "100%" }}>
+            <Grid item {...Props.GICCC}>
+                <div style={{ width: 200, height: 200, borderRadius: '10px', overflow: 'hidden', position: 'relative' }}>
+                    <LoadingImage
+                        src="https://res.cloudinary.com/katyperrycbt/image/upload/v1646233521/imageedit_7_8841258520_qlcyao.gif"
+                        alt="finish-img"
+                        layout='fill'
+                        draggable={false}
+                    />
                 </div>
-                {showType === "ONLY_ONE" ? (
-                    <ArrowDropUpIcon onClick={handleChangeShowType} />
-                ) : (
-                    <ArrowDropDownIcon onClick={handleChangeShowType} />
-                )}
-            </Box>
-            <Box sx={{ maxHeight: "100px", width: "100%" }}>{renderFormType()}</Box>
-        </Box>
+                <Typography
+                    component="h1"
+                    sx={{
+                        fontSize: Fonts.FS_20,
+                        p: "16px 0px 0px",
+                        fontWeight: Fonts.FW_500,
+                    }}
+                >
+                    Well done! You finished the quiz!
+                </Typography>
+
+                <Typography
+                    component="p"
+                    sx={{ fontSize: Fonts.FS_15, p: "8px 0px 0px" }}
+                    align="center"
+                >
+                    Save the progress so next time you can start with more optimized word list
+                </Typography>
+
+                <Button
+                    sx={{ ...SXs.COMMON_BUTTON_STYLES, mt: 1 }}
+                    onClick={handleUpdateVIP}
+                    size="small"
+                    variant="text"
+                >
+                    Update
+                </Button>
+            </Grid>
+
+            <Grid item {...Props.GIRCC}>
+                <Button
+                    onClick={handleBackbutton}
+                    variant="outlined"
+                    sx={{ ...SXs.COMMON_BUTTON_STYLES }}
+                    disabled={loading}
+                    startIcon={<ArrowBackIosIcon />}
+                    size="small"
+                >
+                    Go back
+                </Button>
+            </Grid>
+        </Grid>
     );
 };
 
 const style = {
     flexCenter: {
         display: "flex",
-        justifyContent: "center",
+        justifyContent: "space-between",
         alignItems: "center",
     },
     text: {

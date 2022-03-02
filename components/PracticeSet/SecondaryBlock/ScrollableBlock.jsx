@@ -6,6 +6,7 @@ import { ArrowForward as ArrowForwardIcon, ArrowBack as ArrowBackIcon, } from "@
 import { SXs, Fonts } from '@styles';
 
 import ScrollPages from '@tallis/react-mui-scroll-view';
+import parser from 'html-react-parser';
 
 const ScrollableBlock = ({ data, word }) => {
 
@@ -22,8 +23,9 @@ const ScrollableBlock = ({ data, word }) => {
                             variant='caption'
                             key={`render-${index}`}
                             sx={{ py: 1 }}
-                            dangerouslySetInnerHTML={{
-                                __html: each
+                        >
+                            {
+                                parser(each
                                     ?.split(" ")
                                     ?.map((item) => {
                                         if (item?.match(regex)) {
@@ -37,9 +39,9 @@ const ScrollableBlock = ({ data, word }) => {
                                         }
                                     })
                                     ?.join(" ")
-                                    ?.replace(/\s\s+/g, " "),
-                            }}
-                        ></Typography>
+                                    ?.replace(/\s\s+/g, " "))
+                            }
+                        </Typography>
                     ))}
                 </ScrollPages> :
                 <Alert severity="info">No data</Alert>

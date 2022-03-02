@@ -7,6 +7,8 @@ import { Box, Button, Typography, Container } from "@mui/material";
 import { MotionContainer, varBounceIn } from "./animate";
 import Page from "./Page";
 
+import { SXs } from '@styles';
+
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
@@ -52,7 +54,7 @@ export default function PageError({
                         </motion.div>
 
                         <Link href={redirectTo.link} passHref>
-                            <Button variant="outlined">{redirectTo.title}</Button>
+                            <Button variant="outlined" sx={SXs.COMMON_BUTTON_STYLES}>{redirectTo.title}</Button>
                         </Link>
                     </Box>
                 </MotionContainer>
