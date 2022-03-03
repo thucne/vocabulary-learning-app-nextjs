@@ -341,6 +341,7 @@ function ResponsiveDrawer(props) {
                                                     color: (theme) => theme.palette[bgColor].contrastText,
                                                     borderColor: (theme) =>
                                                         `${theme.palette[bgColor].contrastText}5`,
+                                                    mr: 1
                                                 }}
                                                 onClick={colorMode.toggleColorMode}
                                             >
@@ -352,7 +353,7 @@ function ResponsiveDrawer(props) {
                                             </IconButton>
                                             {User?.name && (
                                                 <IconButton
-                                                    sx={{ padding: "4px", mr: 2 }}
+                                                    sx={{ padding: "4px", mr: 1 }}
                                                     onClick={() => Router.push("/info?tab=me")}
                                                     color="inherit"
                                                 >
@@ -405,7 +406,6 @@ function ResponsiveDrawer(props) {
                                                                 theme.palette[bgColor].main,
                                                             filter: "brightness(1.1)",
                                                         },
-                                                        ml: 1
                                                     }}
                                                     startIcon={<LogoutIcon />}
                                                     disableElevation
@@ -419,7 +419,6 @@ function ResponsiveDrawer(props) {
                                                         width: "40px",
                                                         height: "40px",
                                                         display: ["block", "none"],
-                                                        ml: 1,
                                                         ...SXs.MUI_NAV_ICON_BUTTON,
                                                         borderColor: (theme) =>
                                                             `${theme.palette[bgColor].contrastText}5`,

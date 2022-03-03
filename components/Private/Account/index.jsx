@@ -60,21 +60,23 @@ const Profile = () => {
     }, [photo]);
 
     useEffect(() => {
-        if (user?.photo && !photo?.get("photo")) {
-            const avatar =
-                user?.photo?.formats?.small?.url ||
-                user?.photo?.url ||
-                t.AVT_ALT;
+        const loop = setInterval(() => {
+            if (user?.photo && !photo?.get("photo")) {
+                const avatar =
+                    user?.photo?.formats?.small?.url ||
+                    user?.photo?.url ||
+                    t.AVT_ALT;
 
-            if (photo) {
-                photo.set("photo", avatar);
-                setPhoto(photo);
-            } else {
-                setPhoto(new FormData());
-                photo.set("photo", avatar);
-                setPhoto(photo);
+                if (photo) {
+                    photo?.set("photo", avatar);
+                    setPhoto(photo);
+
+                    clearInterval(loop);
+                }
             }
-        }
+        }, 200);
+
+        return () => clearInterval(loop);
     }, [user?.photo, photo]);
 
     const toggleEditing = (fieldName) => {
