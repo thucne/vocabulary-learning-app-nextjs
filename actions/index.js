@@ -155,3 +155,16 @@ export const updateSettings = (id, data) => async dispatch => {
 
 }
 
+export const updateUser = (data, id) => async (dispatch) => {
+    if (!data || !getJWT()) {
+        return { error: "Empty body or jwt." };
+    }
+    return await axios
+        .put(`${API}/api/users/${id}`, data, {
+            headers: {
+                Authorization: `Bearer ${getJWT()}`,
+            },
+        })
+        .then((res) => handleCommonResponse(res))
+        .catch((err) => handleServerError(err));
+};

@@ -3,18 +3,20 @@ import { useSelector, useDispatch } from "react-redux";
 
 import Image from "next/image";
 
-import { Button, IconButton, TextField, Typography } from "@mui/material";
+import { Button, Fade, IconButton, TextField, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import EditIcon from "@mui/icons-material/Edit";
 import ReplayIcon from "@mui/icons-material/Replay";
 
-import { Fonts } from "@styles";
+import { Colors, Fonts } from "@styles";
 import { RECAPTCHA } from "@config";
 import { updateUser } from "@actions";
 import { validateEmail, validatePassword } from "@utils";
-import { set } from "lodash";
+
 import Index from "@components/LoadingImage";
-const Profile =() => {
+
+
+const Profile = () => {
   const user = useSelector((state) => state?.userData);
   const recaptcha = useSelector((state) => state.recaptcha);
 
@@ -26,27 +28,23 @@ const Profile =() => {
     email: false,
     password: false,
   });
-
+  const [isOpenUpdatePhoto, setIsOpenUpdatePhoto] = useState(false);
   const [updateForm, setUpdateForm] = useState({});
   const [updatePhoto, setUpdatePhoto] = useState("");
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    setUserData({ ...initTempInputs });
+    setUserData({ ...initTempInputs(user) });
   }, [user]);
 
-//   useEffect(() => {
-//     console.log("updateform", updateForm.photo);
-//     console.log("userform", userData.photo);
-//   });
 
-  const initTempInputs = {
+  const initTempInputs =(user)=>({
     username: user?.username,
     email: user?.email,
     password: "",
     photo: user?.photo ?? "",
-  };
+  });
 
   const resetWhole = () => {
     setIsUpdatingField({
@@ -97,10 +95,9 @@ const Profile =() => {
     if (updateForm.photo) formData.append("files.photo", updateForm.photo);
 
     //exclude photo from formData
-    let temptObj ={}
+    let temptObj = {};
     for (let [key, value] of Object.entries(updateForm)) {
-        if (key !== "photo") 
-            temptObj[key] = value;
+      if (key !== "photo") temptObj[key] = value;
     }
 
     if (window?.adHocFetch && recaptcha === true && window.grecaptcha) {
@@ -109,16 +106,18 @@ const Profile =() => {
           .execute(`${RECAPTCHA}`, { action: "vip_authentication" })
           .then(function (token) {
             formData.append("data", JSON.stringify({ ...temptObj, token }));
-            console.log("token",{token})
-            // adHocFetch({
-            //   dispatch,
-            //   action: updateUser(formData, user.id),
-            //   onSuccess: (data) => {console.log(data);resetWhole()},
-            //   onError: (error) => console.log(error),
-            //   onStarting: () => setLoading(true),
-            //   onFinally: () => setLoading(false),
-            //   snackbarMessageOnSuccess: "Update infomation success!",
-            // });
+            adHocFetch({
+              dispatch,
+              action: updateUser(formData, user.id),
+              onSuccess: (data) => {
+                console.log(data);
+                resetWhole();
+              },
+              onError: (error) => console.log(error),
+              onStarting: () => setLoading(true),
+              onFinally: () => setLoading(false),
+              snackbarMessageOnSuccess: "Update infomation success!",
+            });
           });
       });
     }
@@ -144,13 +143,13 @@ const Profile =() => {
       (updateForm?.username?.length > 0 ||
         updateForm?.email?.length > 0 ||
         updateForm?.password?.length > 0 ||
-        updateForm?.photo?.length >0) &&
+        updateForm?.photo?.length > 0) &&
       !errors?.email?.msg &&
       !errors?.password?.msg
     );
   };
 
-  const handleChange = (e, field) => {
+  const handleChangeInputValue = (e, field) => {
     setUpdateForm((state) => ({ ...state, [field]: e.target.value }));
     checkInputCriteria(e, field);
   };
@@ -158,9 +157,9 @@ const Profile =() => {
   const handleUploadPhoto = (e) => {
     if (e.target.files && e.target.files[0]) {
       let reader = new FileReader();
+      setUpdateForm((state) => ({ ...state, photo: e.target.files[0] }));
 
       reader.onload = function (e) {
-        setUpdateForm((state) => ({ ...state, photo: e.target.result }));
         setUserData((state) => ({ ...state, photo: e.target.result }));
       };
       reader.readAsDataURL(e.target.files[0]);
@@ -178,28 +177,15 @@ const Profile =() => {
           flexDirection: ["column", "column", "row"],
         }}
       >
-        <Box
-          sx={{
-            ...styles.flexColumn,
-            flexBasis: "30%",
-            alignItems: "center",
-            height: "100%",
-          }}
-        >
-        <label htmlFor="upload-img">
-        <Image
-            src={
-              userData.photo ||
-              "https://res.cloudinary.com/katyperrycbt/image/upload/v1646137393/e5d9fwaou6rswyztralh.png"
-            }
-            width={150}
-            height={150}
-            objectFit="cover"
-            alt="profile-image"
-          />
-        </label>
-          <input type="file" id="upload-img" hidden onChange={handleUploadPhoto}/>
-        </Box>
+        {/* Update image section*/}
+        <UpdatePhoto
+          src={userData?.photo?.url}
+          isOpenUpdatePhoto={isOpenUpdatePhoto}
+          setIsOpenUpdatePhoto={setIsOpenUpdatePhoto}
+          handleUploadPhoto={handleUploadPhoto}
+        />
+
+        {/* Update infomation section*/}
         <Box
           sx={{
             ...styles.flexColumn,
@@ -212,7 +198,7 @@ const Profile =() => {
               handleToggleUpdateField,
               isUpdatingField,
               updateForm,
-              handleChange,
+              handleChangeInputValue,
               errors
             ).username}
           />
@@ -223,7 +209,7 @@ const Profile =() => {
               handleToggleUpdateField,
               isUpdatingField,
               updateForm,
-              handleChange,
+              handleChangeInputValue,
               errors
             ).email}
           />
@@ -234,7 +220,7 @@ const Profile =() => {
               handleToggleUpdateField,
               isUpdatingField,
               updateForm,
-              handleChange,
+              handleChangeInputValue,
               errors
             ).password}
           />
@@ -248,7 +234,77 @@ const Profile =() => {
       </Box>
     </Box>
   );
-}
+};
+
+const UpdatePhoto = ({
+  setIsOpenUpdatePhoto,
+  handleUploadPhoto,
+  src,
+  isOpenUpdatePhoto,
+}) => {
+  return (
+    <Box
+      sx={{
+        ...styles.flexColumn,
+        flexBasis: "30%",
+        alignItems: "center",
+        height: "100%",
+      }}
+    >
+      <Box
+        sx={{
+          width: "150px",
+          height: "150px",
+          position: "relative",
+          cursor: "pointer",
+        }}
+        onMouseMove={() => setIsOpenUpdatePhoto(true)}
+        onMouseLeave={() => setIsOpenUpdatePhoto(false)}
+      >
+        <Image
+          src={
+            src ||
+            "https://res.cloudinary.com/katyperrycbt/image/upload/v1646137393/e5d9fwaou6rswyztralh.png"
+          }
+          layout="fill"
+          objectFit="cover"
+          alt="profile-image"
+        />
+
+        <Box
+          sx={{
+            position: "absolute",
+            width: "100%",
+            height: "100%",
+            bgcolor: isOpenUpdatePhoto ? Colors.GRAY : "",
+            opacity: isOpenUpdatePhoto ? 0.2 : 0,
+          }}
+        ></Box>
+
+        <Box
+          sx={{
+            position: "absolute",
+            width: "100%",
+            height: "100%",
+            ...styles.flexColumn,
+            alignItems: "center",
+          }}
+        >
+          <Fade in={isOpenUpdatePhoto}>
+            <label htmlFor="upload-img">
+              <EditIcon
+                sx={{ color: Colors.WHITE, opacity: 1, cursor: "pointer" }}
+              />
+            </label>
+          </Fade>
+        </Box>
+      </Box>
+
+      <input type="file" id="upload-img" hidden onChange={handleUploadPhoto} />
+    </Box>
+  );
+};
+
 
 const UpdateForm = ({
   value,
@@ -303,21 +359,22 @@ const UpdateForm = ({
   );
 };
 
+export default React.memo(Profile);
 
-export default React.memo(Profile)
-const styles ={
-    flexColumn:{
-        display: "flex",
-        flexDirection: "column",
-        alignItem: "center",
-        justifyContent: "center",
-    },
-    flexRow:{
-        display: "flex",
-        alignItem: "center",
-        justifyContent: "center",
-    }
-}
+
+const styles = {
+  flexColumn: {
+    display: "flex",
+    flexDirection: "column",
+    alignItem: "center",
+    justifyContent: "center",
+  },
+  flexRow: {
+    display: "flex",
+    alignItem: "center",
+    justifyContent: "center",
+  },
+};
 const inputProps = (
   userData,
   handleToggleUpdateField,
@@ -354,5 +411,3 @@ const inputProps = (
     error: errors?.password,
   },
 });
-
-
