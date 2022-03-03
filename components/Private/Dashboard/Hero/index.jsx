@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import {
     Container,
@@ -11,19 +11,37 @@ import {
 
 import CachedIcon from "@mui/icons-material/Cached";
 
-import WordCard from "@components/PracticeSet";
-import { getLastReviewWord, useSettings } from "@utils";
-import { Colors, Fonts, SXs } from "@styles";
-
 import { useSelector } from "react-redux";
+
+import WordCard from "@components/PracticeSet";
+import { Colors, Fonts, SXs } from "@styles";
+import { useSettings, checkPractiseStatus } from '@utils';
 
 const Welcome = () => {
     const [openReviseWordModal, setOpenReviseWordModal] = useState(false);
 
     const userData = useSelector((state) => state.userData);
     const settings = useSettings(userData);
+    const status = checkPractiseStatus(userData);
+    const { practicesPerDay = 1 } = settings;
 
-    const reviewList = userData?.vips ? getLastReviewWord([...userData.vips]) : []
+    const wordList = userData?.vips ? userData.vips : [];
+
+    const getText = () => {
+        if (wordList.length === 0) {
+            return "No words to practice, please add some words.";
+        } else if (status === practicesPerDay) {
+            return `You have completed practices today. Wanna practice again? YES, why not?!`;
+        } else if (status === 0) {
+            return `It seems you haven't practiced today. Let's get started!`;
+        } else if (status > 0 && status < practicesPerDay) {
+            return `Well-done! You have completed ${status} practices today. Keep up the good work!`;
+        } else if (status > practicesPerDay) {
+            return `You have completed ${practicesPerDay} practices today, more than the times you set. Wonderful!`;
+        } else {
+            return "Let's practice today!";
+        }
+    }
 
     return (
         <Container maxWidth="lg" disableGutters>
@@ -31,7 +49,7 @@ const Welcome = () => {
                 <Grid
                     item
                     xs={12}
-                    sm={6}
+                    sm={9}
                     sx={{
                         display: "flex",
                         justifyContent: "flex-start",
@@ -53,16 +71,15 @@ const Welcome = () => {
                             component="p"
                             sx={{ fontSize: Fonts.FS_15, p: "8px 0px 0px" }}
                         >
-                            It look like you haven&apos;t been revised your words today.
+                            {getText()}&nbsp;&nbsp;&nbsp;
                             <Button
-                                disabled={!reviewList?.length}
+                                disabled={!wordList?.length}
                                 onClick={() => setOpenReviseWordModal(true)}
                                 sx={{
-                                    ...SXs.COMMON_BUTTON_STYLES,
-                                    ml: 1
+                                    ...SXs.MUI_NAV_BUTTON,
                                 }}
                             >
-                                Let&apos;s check it out!
+                                Practice now
                             </Button>
                         </Typography>
                     </Box>
@@ -71,7 +88,7 @@ const Welcome = () => {
                 <Grid
                     item
                     xs={12}
-                    sm={6}
+                    sm={3}
                     sx={{
                         display: "flex",
                         justifyContent: "flex-end",
@@ -92,14 +109,16 @@ const Welcome = () => {
                     </Box>
                 </Grid>
             </Grid>
-            {reviewList?.length > 0 && (
-                <WordCard
-                    open={openReviseWordModal}
-                    setOpen={setOpenReviseWordModal}
-                    wordList={reviewList}
-
-                />
-            )}
+            {
+                wordList?.length > 0 && (
+                    <WordCard
+                        open={openReviseWordModal}
+                        setOpen={setOpenReviseWordModal}
+                        wordList={wordList}
+                        settings={settings}
+                    />
+                )
+            }
         </Container>
     );
 };

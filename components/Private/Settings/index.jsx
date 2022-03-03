@@ -45,7 +45,7 @@ export default function SwitchListSecondary() {
             elRefs.current[0].value = handledChecked.wordsPerPractice;
             elRefs.current[1].value = handledChecked.practicesPerDay;
         }
-    }, [checked]);
+    }, [checked, handledChecked.practicesPerDay, handledChecked.wordsPerPractice]);
 
     const callBackFunction = (dataToUpdate) => {
         if (window && window.adHocFetch && window.grecaptcha && !syncing) {

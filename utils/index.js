@@ -8,7 +8,7 @@ import {
 import Router from "next/router";
 import { logout, updateSettings } from "@actions";
 import { RECAPTCHA } from '@config';
-
+import _ from 'lodash';
 import axios from 'axios';
 
 export const isAuth = () => {
@@ -679,5 +679,31 @@ export const checkIfAudioIsValid = async (link, callback) => {
         newSound.oncanplaythrough = () => callback(true);
     } else {
         return false;
+    }
+}
+
+export const checkPractiseStatus = (userData) => {
+    const allVips = userData?.vips || [];
+
+    if (allVips?.length) {
+
+        // find all words that has lastReview in the 24 hours ago
+        const recentlyReviewedWords = allVips?.filter((item) => {
+            const lastReviewDate = new Date(item?.lastReview);
+            const now = new Date();
+            const diff = now - lastReviewDate;
+            return diff <= 86400000;
+        });
+
+        // check if there is many times of pratices by groupby lastReview value
+        const groupByLastReview = _.groupBy(recentlyReviewedWords, _.property('lastReview'));
+
+        // number of practices
+        const variants = Object.keys(groupByLastReview)?.length || 0;
+
+        return variants;
+
+    } else {
+        return 0;
     }
 }

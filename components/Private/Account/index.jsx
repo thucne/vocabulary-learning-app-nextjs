@@ -4,10 +4,10 @@ import { useSelector, useDispatch } from "react-redux";
 import Image from "next/image";
 
 import {
-    Button, Fade, IconButton, TextField,
-    Typography, Grid, Box, Container, Paper,
+    Button, IconButton, TextField,
+    Typography, Grid, Container, Paper,
     FormControl, FormHelperText,
-    ListItemButton, ListItemIcon, ListItemText,
+    ListItemButton, ListItemText,
     ListItem, InputLabel, Input, InputAdornment
 } from "@mui/material";
 
@@ -17,9 +17,9 @@ import {
     Visibility as VisibilityIcon,
     VisibilityOff as VisibilityOffIcon,
     Save as SaveIcon
-} from '@mui/icons-material'
+} from '@mui/icons-material';
 
-import { Colors, Fonts, Props, SXs } from "@styles";
+import { Fonts, Props, SXs } from "@styles";
 import { RECAPTCHA } from "@config";
 import { updateUser } from "@actions";
 import {
@@ -27,8 +27,6 @@ import {
     useThisToGetSizesFromRef
 } from "@utils";
 import * as t from '@consts';
-
-import LoadingImage from "@components/LoadingImage";
 
 import Uploader from "@tallis/react-dndp";
 import _ from 'lodash';
@@ -448,109 +446,4 @@ const UpdatePhoto = ({ imageSizes, photo, setPhoto, setPhotoWeight, dispatch }) 
     </div>
 )
 
-const UpdateForm = ({
-    value,
-    toggleField,
-    field,
-    isUpdatingField,
-    inputValue,
-    handleChange,
-    error,
-}) => {
-    return (
-        <React.Fragment>
-            <Box sx={{ width: "100%", display: "flex", justifyContent: "center" }}>
-                <Box>
-                    <Typography sx={{ fontSize: Fonts.FS_14, fontWeight: Fonts.FW_600 }}>
-                        {field}
-                    </Typography>
-                    <Box sx={{ height: "60px", mb: 2 }}>
-                        {!isUpdatingField ? (
-                            <Box
-                                sx={{
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    alignItems: "center",
-                                    width: "400px",
-                                }}
-                            >
-                                <Typography>{value?.length ? value : "***********"}</Typography>
-                                <IconButton onClick={() => toggleField(field)}>
-                                    <EditIcon />
-                                </IconButton>
-                            </Box>
-                        ) : (
-                            <TextField
-                                sx={{ width: "400px" }}
-                                label={field}
-                                autoComplete="off"
-                                id={field ?? ""}
-                                size="small"
-                                margin="dense"
-                                error={error?.msg ? true : false}
-                                helperText={error?.msg ?? ""}
-                                //   type={field=="password"?"password":"text"}
-                                value={inputValue}
-                                onChange={(e) => handleChange(e, field)}
-                            />
-                        )}
-                    </Box>
-                </Box>
-            </Box>
-        </React.Fragment>
-    );
-};
-
 export default React.memo(Profile);
-
-
-const styles = {
-    flexColumn: {
-        display: "flex",
-        flexDirection: "column",
-        alignItem: "center",
-        justifyContent: "center",
-    },
-    flexRow: {
-        display: "flex",
-        alignItem: "center",
-        justifyContent: "center",
-    },
-};
-
-const inputProps = (
-    userData,
-    handleToggleUpdateField,
-    isUpdatingField,
-    updateForm,
-    handleChange,
-    errors
-) => ({
-    username: {
-        field: "username",
-        value: userData.username,
-        toggleField: handleToggleUpdateField,
-        isUpdatingField: isUpdatingField.username,
-        inputValue: updateForm?.username,
-        handleChange: handleChange,
-        error: errors?.username,
-    },
-    email: {
-        field: "email",
-        value: userData.email,
-        toggleField: handleToggleUpdateField,
-        isUpdatingField: isUpdatingField.email,
-        inputValue: updateForm?.email,
-        handleChange: handleChange,
-        error: errors?.email,
-    },
-    password: {
-        field: "password",
-        value: "",
-        toggleField: handleToggleUpdateField,
-        isUpdatingField: isUpdatingField.password,
-        inputValue: updateForm?.password,
-        handleChange: handleChange,
-        error: errors?.password,
-    },
-});

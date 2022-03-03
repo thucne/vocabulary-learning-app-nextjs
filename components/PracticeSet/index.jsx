@@ -23,7 +23,7 @@ import {
 import { useTheme } from "@mui/material/styles";
 
 import { Colors, Fonts, SXs, Props } from "@styles";
-import { useWindowSize, useThisToGetSizesFromRef, getAudioUrl } from "@utils";
+import { useWindowSize, useThisToGetSizesFromRef, getAudioUrl, useSettings } from "@utils";
 import { RECAPTCHA } from "@config";
 import { updateManyVIPs, updateVIP } from "@actions";
 import { IMAGE_ALT, AUDIO_ALT } from '@consts';
@@ -40,11 +40,11 @@ const showTypes = {
     HIDE: "HIDE",
 };
 
-const WordCard = ({ open, setOpen, wordList }) => {
+const WordCard = ({ open, setOpen, wordList, settings }) => {
 
     const windowSize = useWindowSize();
     const theme = useTheme();
-
+    
     const audioRef = useRef(null);
     const photoRef = useRef(null);
 
