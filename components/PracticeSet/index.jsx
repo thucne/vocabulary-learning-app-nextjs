@@ -388,24 +388,4 @@ const FinishDialog = ({ handleBackbutton, handleUpdateVIP, loading }) => {
     );
 };
 
-const style = {
-    flexCenter: {
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-    },
-    text: {
-        fontSize: Fonts.FS_16,
-        fontWeight: Fonts.FW_600,
-    },
-    bubbleText: {
-        color: Colors.BLACK,
-        bgcolor: Colors.GRAY_3,
-        px: 2,
-        py: 1,
-        borderRadius: "5px",
-    },
-};
-
-
 export default React.memo(WordCard);
