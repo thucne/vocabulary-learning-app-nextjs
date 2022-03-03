@@ -109,6 +109,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
         setOpens(initOpens);
     };
 
+
     const handleClose = () => {
         // reset all
         resetWhole();
