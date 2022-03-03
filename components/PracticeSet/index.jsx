@@ -16,7 +16,8 @@ import {
     CloseRounded as CloseIcon,
     VolumeUpRounded as VolumeUpIcon,
     ThumbUpRounded as ThumbUpRoundedIcon,
-    ThumbDownRounded as ThumbDownRoundedIcon
+    ThumbDownRounded as ThumbDownRoundedIcon,
+    CloseRounded as CloseRoundedIcon
 } from '@mui/icons-material';
 
 import { useTheme } from "@mui/material/styles";
@@ -161,12 +162,11 @@ const WordCard = ({ open, setOpen, wordList }) => {
                 aria-describedby="scroll-dialog-description"
                 fullScreen={windowSize?.width < theme.breakpoints.values.sm ? true : false}
                 maxWidth="xs"
+                fullWidth
                 sx={{
                     '.MuiPaper-root': {
                         borderRadius: '10px',
-                        maxWidth: windowSize?.width > theme.breakpoints.values.sm && 390,
-                        width: '100%',
-                        height: '100%'
+                        maxWidth: windowSize?.width >= theme.breakpoints.values.sm ? 390 : '100%'
                     }
                 }}
             >
@@ -197,7 +197,7 @@ const WordCard = ({ open, setOpen, wordList }) => {
                 </DialogTitle>
 
                 <DialogContent dividers sx={{
-                    position: 'relative',
+                    position: 'relative'
                 }}>
                     {/* <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
                         <div style={{ position: 'relative', width: '100%', height: '100%', opacity: 0.1 }}>
@@ -213,8 +213,9 @@ const WordCard = ({ open, setOpen, wordList }) => {
                     {
                         wordIndex === wordList.length
                             ? <FinishDialog
-                                handleBackbutton={handlePrevious}
+                                handlePrevious={handlePrevious}
                                 handleUpdateVIP={handleUpdateVIP}
+                                handleClose={handleClose}
                                 loading={loading}
                             />
                             : <Grid container {...Props.GCRCC} sx={{ overflow: 'hidden' }}>
@@ -331,7 +332,7 @@ const WordCard = ({ open, setOpen, wordList }) => {
     );
 };
 
-const FinishDialog = ({ handleBackbutton, handleUpdateVIP, loading }) => {
+const FinishDialog = ({ handlePrevious, handleUpdateVIP, handleClose, loading }) => {
     return (
         <Grid container {...Props.GCCBC} sx={{ height: "100%" }}>
             <Grid item {...Props.GICCC}>
@@ -362,26 +363,39 @@ const FinishDialog = ({ handleBackbutton, handleUpdateVIP, loading }) => {
                     Save the progress so next time you can start with more optimized word list
                 </Typography>
 
-                <Button
-                    sx={{ ...SXs.COMMON_BUTTON_STYLES, mt: 1 }}
-                    onClick={handleUpdateVIP}
-                    size="small"
-                    variant="text"
-                >
-                    Update
-                </Button>
+                <Grid container {...Props.GCRCC} spacing={1}>
+                    <Button
+                        sx={{ ...SXs.COMMON_BUTTON_STYLES, mt: 2, minWidth: '0px' }}
+                        onClick={handleUpdateVIP}
+                        // size="large"
+                        variant="contained"
+                        disableElevation
+                    >
+                        Save
+                    </Button>
+                </Grid>
             </Grid>
 
-            <Grid item {...Props.GIRCC}>
+            <Grid item {...Props.GIRCC} mt={5}>
                 <Button
-                    onClick={handleBackbutton}
+                    onClick={handlePrevious}
                     variant="outlined"
-                    sx={{ ...SXs.COMMON_BUTTON_STYLES }}
+                    sx={{ ...SXs.COMMON_BUTTON_STYLES, mr: 1 }}
                     disabled={loading}
                     startIcon={<ArrowBackIosIcon />}
                     size="small"
                 >
-                    Go back
+                    Back
+                </Button>
+                <Button
+                    sx={{ ...SXs.COMMON_BUTTON_STYLES }}
+                    onClick={handleClose}
+                    size="small"
+                    variant="outlined"
+                    endIcon={<CloseRoundedIcon />}
+                    disabled={loading}
+                >
+                    Close
                 </Button>
             </Grid>
         </Grid>

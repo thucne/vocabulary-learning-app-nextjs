@@ -19,7 +19,7 @@ import { useSelector } from "react-redux";
 import ScrollPaper from "@tallis/react-mui-scroll-view";
 // import ScrollPaper from './ScrollPaper';
 
-import CreateNewWord from "../../WordForm";
+import CreateNewWord from "@components/WordForm";
 
 import { isEqual } from "lodash";
 

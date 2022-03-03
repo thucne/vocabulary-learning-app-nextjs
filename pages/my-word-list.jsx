@@ -6,7 +6,7 @@ import MyWordComponent from "@components/Private/WordList";
 const MyWordList = () => {
     return (
         <Private MetaTag={MetaTag}>
-            <Layout></Layout>
+            <Layout noMeta tabName="Word List"></Layout>
         </Private>
     );
 };

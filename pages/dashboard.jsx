@@ -1,12 +1,12 @@
 import Layout from "@layouts";
 import Meta from "@meta";
 import Private from "@components/Auth/Private";
-import DashboardPage from "@components/Dashboard";
+import DashboardPage from "@components/Private/Dashboard";
 
 const Index = () => {
     return (
         <Private MetaTag={MetaTag}>
-            <Layout>
+            <Layout noMeta tabName="Dashboard">
                 <DashboardPage />
             </Layout>
         </Private>

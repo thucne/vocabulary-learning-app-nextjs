@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import Link from "next/link";
+import Router from "next/router";
 
 import { styled, alpha } from "@mui/material/styles";
 
@@ -30,7 +31,6 @@ import {
 import { SXs } from "@styles";
 
 import { useSelector } from "react-redux";
-
 import { stringAvatar } from "@utils";
 
 const StyledMenu = styled((props) => (
@@ -88,9 +88,6 @@ export default function CustomizedMenus({ isAuth, logout }) {
 
     const user = useSelector((state) => state?.userData);
 
-    // React.useEffect(()=>{
-    //     console.log("user",user)
-    // })
     return (
         <div>
             <IconButton
@@ -115,7 +112,7 @@ export default function CustomizedMenus({ isAuth, logout }) {
             >
                 {(user?.name?.length > 0 ||
                     user?.photo?.formats?.thumbnail?.url?.length > 0) && (
-                        <MenuItem disableRipple color="inherit">
+                        <MenuItem disableRipple color="inherit" onClick={() => Router.push("/my-account")}>
                             <Stack direction="row" alignItems="center">
                                 <Icon
                                     sx={{

@@ -13,6 +13,7 @@ export const HIDE_LINEAR = "HIDE_LINEAR";
 export const SET_PERCENTAGE = "SET_PERCENTAGE";
 
 export const SET_TAB_NAME = "SET_TAB_NAME";
+export const RESET_TAB_NAME = "RESET_TAB_NAME";
 
 export const SET_BG = "SET_BG";
 
@@ -22,7 +23,8 @@ export const CLEAR_USER_DATA = "CLEAR_USER_DATA";
 export const UPDATE_USER_DATA = "UPDATE_USER_DATA";
 
 export const IMAGE_ALT =
-    "https://res.cloudinary.com/katyperrycbt/image/upload/v1645343005/sammy-blue-mountains-image_einbhn.svg";
+    "https://res.cloudinary.com/katyperrycbt/image/upload/v1646295258/3d-flame-side-view-of-camera-polaroid-shop_2_pf95qp.webp";
+export const AVT_ALT = "https://res.cloudinary.com/katyperrycbt/image/upload/v1646312203/casual-life-3d-avatar-with-person-in-glasses-and-orange-shirt_1_lyykbz.webp";
 
 export const AUDIO_ALT = "https://res.cloudinary.com/katyperrycbt/video/upload/v1646213479/1646213423733-voicemaker.in-speech_sjadtl.mp3";
 

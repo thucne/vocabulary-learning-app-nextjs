@@ -163,7 +163,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
                 form.type === "vocab"
                     ? form.clasifyVocab.map((item) => {
                         const findItem = vocabTypes.find((each) => each.value === item);
-                        return vocabTypes.id;
+                        return findItem.id;
                     })
                     : null,
             examples: form.examples,
@@ -177,11 +177,6 @@ export default function CreateNewWord({ open = false, setOpen }) {
         };
 
         formData.append("files.illustration", photo?.get("illustration"));
-
-        let temp = {};
-        for (let pair of formData.entries()) {
-            temp[pair[0]] = pair[1];
-        }
 
         if (window?.adHocFetch && recaptcha === true && window.grecaptcha) {
             grecaptcha.ready(function () {
@@ -294,14 +289,13 @@ export default function CreateNewWord({ open = false, setOpen }) {
     };
 
     const canSubmit = () =>
-        (form.vip?.length &&
+        Boolean((form.vip?.length &&
             form.examples?.length &&
             (form.vnMeanings?.length || form.engMeanings?.length) &&
             !errors?.vip?.length &&
             !errors?.examples?.length &&
             !errors?.meanings?.length &&
-            !(Math.ceil(isOver10MB / 1024 / 1024) > 10)) ??
-        false;
+            !(Math.ceil(isOver10MB / 1024 / 1024) > 10)));
 
     const checkInputCriteria = useCallback(
         (e, name) => {

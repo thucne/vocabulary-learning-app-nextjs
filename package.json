@@ -17,7 +17,7 @@
         "@mui/material": "^5.4.2",
         "@mui/system": "^5.4.2",
         "@mui/x-data-grid": "^5.5.1",
-        "@tallis/react-dndp": "^0.0.5",
+        "@tallis/react-dndp": "^0.0.7",
         "@tallis/react-mui-scroll-view": "^0.0.5",
         "axios": "^0.26.0",
         "chart.js": "^3.7.1",

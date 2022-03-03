@@ -38,7 +38,7 @@ const StyledProgess = styled(LinearProgress)({
     },
 });
 
-const Layout = ({ children, login = false, landing = false }) => {
+const Layout = ({ children, login = false, landing = false, noMeta = false, tabName = "" }) => {
     const router = useRouter();
     const [openMessage, setOpenMessage] = useState(false);
 
@@ -52,6 +52,13 @@ const Layout = ({ children, login = false, landing = false }) => {
             setOpenMessage(true);
         }
     }, [router]);
+
+    useEffect(() => {
+        if (tabName) {
+            dispatch({ type: t.SET_TAB_NAME, payload: tabName });
+        }
+        return () => dispatch({ type: t.RESET_TAB_NAME });
+    }, [tabName, dispatch, router]);
 
     const handleClose = async (event, reason) => {
         if (reason === "clickaway") {
@@ -77,7 +84,9 @@ const Layout = ({ children, login = false, landing = false }) => {
                 pointerEvents: backdrop?.show ? "none" : "auto",
             }}
         >
-            <Meta />
+            {
+                !noMeta && <Meta />
+            }
             <Script
                 id="recaptcha-v3"
                 src={`https://www.google.com/recaptcha/api.js?render=${RECAPTCHA}`}

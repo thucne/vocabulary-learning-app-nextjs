@@ -6,7 +6,7 @@ import MySettingsComponent from "@components/Private/Settings";
 const MyWordList = () => {
     return (
         <Private MetaTag={MetaTag}>
-            <Layout>
+            <Layout noMeta tabName="Settings">
                 <MySettingsComponent />
             </Layout>
         </Private>
