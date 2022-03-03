@@ -10,6 +10,7 @@ import { logout, updateSettings } from "@actions";
 import { RECAPTCHA } from '@config';
 import _ from 'lodash';
 import axios from 'axios';
+import moment from 'moment';
 
 export const isAuth = () => {
     if (typeof window !== "undefined") {
@@ -705,5 +706,60 @@ export const checkPractiseStatus = (userData) => {
 
     } else {
         return 0;
+    }
+}
+
+export const getOptimizedPraticeSet = (wordList = [], settings) => {
+
+    const { lastReview: lastReviewFactor = 1, lastReviewOK: lastReviewOKFactor = 5, wordsPerPractice = 20 } = settings;
+
+    if (wordList?.length) {
+        let evidences = [];
+
+        const sortedWordList = wordList.sort((a, b) => {
+            const aLastReview = a?.lastReview;
+            const bLastReview = b?.lastReview;
+
+            const aLastReviewDate = aLastReview ? new Date(aLastReview) : new Date('01/01/1970');
+            const bLastReviewDate = bLastReview ? new Date(bLastReview) : new Date('01/01/1970');
+
+            const aTimePriority = aLastReviewDate < bLastReviewDate ? 1 : 0;
+            const bTimePriority = aLastReviewDate > bLastReviewDate ? 1 : 0;
+
+            const aLastReviewOKPriority = a?.lastReviewOK === true ? 0 : 1;
+            const bLastReviewOKPriority = b?.lastReviewOK === true ? 0 : 1;
+
+            const aPriority = -(aTimePriority * lastReviewFactor + aLastReviewOKPriority * lastReviewOKFactor);
+            const bPriority = -(bTimePriority * lastReviewFactor + bLastReviewOKPriority * lastReviewOKFactor);
+
+            evidences.push([
+                {
+                    id: a?.id,
+                    vip: a?.vip,
+                    lastReview: moment(aLastReviewDate).fromNow(),
+                    lastReviewOK: a?.lastReviewOK,
+                },
+                {
+                    id: b?.id,
+                    vip: b?.vip,
+                    lastReview: moment(bLastReviewDate).fromNow(),
+                    lastReviewOK: b?.lastReviewOK,
+                },
+                {
+                    lastReviewFactor,
+                    lastReviewOKFactor,
+                    aPriority,
+                    bPriority,
+                    result: aPriority - bPriority > 0 ? 1 : (aPriority - bPriority < 0 ? -1 : 0)
+                }
+            ])
+
+            return aPriority - bPriority > 0 ? 1 : (aPriority - bPriority < 0 ? -1 : 0);
+
+        }).slice(0, wordsPerPractice);
+
+        return sortedWordList;
+    } else {
+        return [];
     }
 }

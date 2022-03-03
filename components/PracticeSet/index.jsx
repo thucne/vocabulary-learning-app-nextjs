@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 
 import Image from "next/image";
 
@@ -23,7 +23,7 @@ import {
 import { useTheme } from "@mui/material/styles";
 
 import { Colors, Fonts, SXs, Props } from "@styles";
-import { useWindowSize, useThisToGetSizesFromRef, getAudioUrl, useSettings } from "@utils";
+import { useWindowSize, useThisToGetSizesFromRef, getAudioUrl, getOptimizedPraticeSet } from "@utils";
 import { RECAPTCHA } from "@config";
 import { updateManyVIPs, updateVIP } from "@actions";
 import { IMAGE_ALT, AUDIO_ALT } from '@consts';
@@ -44,7 +44,7 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
 
     const windowSize = useWindowSize();
     const theme = useTheme();
-    
+
     const audioRef = useRef(null);
     const photoRef = useRef(null);
 
@@ -57,16 +57,18 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
     const [audioUrl, setAudioUrl] = useState("");
     const [loadingAudio, setLoadingAudio] = useState(false);
 
+    const optimizedWordList = useMemo(() => getOptimizedPraticeSet(wordList, settings), [wordList, settings]);
+
     useEffect(() => {
         setWordIndex(0);
-    }, [wordList.length, open]);
+    }, [optimizedWordList.length, open]);
 
     useEffect(() => {
         const run = async () => {
-            if (wordIndex < wordList.length && wordIndex >= 0) {
+            if (wordIndex < optimizedWordList.length && wordIndex >= 0) {
                 setLoadingAudio(true);
                 setAudioUrl("");
-                getAudioUrl(wordList[wordIndex].audio, (url) => {
+                getAudioUrl(optimizedWordList[wordIndex].audio, (url) => {
                     setAudioUrl(url);
                     if (audioRef.current) {
                         audioRef.current.pause();
@@ -77,7 +79,7 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
             }
         }
         run();
-    }, [wordIndex, wordList]);
+    }, [wordIndex, optimizedWordList]);
 
     const handleClose = () => {
         setOpen(false);
@@ -120,7 +122,7 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
             if (prev === 0) {
                 return 0;
             } else {
-                return prev > wordList.length ? wordList.length - 1 : prev - 1;
+                return prev > optimizedWordList.length ? optimizedWordList.length - 1 : prev - 1;
             }
         });
     };
@@ -128,7 +130,7 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
 
     const updateWordStatus = (value) => {
         setLearnStatus((prev) => {
-            const findIndex = prev.findIndex((item) => item.id === wordList[wordIndex].id);
+            const findIndex = prev.findIndex((item) => item?.id === optimizedWordList?.[wordIndex]?.id);
 
             if (findIndex !== -1) {
                 prev[findIndex].lastReviewOK = Boolean(value);
@@ -137,7 +139,7 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
                 return [
                     ...prev,
                     {
-                        id: wordList?.[wordIndex]?.id,
+                        id: optimizedWordList?.[wordIndex]?.id,
                         lastReviewOK: Boolean(value),
                     },
                 ];
@@ -151,6 +153,14 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
         terminalCondition: ({ width }) => width !== 0,
         falseCondition: ({ width }) => width === 0,
     });
+
+    const isThumbDownSelected = () => {
+        return learnStatus.findIndex((item) => item?.id === optimizedWordList?.[wordIndex]?.id && item?.lastReviewOK === false) !== -1;
+    }
+
+    const isThumbUpSelected = () => {
+        return learnStatus.findIndex((item) => item?.id === optimizedWordList?.[wordIndex]?.id && item?.lastReviewOK === true) !== -1;
+    }
 
     return (
         <div>
@@ -191,7 +201,7 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
                             Practice Set
                         </Typography>
                         <Typography variant="caption" sx={{ display: 'inline' }}>
-                            Words: {(wordIndex + 1) < wordList.length ? (wordIndex + 1) : wordList.length}/{wordList.length}
+                            Words: {(wordIndex + 1) < optimizedWordList.length ? (wordIndex + 1) : optimizedWordList.length}/{optimizedWordList.length}
                         </Typography>
                     </Grid>
                 </DialogTitle>
@@ -211,7 +221,7 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
                         </div>
                     </div> */}
                     {
-                        wordIndex === wordList.length
+                        wordIndex === optimizedWordList.length
                             ? <FinishDialog
                                 handlePrevious={handlePrevious}
                                 handleUpdateVIP={handleUpdateVIP}
@@ -231,8 +241,8 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
                                     }}>
                                         <LoadingImage
                                             src={
-                                                wordList?.[wordIndex]?.illustration?.formats?.large?.url ||
-                                                wordList?.[wordIndex]?.illustration?.url ||
+                                                optimizedWordList?.[wordIndex]?.illustration?.formats?.large?.url ||
+                                                optimizedWordList?.[wordIndex]?.illustration?.url ||
                                                 IMAGE_ALT
                                             }
                                             alt="something"
@@ -245,8 +255,8 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
                                 </Grid>
                                 <Grid item xs={12} {...Props.GIRBC}>
                                     <Typography variant="caption">
-                                        Last review: {moment(wordList?.[wordIndex]?.lastReview).fromNow()}.
-                                        Status: {wordList?.[wordIndex]?.lastReviewOK ? 'remember' : 'don\'t remember'}.
+                                        Last review: {moment(optimizedWordList?.[wordIndex]?.lastReview).fromNow()}.
+                                        Status: {optimizedWordList?.[wordIndex]?.lastReviewOK ? 'remember' : 'don\'t remember'}.
                                     </Typography>
                                 </Grid>
                                 <Grid item xs={12} {...Props.GIRBC} mt={3}>
@@ -259,7 +269,7 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
                                         sx={{ fontWeight: Fonts.FW_600, mx: 3 }}
                                         className='overflowTypography'
                                     >
-                                        {wordList[wordIndex].vip}
+                                        {optimizedWordList[wordIndex].vip}
                                     </Typography>
 
                                     <IconButton onClick={handleNext}>
@@ -271,12 +281,12 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
                                 <Grid item xs={12} {...Props.GIRCC} mt={1} sx={{ position: 'relative' }} >
 
                                     <Typography sx={{ color: (theme) => theme.palette.action.main }}>
-                                        {wordList[wordIndex].pronounce}
+                                        {optimizedWordList[wordIndex].pronounce}
                                     </Typography>
 
                                     {
                                         !loadingAudio && <IconButton
-                                            disabled={!wordList?.[wordIndex]?.audio}
+                                            disabled={!optimizedWordList?.[wordIndex]?.audio}
                                             onClick={() => audioRef.current.play()}
                                             sx={{ fontSize: Fonts.FS_16, height: '25px', width: '25px', ml: 1 }}
                                         >
@@ -291,7 +301,7 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
                                 </Grid>
 
                                 <Grid item xs={12} {...Props.GICCC} mt={1.5}>
-                                    <SecondaryBlock data={wordList[wordIndex]} />
+                                    <SecondaryBlock data={optimizedWordList[wordIndex]} />
                                 </Grid>
 
                             </Grid>
@@ -299,7 +309,7 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
                 </DialogContent>
 
                 {
-                    wordIndex < wordList.length && wordIndex >= 0 && <DialogActions>
+                    wordIndex < optimizedWordList.length && wordIndex >= 0 && <DialogActions>
                         <Grid container {...Props.GCRCC} spacing={1}>
                             <Grid item>
                                 <Typography>Remember this word?</Typography>
@@ -309,7 +319,10 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
                                 <IconButton
                                     onClick={() => updateWordStatus(false)}
                                     variant="outlined"
-                                    sx={SXs.MUI_NAV_ICON_BUTTON}
+                                    sx={{
+                                        ...SXs.MUI_NAV_ICON_BUTTON,
+                                        backgroundColor: isThumbDownSelected() && Colors.LOGO_BLUE
+                                    }}
                                 >
                                     <ThumbDownRoundedIcon />
                                 </IconButton>
@@ -319,7 +332,10 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
                                 <IconButton
                                     onClick={() => updateWordStatus(true)}
                                     variant="outlined"
-                                    sx={SXs.MUI_NAV_ICON_BUTTON}
+                                    sx={{
+                                        ...SXs.MUI_NAV_ICON_BUTTON,
+                                        backgroundColor: isThumbUpSelected() && Colors.LOGO_YELLOW
+                                    }}
                                 >
                                     <ThumbUpRoundedIcon />
                                 </IconButton>

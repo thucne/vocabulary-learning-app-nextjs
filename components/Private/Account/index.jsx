@@ -60,7 +60,7 @@ const Profile = () => {
     }, [photo]);
 
     useEffect(() => {
-        if (user?.photo && !photo.get("photo")) {
+        if (user?.photo && !photo?.get("photo")) {
             const avatar =
                 user?.photo?.formats?.small?.url ||
                 user?.photo?.url ||
