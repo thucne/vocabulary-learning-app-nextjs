@@ -23,7 +23,7 @@ import {
 import { useTheme } from "@mui/material/styles";
 
 import { Colors, Fonts, SXs, Props } from "@styles";
-import { useWindowSize, useThisToGetSizesFromRef, getAudioUrl, getOptimizedPraticeSet } from "@utils";
+import { useWindowSize, useThisToGetSizesFromRef, getAudioUrl, getOptimizedPraticeSet, useSettings } from "@utils";
 import { RECAPTCHA } from "@config";
 import { updateManyVIPs, updateVIP } from "@actions";
 import { IMAGE_ALT, AUDIO_ALT } from '@consts';
@@ -58,6 +58,9 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
     const [loadingAudio, setLoadingAudio] = useState(false);
 
     const optimizedWordList = useMemo(() => getOptimizedPraticeSet(wordList, settings), [wordList, settings]);
+
+    const userData = useSelector((state) => state.userData);
+    const { objectFit = "contain" } = useSettings(userData);
 
     useEffect(() => {
         setWordIndex(0);
@@ -246,7 +249,7 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
                                                 IMAGE_ALT
                                             }
                                             alt="something"
-                                            objectFit="contain"
+                                            objectFit={objectFit}
                                             layout='fill'
                                             quality={100}
                                             draggable={false}

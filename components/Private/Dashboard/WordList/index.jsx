@@ -20,7 +20,7 @@ import ScrollPaper from "@tallis/react-mui-scroll-view";
 // import ScrollPaper from './ScrollPaper';
 
 import CreateNewWord from "@components/WordForm";
-
+import { useSettings } from "@utils";
 import { isEqual } from "lodash";
 
 const WordListBlock = () => {
@@ -58,7 +58,7 @@ const WordListBlock = () => {
     );
 };
 
-const NewWord = () => { 
+const NewWord = () => {
     const [open, setOpen] = useState(false);
     return (
         <div>
@@ -71,6 +71,7 @@ const NewWord = () => {
 }
 
 const ListWord = ({ wordList, config, sizes }) => {
+
     return (
         <Grid item xs={12} mt={2} sx={{ px: wordList?.length === 0 ? 0 : 2 }}>
             {
@@ -97,6 +98,9 @@ const EachChild = ({ word, width }) => {
     const theme = useTheme();
     const [loading, setLoading] = useState(true);
 
+    const userData = useSelector((state) => state.userData);
+    const { objectFit = "contain" } = useSettings(userData);
+
     const photo =
         word?.illustration?.formats?.small?.url ||
         word?.illustration?.url ||
@@ -119,7 +123,7 @@ const EachChild = ({ word, width }) => {
                     src={photo}
                     alt="Illustration"
                     layout="fill"
-                    objectFit="contain"
+                    objectFit={objectFit}
                     priority={true}
                     draggable={false}
                     doneLoading={() => setLoading(false)}

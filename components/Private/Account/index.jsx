@@ -118,42 +118,7 @@ const Profile = () => {
         setLoading(false);
     };
 
-    const checkInputCriteria = (e, field) => {
-        switch (field) {
-            case "email":
-                var error = {};
-                if (!validateEmail(e.target.value)) {
-                    error = { msg: "Invalid email" };
-                }
-                if (!e.target.value) error = { msg: "Email is required" };
-                setErrors((state) => ({
-                    ...state,
-                    ["email"]: error,
-                }));
-                return;
-            case "password":
-                var error = {};
-
-                if (!validatePassword(e.target.value)) {
-                    error = {
-                        msg: "At least 8 characters, 1 uppercase and 1 number",
-                    };
-                }
-                if (!e.target.value) error = { msg: "Password is required" };
-                setErrors((state) => ({
-                    ...state,
-                    ["password"]: error,
-                }));
-                return;
-        }
-    };
-
     const canSubmit = !errors?.username && !errors?.email && !errors?.password && !(Math.ceil(photoWeight / 1024 / 1024) > 10);
-
-    const handleChangeInputValue = (e, field) => {
-        setUpdateForm((state) => ({ ...state, [field]: e.target.value }));
-        checkInputCriteria(e, field);
-    };
 
     const imageSizes = useThisToGetSizesFromRef(imageRef, {
         revalidate: 1000,
@@ -184,7 +149,9 @@ const Profile = () => {
 
         let formData = new FormData();
 
-        formData.append("files.photo", photo?.get("illustration"));
+        if (photo?.get("illustration")) {
+            formData.append("files.photo", photo.get("illustration"));
+        }
 
         if (window?.adHocFetch && recaptcha === true && window.grecaptcha) {
             grecaptcha.ready(function () {
