@@ -598,6 +598,7 @@ export const defaultSettings = {
     lastReview: 1,
     lastReviewOK: 5,
     lastPractice: "",
+    objectFit: "contain"
 };
 
 const convertSettingsValue = (value) => {

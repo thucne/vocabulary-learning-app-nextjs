@@ -17,9 +17,10 @@ import {
     AutoStories as AutoStoriesIcon,
     Timelapse as TimelapseIcon,
     LowPriority as LowPriorityIcon,
+    Crop as CropIcon
 } from "@mui/icons-material";
 
-import { Colors, Fonts, SXs } from "@styles";
+import { Colors, Fonts, SXs, Props } from "@styles";
 import { toggleSettings, useSettings, defaultSettings } from "@utils";
 import { updateSettings } from '@actions';
 import { RECAPTCHA } from "@config";
@@ -27,6 +28,8 @@ import * as t from '@consts';
 
 import { debounce } from "lodash";
 import { useSelector, useDispatch } from "react-redux";
+
+import LoadingImage from '@components/LoadingImage';
 
 export default function SwitchListSecondary() {
     const dispatch = useDispatch();
@@ -261,6 +264,58 @@ export default function SwitchListSecondary() {
                         </List>
                     </Paper>
                 </Grid>
+
+                <Grid item xs={12} sm={6} md={4} my={1} px={[0, 0.5]}>
+                    <Paper variant="outlined" sx={gridSX}>
+                        <List subheader={<ListHeadings title="Advanced" />}>
+                            <AutoFillLevel
+                                handleChange={handleChange}
+                                isExist={isExist}
+                                {...autoFillLevelsProps.objectFit}
+                            />
+                            <Grid container {...Props.GCRCC}>
+                                <Grid item xs={4} {...Props.GICCC}>
+                                    <div style={{ position: "relative", width: 75, height: 75 }}>
+                                        <LoadingImage
+                                            src="https://res.cloudinary.com/katyperrycbt/image/upload/v1646400989/Screenshot_21_j4fwwg.webp"
+                                            alt="Contain Fit"
+                                            layout="fill"
+                                            draggable={false}
+                                            quality={100}
+                                        />
+                                    </div>
+                                    <Typography variant="caption">Contain</Typography>
+                                </Grid>
+                                <Grid item xs={4} {...Props.GICCC}>
+                                    <div style={{ position: "relative", width: 75, height: 75 }}>
+                                        <LoadingImage
+                                            src="https://res.cloudinary.com/katyperrycbt/image/upload/v1646400989/Screenshot_22_jqyuyn.webp"
+                                            alt="Cover Fit"
+                                            width={100}
+                                            height={100}
+                                            draggable={false}
+                                            quality={100}
+                                        />
+                                    </div>
+                                    <Typography variant="caption">Cover</Typography>
+                                </Grid>
+                                <Grid item xs={4} {...Props.GICCC}>
+                                    <div style={{ position: "relative", width: 75, height: 75 }}>
+                                        <LoadingImage
+                                            src="https://res.cloudinary.com/katyperrycbt/image/upload/v1646400989/Screenshot_23_msdluj.webp"
+                                            alt="Fill Fit"
+                                            width={100}
+                                            height={100}
+                                            draggable={false}
+                                            quality={100}
+                                        />
+                                    </div>
+                                    <Typography variant="caption">Fill</Typography>
+                                </Grid>
+                            </Grid>
+                        </List>
+                    </Paper>
+                </Grid>
             </Grid>
         </Container>
     );
@@ -488,4 +543,17 @@ const autoFillLevelsProps = {
         defaultValue: 5,
         label: "Factor",
     },
+    objectFit: {
+        title: "Image fit",
+        values: [
+            { value: "fill", label: "Fill" },
+            { value: "contain", label: "Contain" },
+            { value: "cover", label: "Cover" },
+        ],
+        name: "objectFit",
+        subtitle: "How the image will be displayed in the grid.",
+        Icon: CropIcon,
+        defaultValue: "contain",
+        label: "Fit"
+    }
 };
