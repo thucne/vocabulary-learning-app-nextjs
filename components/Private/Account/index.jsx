@@ -48,6 +48,7 @@ const Profile = () => {
 
     const imageRef = useRef(null);
 
+
     useEffect(() => {
         const loop = setInterval(() => {
             if (!photo && window) {

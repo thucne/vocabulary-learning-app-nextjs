@@ -763,3 +763,30 @@ export const getOptimizedPraticeSet = (wordList = [], settings) => {
         return [];
     }
 }
+
+
+export const getIllustrationsList =(userData={}) => {
+    if(!userData?.vips?.length) return []
+
+    let wordList = [...userData.vips]
+
+    return wordList.filter((item) =>item.illustration)
+    .map(item=>item.illustration)
+}
+
+export const getAllImageFormats = image =>{
+    if(!image) return null
+
+    let opens ={}
+
+    const formatArrays = Object.entries(image.formats)
+    formatArrays.map((item,index)=>{
+        opens[item[0]] = index==0 ? true : false
+    })
+
+    return {formatArrays,opens}
+}
+
+export const capitalizeFirstLetter = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
