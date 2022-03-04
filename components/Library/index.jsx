@@ -15,12 +15,9 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useEffect, useMemo, useState } from "react";
-import { Fonts, Props } from "@styles";
 import { useSelector } from "react-redux";
 import { getIllustrationsList } from "@utils";
-import Index from "@components/LoadingImage";
-import { TabPanel } from "@mui/lab";
-import { InboxOutlined } from "@mui/icons-material";
+
 import ImageSumary from "./ImageInfo/ImageSumary";
 import MetaData from "./ImageInfo/MetaData";
 import ImageGallery from "./ImageGallery";
@@ -31,12 +28,12 @@ const Library = () => {
 
   const illustrationsList = useMemo(() => getIllustrationsList(user), [user]);
 
-  const handleClose = () => setCurrentImg(null);
-
   const commonProps = {
     currentImg,
     handleClose,
   };
+
+  const handleClose = () => setCurrentImg(null);
 
   return (
     <Container maxWidth="full">
@@ -45,12 +42,12 @@ const Library = () => {
         setCurrentImg={setCurrentImg}
       />
 
+      {/* // popup Image info */}
       {!!currentImg && <ImgInfo {...commonProps} />}
     </Container>
   );
 };
 
-// popup Image info
 const ImgInfo = ({ currentImg: illustration, handleClose }) => {
   const [value, setValue] = React.useState(0);
 

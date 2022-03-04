@@ -2,9 +2,11 @@ import { Grid, ImageList, ImageListItem, Typography } from "@mui/material";
 
 import { Box } from "@mui/system";
 import { Fonts, Props } from "@styles";
+
 import Image from "next/image";
 
 const ImageGallery = (props) => {
+
   const { illustrationsList, setCurrentImg } = props;
 
   return (
@@ -30,10 +32,11 @@ const ImageGallery = (props) => {
 
         <Grid item xs={12} {...Props.GIRCC} sx={{ p: 5 }}>
           <Box sx={{ width: ["100%", "80%"], height: 450, overflowY: "auto" }}>
+
             <ImageList variant="masonry" cols={3} gap={8}>
               {illustrationsList.map((illustration, index) => (
                 <ImageListItem key={index}>
-                  <Image
+                  <img
                     src={`${illustration.formats.small.url}?w=248&fit=crop&auto=format`}
                     layout="fill"
                     alt={illustration.name}
@@ -43,6 +46,7 @@ const ImageGallery = (props) => {
                 </ImageListItem>
               ))}
             </ImageList>
+
           </Box>
         </Grid>
       </Grid>

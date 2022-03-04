@@ -5,11 +5,12 @@ import { Box } from "@mui/system";
 import { Fonts } from "@styles";
 
 const ImageSumary = (props) => {
+
   const { illustration, value, index, } = props;
 
   const infoData = [
     ["File Name", illustration.name],
-    ["Format", illustration.ext],
+    ["Format", illustration.ext,{break:true}],
     ["File size", illustration.size],
     [
       "Dimension",
@@ -27,7 +28,6 @@ const ImageSumary = (props) => {
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
- 
     >
       {value === index && (
         <Box sx={{ p: 3 }}>
@@ -38,16 +38,17 @@ const ImageSumary = (props) => {
               objectFit="contain"
             />
           </div>
+
           {infoData.map((info, index) => (
             <Box key={index}>
               <ListItem>
                 <Grid container>
                   <Grid item xs={4}>
-                    <Typography sx={{...styles(Fonts).text}}>{info[0]}</Typography>
+                    <Typography sx={{...styles(Fonts).textKey}}>{info[0]}</Typography>
                   </Grid>
 
                   <Grid item xs={8}>
-                  <Typography sx={{fontSize:[Fonts.FS_12,Fonts.FS_14,Fonts.FS_16]}}>{info[1]}</Typography>
+                  <Typography sx={{...styles(Fonts).textValue}}>{info[1]}</Typography>
                   </Grid>
                 </Grid>
               </ListItem>
@@ -63,11 +64,15 @@ const ImageSumary = (props) => {
 };
 
 const styles=(Fonts) =>({
-    text:{
+    textKey:{
         fontWeight:Fonts.FW_800,
         fontSize:[Fonts.FS_12,
             Fonts.FS_14,Fonts.FS_16]
+    },
+    textValue:{
+        fontSize:[Fonts.FS_12,Fonts.FS_14,Fonts.FS_16]
     }
+
 })
 
 export default ImageSumary;
