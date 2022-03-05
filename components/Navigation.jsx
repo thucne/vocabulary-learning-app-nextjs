@@ -470,7 +470,7 @@ function ResponsiveDrawer(props) {
                                             onClick={colorMode.toggleColorMode}
                                             color="mui_button_inner"
                                         >
-                                            {theme.palette.mode === "dark" ? (
+                                            {theme.palette.mode === "light" ? (
                                                 <DarkModeOutlinedIcon />
                                             ) : (
                                                 <LightModeOutlinedIcon />
