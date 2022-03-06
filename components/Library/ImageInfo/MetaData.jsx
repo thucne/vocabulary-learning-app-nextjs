@@ -16,9 +16,10 @@ import LinkIcon from "@mui/icons-material/Link";
 import { Box } from "@mui/system";
 
 import { Fonts, SXs, Props, Colors } from "@styles";
-import { capitalizeFirstLetter, getAllImageFormats } from "@utils";
+import { capitalizeFirstLetter, getAllImageFormats, shortenLink } from "@utils";
 import Link from "next/link";
 
+const MAX_FILENAME_LENGTH = 10;
 const MetaData = (props) => {
   const { illustration, value, index } = props;
 
@@ -63,10 +64,9 @@ const MetaData = (props) => {
                 </Button>
               </Grid>
 
-              <InfoExpand format={format} openSecsons={openSecsons}  />
-              {index!==formatArrays.length-1 && <Divider/>}
+              <InfoExpand format={format} openSecsons={openSecsons} />
+              {index !== formatArrays.length - 1 && <Divider />}
             </Box>
-            
           ))}
         </Box>
       )}
@@ -74,13 +74,14 @@ const MetaData = (props) => {
   );
 };
 
-const InfoExpand = ({ format, openSecsons,isBreak }) => {
+const InfoExpand = ({ format, openSecsons, isBreak }) => {
   const infoData = [
     ["File size", `${format[1].size} kb`],
     ["Dimension", `${format[1].width}x${format[1].height}`],
   ];
 
   const [isCopy, setIsCopy] = useState(false);
+
   const copyToClipboard = (e) => {
     e.preventDefault();
     navigator.clipboard.writeText(format[1].url);
@@ -95,15 +96,15 @@ const InfoExpand = ({ format, openSecsons,isBreak }) => {
         unmountOnExit
       >
         {infoData.map((info, index) => (
-          <Grid container key={index}>
+          <Grid container key={index} mb={1}>
             <Grid item xs={4}>
-              <Typography sx={{ ...styles(Fonts).text }}>{info[0]}</Typography>
+              <Typography sx={{ ...styles(Fonts).keyText }}>{info[0]}</Typography>
             </Grid>
 
             <Grid item xs={8}>
               <Typography
                 sx={{
-                  fontSize: [Fonts.FS_12, Fonts.FS_14, Fonts.FS_16],
+                  ...styles(Fonts).valueText,
                 }}
               >
                 {info[1]}
@@ -112,30 +113,67 @@ const InfoExpand = ({ format, openSecsons,isBreak }) => {
           </Grid>
         ))}
 
-        <Box sx={{ width: "100%" }}>
-          <Link href={format[1].url} passHref >
-            <a target="_blank" rel={format[1].url} style={{wordWrap: 'break-word',color:Colors.BLUE,textDecoration:'underline'}} >
-              {format[1].url}
-            </a>
-          </Link>
-        </Box>
+        <Grid container>
+          <Grid item xs={4}>
+            <Typography sx={{ ...styles(Fonts).keyText }}>Url</Typography>
+          </Grid>
 
-        <Box sx={{ display: "flex", justifyContent: "center" }}>
-          <IconButton onClick={copyToClipboard}>
-            <Tooltip title={isCopy ? "Copied" : "Copy"}>
-              <LinkIcon />
-            </Tooltip>
-          </IconButton>
-        </Box>
+          <Grid item xs={8}>
+            <Box
+              sx={{
+                ...styles().info,
+              }}
+            >
+              <Box sx={{ width: "80%" }}>
+                <Link href={format[1].url} passHref>
+                  <a
+                    target="_blank"
+                    rel={format[1].url}
+                    style={{ ...styles().link }}
+                  >
+                    {shortenLink(format[1].url, 10)}
+                  </a>
+                </Link>
+              </Box>
+              <Box sx={{ ...styles().copyButton }}>
+                <IconButton onClick={copyToClipboard}>
+                  <Tooltip title={isCopy ? "Copied" : "Copy"}>
+                    <LinkIcon />
+                  </Tooltip>
+                </IconButton>
+              </Box>
+            </Box>
+          </Grid>
+        </Grid>
       </Collapse>
     </Grid>
   );
 };
 
-const styles = (Fonts) => ({
-  text: {
+const styles = (Fonts = {}) => ({
+  keyText: {
     fontWeight: Fonts.FW_500,
     fontSize: [Fonts.FS_12, Fonts.FS_14, Fonts.FS_16],
+  },
+  valueText:{
+    fontSize: [Fonts.FS_12, Fonts.FS_14, Fonts.FS_16],
+  },
+  link: {
+    wordWrap: "break-word",
+    color: Colors.BLUE,
+    textDecoration: "underline",
+    fontSize: [Fonts.FS_12, Fonts.FS_14, Fonts.FS_16],
+  },
+  copyButton: {
+    display: "flex",
+    justifyContent: "center",
+    width: "20%",
+  },
+  info: {
+    display: "flex",
+    justifyContent: "space-between",
+    width: "100%",
+    mb: 2,
   },
 });
 

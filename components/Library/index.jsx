@@ -3,6 +3,7 @@ import {
   Container,
   Dialog,
   Grid,
+  IconButton,
   ImageList,
   ImageListItem,
   List,
@@ -21,19 +22,19 @@ import { getIllustrationsList } from "@utils";
 import ImageSumary from "./ImageInfo/ImageSumary";
 import MetaData from "./ImageInfo/MetaData";
 import ImageGallery from "./ImageGallery";
+import { CloseOutlined } from "@mui/icons-material";
 
 const Library = () => {
   const user = useSelector((state) => state?.userData);
   const [currentImg, setCurrentImg] = useState(null);
 
   const illustrationsList = useMemo(() => getIllustrationsList(user), [user]);
+  const handleClose = () => setCurrentImg(null);
 
   const commonProps = {
     currentImg,
     handleClose,
   };
-
-  const handleClose = () => setCurrentImg(null);
 
   return (
     <Container maxWidth="full">
@@ -65,7 +66,7 @@ const ImgInfo = ({ currentImg: illustration, handleClose }) => {
   return (
     <Dialog maxWidth="xs" fullWidth open={!!illustration} onClose={handleClose}>
       <Box sx={{ width: "100%" }}>
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+        <Box sx={{...styles.tabBar}}>
           <Tabs
             value={value}
             onChange={handleChange}
@@ -79,8 +80,24 @@ const ImgInfo = ({ currentImg: illustration, handleClose }) => {
         <ImageSumary value={value} index={0} illustration={illustration} />
         <MetaData value={value} index={1} illustration={illustration} />
       </Box>
+
+      <IconButton sx={{ ...styles.closeButton }}>
+        <CloseOutlined onClick={handleClose} />
+      </IconButton>
     </Dialog>
   );
 };
 
+const styles = {
+  closeButton: {
+    position: "absolute",
+    top: 5,
+    right: 5,
+    cursor: "pointer",
+  },
+  tabBar: {
+    borderBottom: 1,
+    borderColor: "divider",
+  },
+};
 export default Library;

@@ -1,3 +1,4 @@
+import Index from "@components/LoadingImage";
 import { Grid, ImageList, ImageListItem, Typography } from "@mui/material";
 
 import { Box } from "@mui/system";
@@ -31,7 +32,7 @@ const ImageGallery = (props) => {
         </Grid>
 
         <Grid item xs={12} {...Props.GIRCC} sx={{ p: 5 }}>
-          <Box sx={{ width: ["100%", "80%"], height: 450, overflowY: "auto" }}>
+          <Box sx={{ width: ["100%", "80%"] }}>
 
             <ImageList variant="masonry" cols={3} gap={8}>
               {illustrationsList.map((illustration, index) => (
@@ -39,6 +40,7 @@ const ImageGallery = (props) => {
                   <img
                     src={`${illustration.formats.small.url}?w=248&fit=crop&auto=format`}
                     layout="fill"
+                    loading="lazy"
                     alt={illustration.name}
                     style={{ cursor: "pointer" }}
                     onClick={() => setCurrentImg(illustration)}

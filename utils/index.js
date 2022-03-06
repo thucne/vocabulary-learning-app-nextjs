@@ -791,3 +791,13 @@ export const getAllImageFormats = image =>{
 export const capitalizeFirstLetter = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
+
+export const shortenLink = (link, maxLength) => {
+
+    let splited = link.split("/")
+    
+    let fileName = splited[splited.length - 1].slice(-maxLength)
+
+    return splited.slice(0, 3).join("/") + "..." + fileName
+    
+}
