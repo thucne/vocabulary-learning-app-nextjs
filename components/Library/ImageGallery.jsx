@@ -39,7 +39,6 @@ const ImageGallery = (props) => {
                 <ImageListItem key={index}>
                   <img
                     src={`${illustration.formats.small.url}?w=248&fit=crop&auto=format`}
-                    layout="fill"
                     loading="lazy"
                     alt={illustration.name}
                     style={{ cursor: "pointer" }}

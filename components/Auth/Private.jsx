@@ -47,7 +47,7 @@ const Private = ({ children, MetaTag }) => {
                 );
                 return;
             }
-
+            
             setLogin(true);
         };
         validate().then(() => setValidate(true));

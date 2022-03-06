@@ -67,6 +67,7 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
     }, [optimizedWordList.length, open]);
 
     useEffect(() => {
+        let canRun = true;
         const run = async () => {
             if (wordIndex < optimizedWordList.length && wordIndex >= 0) {
                 setLoadingAudio(true);
@@ -81,7 +82,13 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
                 });
             }
         }
-        run();
+
+        if (canRun) {
+            run();
+        }
+
+        return () => canRun = false;
+
     }, [wordIndex, optimizedWordList]);
 
     const handleClose = () => {

@@ -26,9 +26,11 @@ import { isEqual } from "lodash";
 const WordListBlock = () => {
     const [sizes, setSizes] = useState({ width: 0, height: 0 });
 
-    const wordList = useSelector((state) =>
+    const wordListRaw = useSelector((state) =>
         state.userData?.vips?.length > 0 ? state.userData.vips : []
     );
+
+    const wordList = useMemo(() => wordListRaw, [wordListRaw]);
 
     return (
         <Container maxWidth="lg" disableGutters>
@@ -124,7 +126,6 @@ const EachChild = ({ word, width }) => {
                     alt="Illustration"
                     layout="fill"
                     objectFit={objectFit}
-                    priority={true}
                     draggable={false}
                     doneLoading={() => setLoading(false)}
                 />
