@@ -1,12 +1,14 @@
 import Layout from "@layouts";
 import Meta from "@meta";
 import Private from "@components/Auth/Private";
-import MyWordComponent from "@components/Private/WordList";
+import WordList from "@components/Private/WordList";
 
 const MyWordList = () => {
     return (
         <Private MetaTag={MetaTag}>
-            <Layout noMeta tabName="Word List"></Layout>
+            <Layout noMeta tabName="Word List">
+                <WordList />
+            </Layout>
         </Private>
     );
 };
