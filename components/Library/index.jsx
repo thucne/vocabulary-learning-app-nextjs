@@ -1,3 +1,7 @@
+import React, { useEffect, useMemo, useState } from "react";
+
+import { useSelector } from "react-redux";
+
 import {
   Box,
   Container,
@@ -15,8 +19,7 @@ import {
   Tabs,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
+
 import { getIllustrationsList } from "@utils";
 
 import ImageSumary from "./ImageInfo/ImageSumary";
@@ -81,8 +84,8 @@ const ImgInfo = ({ currentImg: illustration, handleClose }) => {
         <MetaData value={value} index={1} illustration={illustration} />
       </Box>
 
-      <IconButton sx={{ ...styles.closeButton }}>
-        <CloseOutlined onClick={handleClose} />
+      <IconButton sx={{ ...styles.closeButton }} onClick={handleClose}>
+        <CloseOutlined  />
       </IconButton>
     </Dialog>
   );
@@ -100,4 +103,4 @@ const styles = {
     borderColor: "divider",
   },
 };
-export default Library;
+export default React.memo(Library);

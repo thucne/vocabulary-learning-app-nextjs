@@ -1,3 +1,5 @@
+import React from 'react'
+
 import Index from "@components/LoadingImage";
 import { Divider, Grid, ListItem, Typography } from "@mui/material";
 
@@ -6,7 +8,7 @@ import { Fonts } from "@styles";
 
 const ImageSumary = (props) => {
   const { illustration, value, index } = props;
-
+console.log("rerendering ImageSumary");
   const infoData = [
     ["File Name", illustration.name],
     ["Format", illustration.ext, { break: true }],
@@ -79,4 +81,4 @@ const styles = (Fonts={}) => ({
   },
 });
 
-export default ImageSumary;
+export default React.memo(ImageSumary);

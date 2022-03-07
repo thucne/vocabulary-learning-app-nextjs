@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import React,{ useMemo, useState } from "react";
 
 import Index from "@components/LoadingImage";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
@@ -22,6 +22,7 @@ import Link from "next/link";
 const MAX_FILENAME_LENGTH = 10;
 const MetaData = (props) => {
   const { illustration, value, index } = props;
+  console.log("rerendering Metadata");
 
   const { formatArrays, opens } = useMemo(
     () => getAllImageFormats(illustration),
@@ -98,7 +99,9 @@ const InfoExpand = ({ format, openSecsons, isBreak }) => {
         {infoData.map((info, index) => (
           <Grid container key={index} mb={1}>
             <Grid item xs={4}>
-              <Typography sx={{ ...styles(Fonts).keyText }}>{info[0]}</Typography>
+              <Typography sx={{ ...styles(Fonts).keyText }}>
+                {info[0]}
+              </Typography>
             </Grid>
 
             <Grid item xs={8}>
@@ -125,22 +128,28 @@ const InfoExpand = ({ format, openSecsons, isBreak }) => {
               }}
             >
               <Box sx={{ width: "80%" }}>
-                <Link href={format[1].url} passHref>
-                  <a
-                    target="_blank"
-                    rel={format[1].url}
-                    style={{ ...styles().link }}
-                  >
-                    {shortenLink(format[1].url, 10)}
-                  </a>
-                </Link>
-              </Box>
-              <Box sx={{ ...styles().copyButton }}>
-                <IconButton onClick={copyToClipboard}>
-                  <Tooltip title={isCopy ? "Copied" : "Copy"}>
-                    <LinkIcon />
-                  </Tooltip>
-                </IconButton>
+                <span>
+                  <Link href={format[1].url} passHref>
+                    <a
+                      target="_blank"
+                      rel={format[1].url}
+                      style={{
+                        ...styles().link,
+                       
+                      }}
+                    >
+                      {shortenLink(format[1].url, 10)}
+                    </a>
+                  </Link>
+                </span>
+
+                <Box sx={{ ...styles().copyButton }}>
+                  <IconButton onClick={copyToClipboard}>
+                    <Tooltip title={isCopy ? "Copied" : "Copy"}>
+                      <LinkIcon />
+                    </Tooltip>
+                  </IconButton>
+                </Box>
               </Box>
             </Box>
           </Grid>
@@ -155,7 +164,7 @@ const styles = (Fonts = {}) => ({
     fontWeight: Fonts.FW_500,
     fontSize: [Fonts.FS_12, Fonts.FS_14, Fonts.FS_16],
   },
-  valueText:{
+  valueText: {
     fontSize: [Fonts.FS_12, Fonts.FS_14, Fonts.FS_16],
   },
   link: {
@@ -165,7 +174,7 @@ const styles = (Fonts = {}) => ({
     fontSize: [Fonts.FS_12, Fonts.FS_14, Fonts.FS_16],
   },
   copyButton: {
-    display: "flex",
+    display: "inline",
     justifyContent: "center",
     width: "20%",
   },
@@ -177,4 +186,4 @@ const styles = (Fonts = {}) => ({
   },
 });
 
-export default MetaData;
+export default React.memo(MetaData);
