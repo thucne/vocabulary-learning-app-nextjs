@@ -8,24 +8,18 @@ import {
     Dialog,
     Grid,
     IconButton,
-    ImageList,
-    ImageListItem,
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemIcon,
-    ListItemText,
     Tab,
     Tabs,
-    Typography,
 } from "@mui/material";
 
+import { CloseOutlined } from "@mui/icons-material";
+
 import { getIllustrationsList } from "@utils";
+import { SXs } from '@styles';
 
 import ImageSumary from "./ImageInfo/ImageSumary";
 import MetaData from "./ImageInfo/MetaData";
 import ImageGallery from "./ImageGallery";
-import { CloseOutlined } from "@mui/icons-material";
 
 const Library = () => {
     const user = useSelector((state) => state?.userData);
@@ -74,19 +68,26 @@ const ImgInfo = ({ currentImg: illustration, handleClose }) => {
                         value={value}
                         onChange={handleChange}
                         aria-label="basic tabs example"
+                        centered
                     >
-                        <Tab label="Summary" {...a11yProps(0)} />
-                        <Tab label="MetaData" {...a11yProps(1)} />
+                        <Tab label="Summary" {...a11yProps(0)} sx={SXs.BASE_BUTTON_STYLES} />
+                        <Tab label="Formats" {...a11yProps(1)} sx={SXs.BASE_BUTTON_STYLES} />
                     </Tabs>
+                    <IconButton sx={{
+                        ...styles.closeButton,
+                        ...SXs.MUI_NAV_ICON_BUTTON,
+                        width: '30px',
+                        height: '30px',
+                        fontSize: '25px',
+                        borderRadius: '5px',
+                    }} onClick={handleClose}>
+                        <CloseOutlined />
+                    </IconButton>
                 </Box>
 
                 <ImageSumary value={value} index={0} illustration={illustration} />
                 <MetaData value={value} index={1} illustration={illustration} />
             </Box>
-
-            <IconButton sx={{ ...styles.closeButton }} onClick={handleClose}>
-                <CloseOutlined />
-            </IconButton>
         </Dialog>
     );
 };
@@ -94,13 +95,14 @@ const ImgInfo = ({ currentImg: illustration, handleClose }) => {
 const styles = {
     closeButton: {
         position: "absolute",
-        top: 5,
-        right: 5,
-        cursor: "pointer",
+        top: '50%',
+        right: '24px',
+        transform: 'translateY(-50%)',
     },
     tabBar: {
         borderBottom: 1,
         borderColor: "divider",
+        position: "relative",
     },
 };
 export default React.memo(Library);

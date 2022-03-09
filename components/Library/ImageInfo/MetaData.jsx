@@ -1,6 +1,5 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useRef } from "react";
 
-import Index from "@components/LoadingImage";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import {
     Button,
@@ -11,18 +10,30 @@ import {
     ListItem,
     Tooltip,
     Typography,
+    Box,
+    Link as MuiLink
 } from "@mui/material";
-import LinkIcon from "@mui/icons-material/Link";
-import { Box } from "@mui/system";
+
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import CheckIcon from '@mui/icons-material/Check';
 
 import { Fonts, SXs, Props, Colors } from "@styles";
-import { capitalizeFirstLetter, getAllImageFormats, shortenLink } from "@utils";
+import {
+    capitalizeFirstLetter, getAllImageFormats, shortenLink,
+    useThisToGetSizesFromRef
+} from "@utils";
+
+import { useDispatch } from 'react-redux';
+import * as t from '@consts';
+
 import Link from "next/link";
 
 const MAX_FILENAME_LENGTH = 10;
+
 const MetaData = (props) => {
     const { illustration, value, index } = props;
-    console.log("rerendering Metadata");
+
+    const buttonRef = useRef(null);
 
     const { formatArrays, opens } = useMemo(
         () => getAllImageFormats(illustration),
@@ -30,6 +41,12 @@ const MetaData = (props) => {
     );
 
     const [openSecsons, setOpenSecsons] = useState(opens);
+
+    const buttonSize = useThisToGetSizesFromRef(buttonRef, {
+        revalidate: 1000,
+        terminalCondition: ({ width }) => width !== 0,
+        falseCondition: ({ width }) => width === 0,
+    });
 
     return (
         <div
@@ -42,7 +59,7 @@ const MetaData = (props) => {
                 <Box sx={{ p: 3 }}>
                     {formatArrays.map((format, index) => (
                         <Box key={index}>
-                            <Grid key={index} item xs={12}>
+                            <Grid ref={buttonRef} key={index} item xs={12}>
                                 <Button
                                     fullWidth
                                     disableRipple
@@ -55,6 +72,8 @@ const MetaData = (props) => {
                                     sx={{
                                         ...SXs.COMMON_BUTTON_STYLES,
                                         justifyContent: "space-between",
+                                        width: `calc(${buttonSize?.width + 10}px)`,
+                                        ml: '-5px',
                                     }}
                                     endIcon={
                                         openSecsons[format[0]] ? <ExpandLess /> : <ExpandMore />
@@ -66,7 +85,7 @@ const MetaData = (props) => {
                             </Grid>
 
                             <InfoExpand format={format} openSecsons={openSecsons} />
-                            {index !== formatArrays.length - 1 && <Divider />}
+                            {index !== formatArrays.length - 1 && <Divider sx={{my:1}} />}
                         </Box>
                     ))}
                 </Box>
@@ -76,6 +95,8 @@ const MetaData = (props) => {
 };
 
 const InfoExpand = ({ format, openSecsons, isBreak }) => {
+    const dispatch = useDispatch();
+
     const infoData = [
         ["File size", `${format[1].size} kb`],
         ["Dimension", `${format[1].width}x${format[1].height}`],
@@ -85,8 +106,16 @@ const InfoExpand = ({ format, openSecsons, isBreak }) => {
 
     const copyToClipboard = (e) => {
         e.preventDefault();
-        navigator.clipboard.writeText(format[1].url);
-        setIsCopy(true);
+        navigator.clipboard.writeText(format[1].url).then(() => {
+            setIsCopy(true);
+            setTimeout(() => {
+                setIsCopy(false);
+            }, 1000);
+
+            dispatch({ type: t.SHOW_SNACKBAR, payload: { message: "Copied to clipboard", type: "info" } });
+        }, () => {
+            dispatch({ type: t.SHOW_SNACKBAR, payload: { message: "Failed to copy", type: "warning" } });
+        });
     };
     return (
         <Grid item xs={12}>
@@ -98,16 +127,16 @@ const InfoExpand = ({ format, openSecsons, isBreak }) => {
             >
                 {infoData.map((info, index) => (
                     <Grid container key={index} mb={1}>
-                        <Grid item xs={4}>
-                            <Typography sx={{ ...styles(Fonts).keyText }}>
+                        <Grid item xs={3}>
+                            <Typography sx={{ ...styles.keyText }}>
                                 {info[0]}
                             </Typography>
                         </Grid>
 
-                        <Grid item xs={8}>
+                        <Grid item xs={9}>
                             <Typography
                                 sx={{
-                                    ...styles(Fonts).valueText,
+                                    ...styles.valueText,
                                 }}
                             >
                                 {info[1]}
@@ -117,41 +146,27 @@ const InfoExpand = ({ format, openSecsons, isBreak }) => {
                 ))}
 
                 <Grid container>
-                    <Grid item xs={4}>
-                        <Typography sx={{ ...styles(Fonts).keyText }}>Url</Typography>
+                    <Grid item xs={3}>
+                        <Typography sx={{ ...styles.keyText }}>URL</Typography>
                     </Grid>
 
-                    <Grid item xs={8}>
-                        <Box
-                            sx={{
-                                ...styles().info,
-                            }}
-                        >
-                            <Box sx={{ width: "80%" }}>
-                                <span>
-                                    <Link href={format[1].url} passHref>
-                                        <a
-                                            target="_blank"
-                                            rel={format[1].url}
-                                            style={{
-                                                ...styles().link,
+                    <Grid item xs={9} {...Props.GIRBC} >
+                        <Link href={format[1].url} passHref>
+                            <MuiLink
+                                target="_blank"
+                                rel={format[1].url}
+                                sx={styles.link}
+                                underline="hover"
+                                className="overflowTypography"
+                                title="Link to image"
+                            >
+                                {shortenLink(format[1].url, 10)}
+                            </MuiLink>
+                        </Link>
 
-                                            }}
-                                        >
-                                            {shortenLink(format[1].url, 10)}
-                                        </a>
-                                    </Link>
-                                </span>
-
-                                <Box sx={{ ...styles().copyButton }}>
-                                    <IconButton onClick={copyToClipboard}>
-                                        <Tooltip title={isCopy ? "Copied" : "Copy"}>
-                                            <LinkIcon />
-                                        </Tooltip>
-                                    </IconButton>
-                                </Box>
-                            </Box>
-                        </Box>
+                            <IconButton onClick={copyToClipboard}>
+                                <ContentCopyIcon sx={{ fontSize: Fonts.FS_15 }} />
+                            </IconButton>
                     </Grid>
                 </Grid>
             </Collapse>
@@ -159,7 +174,7 @@ const InfoExpand = ({ format, openSecsons, isBreak }) => {
     );
 };
 
-const styles = (Fonts = {}) => ({
+const styles = ({
     keyText: {
         fontWeight: Fonts.FW_500,
         fontSize: [Fonts.FS_12, Fonts.FS_14, Fonts.FS_16],
@@ -168,15 +183,7 @@ const styles = (Fonts = {}) => ({
         fontSize: [Fonts.FS_12, Fonts.FS_14, Fonts.FS_16],
     },
     link: {
-        wordWrap: "break-word",
-        color: Colors.BLUE,
-        textDecoration: "underline",
         fontSize: [Fonts.FS_12, Fonts.FS_14, Fonts.FS_16],
-    },
-    copyButton: {
-        display: "inline",
-        justifyContent: "center",
-        width: "20%",
     },
     info: {
         display: "flex",

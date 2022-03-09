@@ -770,11 +770,21 @@ export const capitalizeFirstLetter = (string) => {
 
 export const shortenLink = (link, maxLength) => {
 
-    let splited = link.split("/")
+    if (isValidHttpUrl(link)) {
+        const generatedURL = new URL(link);
 
-    let fileName = splited[splited.length - 1].slice(-maxLength)
+        // get first n chars of the last pathname
+        const pathname = generatedURL.pathname;
+        const pathnameChars = pathname.substring(pathname.lastIndexOf('/') + 1, pathname.length);
+        const firstNChars = pathnameChars.split("_")?.[0].slice(0, maxLength);
 
-    return splited.slice(0, 3).join("/") + "/..." + fileName
+        // make link pretty
+        const prettyLink = generatedURL.origin + "/.../" + firstNChars + "...";
+
+        return prettyLink;
+    } else {
+        return "URL is not valid";
+    }
 
 }
 

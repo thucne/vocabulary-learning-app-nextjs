@@ -29,7 +29,6 @@ const ImageGallery = (props) => {
                 setLoading(true);
                 illustrationsList?.forEach((img, index) => {
                     const photo = img?.formats?.small?.url || img?.formats?.medium?.url || img?.formats?.large?.url || img.url;
-                    console.log('photo', photo);
                     getSizeImage(photo, (data) => {
                         setImgSizes((prev) => {
                             prev[index] = data;
@@ -54,7 +53,7 @@ const ImageGallery = (props) => {
 
     const cols = windowSize?.width < theme.breakpoints.values.sm ? 3 : windowSize?.width < theme.breakpoints.values.md ? 4 : 5;
 
-    const skeletonWidth = Math.floor(containerSize.width / (Number(cols + 0.1)));
+    const skeletonWidth = Math.floor((containerSize.width / (cols + 0.1)) - 4);
 
     return (
         <>
@@ -85,7 +84,7 @@ const ImageGallery = (props) => {
                                 <ImageListItem key={index}>
                                     {
                                         !isNaN(imgSizes?.[index]?.height * 248 / imgSizes?.[index]?.width) && <Image
-                                            src={`${illustration.formats.small.url}?w=248&fit=crop&auto=format`}
+                                            src={`${illustration.formats.small.url}`}
                                             loading="lazy"
                                             width={248}
                                             height={imgSizes[index]?.height * 248 / imgSizes[index]?.width}
@@ -93,22 +92,23 @@ const ImageGallery = (props) => {
                                             onClick={() => setCurrentImg(illustration)}
                                             quality={100}
                                             bgColor={getPastelColor()}
+                                            draggable={false}
                                         />
                                     }
                                 </ImageListItem>
                             ))}
                             {loading && [
-                                <ImageListItem key={`skeleton-1`}><Skeleton variant="rectangular" animatin="wave" width={skeletonWidth} height={250} /></ImageListItem>,
-                                <ImageListItem key={`skeleton-2`}><Skeleton variant="rectangular" animatin="wave" width={skeletonWidth} height={175} /></ImageListItem>,
-                                <ImageListItem key={`skeleton-3`}><Skeleton variant="rectangular" animatin="wave" width={skeletonWidth} height={130} /></ImageListItem>,
-                                <ImageListItem key={`skeleton-4`}><Skeleton variant="rectangular" animatin="wave" width={skeletonWidth} height={215} /></ImageListItem>,
-                                <ImageListItem key={`skeleton-5`}><Skeleton variant="rectangular" animatin="wave" width={skeletonWidth} height={172} /></ImageListItem>,
-                                <ImageListItem key={`skeleton-6`}><Skeleton variant="rectangular" animatin="wave" width={skeletonWidth} height={325} /></ImageListItem>,
-                                <ImageListItem key={`skeleton-7`}><Skeleton variant="rectangular" animatin="wave" width={skeletonWidth} height={150} /></ImageListItem>,
-                                <ImageListItem key={`skeleton-8`}><Skeleton variant="rectangular" animatin="wave" width={skeletonWidth} height={175} /></ImageListItem>,
-                                <ImageListItem key={`skeleton-9`}><Skeleton variant="rectangular" animatin="wave" width={skeletonWidth} height={65} /></ImageListItem>,
-                                <ImageListItem key={`skeleton-10`}><Skeleton variant="rectangular" animatin="wave" width={skeletonWidth} height={225} /></ImageListItem>,
-                                <ImageListItem key={`skeleton-11`}><Skeleton variant="rectangular" animatin="wave" width={skeletonWidth} height={250} /></ImageListItem>,
+                                <ImageListItem key={`skeleton-1`}><Skeleton variant="rectangular" animatin="wave" width={skeletonWidth} height={skeletonWidth * 0.8} /></ImageListItem>,
+                                <ImageListItem key={`skeleton-2`}><Skeleton variant="rectangular" animatin="wave" width={skeletonWidth} height={skeletonWidth * 1.66} /></ImageListItem>,
+                                <ImageListItem key={`skeleton-3`}><Skeleton variant="rectangular" animatin="wave" width={skeletonWidth} height={skeletonWidth * 1.7} /></ImageListItem>,
+                                <ImageListItem key={`skeleton-4`}><Skeleton variant="rectangular" animatin="wave" width={skeletonWidth} height={skeletonWidth * 0.4} /></ImageListItem>,
+                                <ImageListItem key={`skeleton-5`}><Skeleton variant="rectangular" animatin="wave" width={skeletonWidth} height={skeletonWidth * 1.3} /></ImageListItem>,
+                                <ImageListItem key={`skeleton-6`}><Skeleton variant="rectangular" animatin="wave" width={skeletonWidth} height={skeletonWidth * 0.95} /></ImageListItem>,
+                                <ImageListItem key={`skeleton-7`}><Skeleton variant="rectangular" animatin="wave" width={skeletonWidth} height={skeletonWidth * 1.5} /></ImageListItem>,
+                                <ImageListItem key={`skeleton-8`}><Skeleton variant="rectangular" animatin="wave" width={skeletonWidth} height={skeletonWidth * 0.55} /></ImageListItem>,
+                                <ImageListItem key={`skeleton-9`}><Skeleton variant="rectangular" animatin="wave" width={skeletonWidth} height={skeletonWidth * 1.44} /></ImageListItem>,
+                                <ImageListItem key={`skeleton-10`}><Skeleton variant="rectangular" animatin="wave" width={skeletonWidth} height={skeletonWidth * 0.45} /></ImageListItem>,
+                                <ImageListItem key={`skeleton-11`}><Skeleton variant="rectangular" animatin="wave" width={skeletonWidth} height={skeletonWidth * 0.60} /></ImageListItem>,
                             ]}
                         </ImageList>
 
