@@ -40,7 +40,7 @@ const MetaData = (props) => {
         [illustration]
     );
 
-    const [openSecsons, setOpenSecsons] = useState(opens);
+    const [openSecsons, setOpenSecsons] = useState({ origin: true });
 
     const buttonSize = useThisToGetSizesFromRef(buttonRef, {
         revalidate: 1000,
@@ -57,9 +57,45 @@ const MetaData = (props) => {
         >
             {value === index && (
                 <Box sx={{ p: 3 }}>
+
+                    {/* Origin  */}
+
+                    <Box>
+                        <Grid ref={buttonRef} item xs={12}>
+                            <Button
+                                fullWidth
+                                disableRipple
+                                onClick={() =>
+                                    setOpenSecsons((prev) => ({
+                                        ...prev,
+                                        origin: !prev.origin,
+                                    }))
+                                }
+                                sx={{
+                                    ...SXs.COMMON_BUTTON_STYLES,
+                                    justifyContent: "space-between",
+                                    width: `calc(${buttonSize?.width + 10}px)`,
+                                    ml: '-5px',
+                                }}
+                                endIcon={
+                                    openSecsons.origin ? <ExpandLess /> : <ExpandMore />
+                                }
+                                size="small"
+                            >
+                                Origin
+                            </Button>
+                        </Grid>
+
+                        <InfoExpand format={[
+                            "origin",
+                            illustration
+                        ]} openSecsons={openSecsons} />
+                        {index !== formatArrays.length - 1 && <Divider sx={{ my: 1 }} />}
+                    </Box>
+
                     {formatArrays.map((format, index) => (
                         <Box key={index}>
-                            <Grid ref={buttonRef} key={index} item xs={12}>
+                            <Grid key={index} item xs={12}>
                                 <Button
                                     fullWidth
                                     disableRipple
@@ -85,7 +121,7 @@ const MetaData = (props) => {
                             </Grid>
 
                             <InfoExpand format={format} openSecsons={openSecsons} />
-                            {index !== formatArrays.length - 1 && <Divider sx={{my:1}} />}
+                            {index !== formatArrays.length - 1 && <Divider sx={{ my: 1 }} />}
                         </Box>
                     ))}
                 </Box>
@@ -98,20 +134,13 @@ const InfoExpand = ({ format, openSecsons, isBreak }) => {
     const dispatch = useDispatch();
 
     const infoData = [
-        ["File size", `${format[1].size} kb`],
-        ["Dimension", `${format[1].width}x${format[1].height}`],
+        ["File size", `${format[1].size} KB`],
+        ["Dimensions", `${format[1].width} x ${format[1].height}`],
     ];
-
-    const [isCopy, setIsCopy] = useState(false);
 
     const copyToClipboard = (e) => {
         e.preventDefault();
         navigator.clipboard.writeText(format[1].url).then(() => {
-            setIsCopy(true);
-            setTimeout(() => {
-                setIsCopy(false);
-            }, 1000);
-
             dispatch({ type: t.SHOW_SNACKBAR, payload: { message: "Copied to clipboard", type: "info" } });
         }, () => {
             dispatch({ type: t.SHOW_SNACKBAR, payload: { message: "Failed to copy", type: "warning" } });
@@ -164,9 +193,9 @@ const InfoExpand = ({ format, openSecsons, isBreak }) => {
                             </MuiLink>
                         </Link>
 
-                            <IconButton onClick={copyToClipboard}>
-                                <ContentCopyIcon sx={{ fontSize: Fonts.FS_15 }} />
-                            </IconButton>
+                        <IconButton onClick={copyToClipboard}>
+                            <ContentCopyIcon sx={{ fontSize: [Fonts.FS_12, Fonts.FS_14, Fonts.FS_16] }} />
+                        </IconButton>
                     </Grid>
                 </Grid>
             </Collapse>
