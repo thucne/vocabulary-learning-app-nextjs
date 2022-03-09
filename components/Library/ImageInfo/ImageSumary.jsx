@@ -10,7 +10,7 @@ import { ContentCopy as ContentCopyIcon } from "@mui/icons-material";
 import { Box } from "@mui/system";
 import { Fonts, Props } from "@styles";
 import * as t from '@consts';
-import { shortenLink } from '@utils';
+import { shortenLink, formatBytes } from '@utils';
 
 import { useDispatch } from 'react-redux';
 import moment from 'moment';
@@ -20,9 +20,9 @@ const ImageSumary = (props) => {
     const { illustration, value, index } = props;
 
     const infoData = [
-        ["File Name", illustration.name],
+        ["Name", illustration.name],
         ["Format", illustration.ext],
-        ["File size", `${illustration.size} KB`],
+        ["File size", `${formatBytes(illustration.size * 1024)}`],
         [
             "Dimensions",
             `${illustration.width} x ${illustration.height}`,

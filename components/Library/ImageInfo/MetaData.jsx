@@ -20,7 +20,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import { Fonts, SXs, Props, Colors } from "@styles";
 import {
     capitalizeFirstLetter, getAllImageFormats, shortenLink,
-    useThisToGetSizesFromRef
+    useThisToGetSizesFromRef, formatBytes
 } from "@utils";
 
 import { useDispatch } from 'react-redux';
@@ -134,7 +134,7 @@ const InfoExpand = ({ format, openSecsons, isBreak }) => {
     const dispatch = useDispatch();
 
     const infoData = [
-        ["File size", `${format[1].size} KB`],
+        ["File size", `${formatBytes(format[1].size * 1024)}`],
         ["Dimensions", `${format[1].width} x ${format[1].height}`],
     ];
 

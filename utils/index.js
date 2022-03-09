@@ -743,25 +743,28 @@ export const getOptimizedPraticeSet = (wordList = [], settings) => {
 
 
 export const getIllustrationsList = (userData = {}) => {
-    if (!userData?.vips?.length) return []
+    if (!userData?.vips?.length) return [];
 
-    let wordList = [...userData.vips]
+    let wordList = [...userData.vips];
 
     return wordList.filter((item) => item.illustration)
-        .map(item => item.illustration)
+        .map(item => item.illustration);
 }
 
 export const getAllImageFormats = image => {
-    if (!image) return null
+    if (!image) return null;
 
-    let opens = {}
+    let opens = {};
 
-    const formatArrays = Object.entries(image.formats)
+    const arrayOrder = ['origin', 'large', 'medium', 'small', 'thumbnail'];
+
+    const formatArrays = Object.entries(image.formats).sort((a, b) => arrayOrder.indexOf(a[0]) - arrayOrder.indexOf(b[0]));
+
     formatArrays.map((item, index) => {
         opens[item[0]] = index == 0 ? true : false
     })
 
-    return { formatArrays, opens }
+    return { formatArrays, opens };
 }
 
 export const capitalizeFirstLetter = (string) => {
@@ -792,4 +795,16 @@ export function getPastelColor() {
     return "hsl(" + 360 * Math.random() + ',' +
         (25 + 70 * Math.random()) + '%,' +
         (85 + 10 * Math.random()) + '%)'
+}
+
+export function formatBytes(bytes, decimals = 2) {
+    if (bytes === 0) return '0 Bytes';
+
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
