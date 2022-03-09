@@ -333,30 +333,6 @@ export function useWindowSize() {
     return size;
 }
 
-export function useDebounce(input, callback, delay = 2000) {
-    const callbackRef = useRef(callback);
-    const timeoutRef = useRef(null);
-
-    useEffect(() => {
-        callbackRef.current = callback;
-    }, [callback]);
-
-    const setTime = useCallback(() => {
-        timeoutRef.current = setTimeout(() => {
-            if (typeof callbackRef.current == "function") callbackRef.current();
-        }, [delay]);
-    }, [delay]);
-
-    const clear = useCallback(() => {
-        timeoutRef.current && clearTimeout(timeoutRef.current);
-    }, []);
-
-    useEffect(() => {
-        setTime();
-        return clear;
-    }, [delay, setTime, input]);
-}
-
 export const groupBy = function (xs, key) {
     return xs.reduce(function (rv, x) {
         (rv[x[key]] = rv[x[key]] || []).push(x);
@@ -766,26 +742,26 @@ export const getOptimizedPraticeSet = (wordList = [], settings) => {
 }
 
 
-export const getIllustrationsList =(userData={}) => {
-    if(!userData?.vips?.length) return []
+export const getIllustrationsList = (userData = {}) => {
+    if (!userData?.vips?.length) return []
 
     let wordList = [...userData.vips]
 
-    return wordList.filter((item) =>item.illustration)
-    .map(item=>item.illustration)
+    return wordList.filter((item) => item.illustration)
+        .map(item => item.illustration)
 }
 
-export const getAllImageFormats = image =>{
-    if(!image) return null
+export const getAllImageFormats = image => {
+    if (!image) return null
 
-    let opens ={}
+    let opens = {}
 
     const formatArrays = Object.entries(image.formats)
-    formatArrays.map((item,index)=>{
-        opens[item[0]] = index==0 ? true : false
+    formatArrays.map((item, index) => {
+        opens[item[0]] = index == 0 ? true : false
     })
 
-    return {formatArrays,opens}
+    return { formatArrays, opens }
 }
 
 export const capitalizeFirstLetter = (string) => {
@@ -795,9 +771,15 @@ export const capitalizeFirstLetter = (string) => {
 export const shortenLink = (link, maxLength) => {
 
     let splited = link.split("/")
-    
+
     let fileName = splited[splited.length - 1].slice(-maxLength)
 
-    return splited.slice(0, 3).join("/") + "..." + fileName
-    
+    return splited.slice(0, 3).join("/") + "/..." + fileName
+
+}
+
+export function getPastelColor() {
+    return "hsl(" + 360 * Math.random() + ',' +
+        (25 + 70 * Math.random()) + '%,' +
+        (85 + 10 * Math.random()) + '%)'
 }
