@@ -80,26 +80,29 @@ const ImageGallery = (props) => {
                     <Box sx={{ width: ["100%", "95%"] }}>
 
                         <ImageList variant="masonry" cols={cols} gap={8} ref={myRef}>
-                            {!loading && illustrationsList.map((illustration, index) => (
-                                <ImageListItem key={index}>
-                                    {
-                                        !isNaN(imgSizes?.[index]?.height * 248 / imgSizes?.[index]?.width) && <label title={`Word: ${illustration.word}. Photo: ${illustration.name}` || 'Photo'}>
-                                            <LoadingImage
-                                                src={`${illustration.formats.small.url}`}
-                                                loading="lazy"
-                                                width={248}
-                                                height={imgSizes[index]?.height * 248 / imgSizes[index]?.width}
-                                                alt={illustration?.name || 'Photo'}
-                                                onClick={() => setCurrentImg(illustration)}
-                                                quality={100}
-                                                bgColor={getPastelColor()}
-                                                draggable={false}
-                                                className="cursorPointer"
-                                            />
-                                        </label>
-                                    }
-                                </ImageListItem>
-                            ))}
+                            {!loading && illustrationsList.map((illustration, index) => {
+                                const photo = illustration?.formats?.small?.url || illustration?.formats?.medium?.url || illustration?.formats?.large?.url || illustration.url;
+                                return (
+                                    <ImageListItem key={index}>
+                                        {
+                                            !isNaN(imgSizes?.[index]?.height * 248 / imgSizes?.[index]?.width) && <label title={`Word: ${illustration.word}. Photo: ${illustration.name}` || 'Photo'}>
+                                                <LoadingImage
+                                                    src={`${photo}`}
+                                                    loading="lazy"
+                                                    width={248}
+                                                    height={imgSizes[index]?.height * 248 / imgSizes[index]?.width}
+                                                    alt={illustration?.name || 'Photo'}
+                                                    onClick={() => setCurrentImg(illustration)}
+                                                    quality={100}
+                                                    bgColor={getPastelColor()}
+                                                    draggable={false}
+                                                    className="cursorPointer"
+                                                />
+                                            </label>
+                                        }
+                                    </ImageListItem>
+                                )
+                            })}
                             {loading && [
                                 <ImageListItem key={`skeleton-1`}><Skeleton variant="rectangular" animatin="wave" width={skeletonWidth} height={skeletonWidth * 0.8} /></ImageListItem>,
                                 <ImageListItem key={`skeleton-2`}><Skeleton variant="rectangular" animatin="wave" width={skeletonWidth} height={skeletonWidth * 1.66} /></ImageListItem>,

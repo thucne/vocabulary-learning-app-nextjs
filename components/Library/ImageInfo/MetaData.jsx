@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import CheckIcon from '@mui/icons-material/Check';
 
 import { Fonts, SXs, Props, Colors } from "@styles";
@@ -174,7 +175,7 @@ const InfoExpand = ({ format, openSecsons, isBreak }) => {
                 ))}
 
                 <Grid container>
-                    <Grid item xs={3}>
+                    <Grid item xs={3} {...Props.GIRSC}>
                         <Typography sx={{ ...styles.keyText }}>URL</Typography>
                     </Grid>
 
@@ -186,14 +187,14 @@ const InfoExpand = ({ format, openSecsons, isBreak }) => {
                                 sx={styles.link}
                                 underline="hover"
                                 className="overflowTypography"
-                                title="Link to image"
+                                title="Open image in new tab"
                             >
-                                {shortenLink(format[1].url, 10)}
+                                {shortenLink(format[1].url, 10)}&nbsp;<OpenInNewIcon sx={{ fontSize: Fonts.FS_14 }} />
                             </MuiLink>
                         </Link>
 
                         <IconButton onClick={copyToClipboard}>
-                            <ContentCopyIcon sx={{ fontSize: [Fonts.FS_12, Fonts.FS_14, Fonts.FS_16] }} />
+                            <ContentCopyIcon sx={{ fontSize: [Fonts.FS_12, Fonts.FS_14] }} />
                         </IconButton>
                     </Grid>
                 </Grid>
@@ -212,6 +213,8 @@ const styles = ({
     },
     link: {
         fontSize: [Fonts.FS_12, Fonts.FS_14],
+        display: 'flex',
+        alignItems: 'center',
     },
     info: {
         display: "flex",
