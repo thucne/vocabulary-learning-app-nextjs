@@ -2,10 +2,14 @@ import React, { useState } from 'react'
 
 import Link from 'next/link';
 
-import Index from "@components/LoadingImage";
+import LoadingImage from "@components/LoadingImage";
 import { Divider, Grid, ListItem, Typography, Link as MuiLink, IconButton } from "@mui/material";
 
-import { ContentCopy as ContentCopyIcon, OpenInNew as OpenInNewIcon } from "@mui/icons-material";
+import {
+    ContentCopy as ContentCopyIcon,
+    OpenInNew as OpenInNewIcon,
+    Image as ImageIcon
+} from "@mui/icons-material";
 
 import { Box } from "@mui/system";
 import { Fonts, Props } from "@styles";
@@ -22,7 +26,7 @@ const ImageSumary = (props) => {
     const infoData = [
         ["Illustration", illustration.word, true, true],
         ["Name", illustration.name],
-        ["Format", illustration.ext],
+        ["Format", illustration.ext, false, false, true],
         ["File size", `${formatBytes(illustration.size * 1024)}`],
         [
             "Dimensions",
@@ -56,13 +60,16 @@ const ImageSumary = (props) => {
             {value === index && (
                 <Box sx={{ p: 3 }}>
                     <div style={{ ...styles.image }}>
-                        <Index
+                        <LoadingImage
                             src={photo}
                             layout="fill"
                             objectFit="contain"
                             // className="transparentBg"
                             className="transparentCheckerboardPattern"
                             bgColor="transparent"
+                            draggable={false}
+                            quality={100}
+                            alt="Image"
                         />
                     </div>
 
@@ -70,7 +77,7 @@ const ImageSumary = (props) => {
                         <Box key={index}>
                             <ListItem sx={{ px: 0 }}>
                                 <Grid container>
-                                    <Grid item xs={3}>
+                                    <Grid item xs={3} {...Props.GIRSC}>
                                         <Typography sx={{ ...styles.textKey }}>
                                             {info[0]}
                                         </Typography>
@@ -92,7 +99,7 @@ const ImageSumary = (props) => {
                                                     </MuiLink>
                                                 </Link> :
                                                 <Typography sx={{ ...styles.textValue }}>
-                                                    {info[1]}
+                                                    {info[4] && <><ImageIcon fontSize="small" />&nbsp;</>}{info[1]}
                                                 </Typography>
                                         }
                                     </Grid>
@@ -105,7 +112,7 @@ const ImageSumary = (props) => {
                     <Box>
                         <ListItem sx={{ px: 0 }}>
                             <Grid container>
-                                <Grid item xs={3}>
+                                <Grid item xs={3} {...Props.GIRSC}>
                                     <Typography sx={{ ...styles.textKey }}>
                                         URL
                                     </Typography>
@@ -119,14 +126,14 @@ const ImageSumary = (props) => {
                                             sx={styles.textValue}
                                             underline="hover"
                                             className="overflowTypography"
-                                            title="Link to image"
+                                            title="Open image in new tab"
                                         >
-                                            {shortenLink(illustration.url, 10)}
+                                            {shortenLink(illustration.url, 10)}&nbsp;<OpenInNewIcon sx={{ fontSize: Fonts.FS_14 }} />
                                         </MuiLink>
                                     </Link>
 
                                     <IconButton onClick={copyToClipboard}>
-                                        <ContentCopyIcon sx={{ fontSize: [Fonts.FS_12, Fonts.FS_14, Fonts.FS_16] }} />
+                                        <ContentCopyIcon sx={{ fontSize: [Fonts.FS_12, Fonts.FS_14] }} />
                                     </IconButton>
                                 </Grid>
                             </Grid>
