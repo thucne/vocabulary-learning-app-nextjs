@@ -810,3 +810,13 @@ export function formatBytes(bytes, decimals = 2) {
 
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
+
+export const getWordList = (userData,set=0, limit=8,  )=>{
+    if(!userData?.vips?.length) return [];
+    
+    let tempt =[...userData.vips]
+
+    let skip = set * limit;
+    let sliced = tempt.slice(skip, skip+limit)
+     return sliced
+}
