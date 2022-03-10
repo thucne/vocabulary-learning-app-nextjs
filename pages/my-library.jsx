@@ -1,5 +1,5 @@
 import Private from "@components/Auth/Private";
-import Library from "@components/Library";
+import Library from "@components/Private/Library";
 import Meta from "@components/Meta";
 import Layout from "@layouts/";
 import React from "react";

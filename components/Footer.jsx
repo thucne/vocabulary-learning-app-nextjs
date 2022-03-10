@@ -54,13 +54,10 @@ const Footer = ({ bottom, landing }) => {
                     <Grid
                         item
                         xs={5}
-                        lg={12}
+                        lg={14}
                         sx={{
                             width: "100%",
                             height: 200,
-                            ":hover": {
-                                filter: "brightness(0.5)",
-                            },
                         }}
                     >
                         <Link href="/" passHref>
@@ -84,7 +81,7 @@ const Footer = ({ bottom, landing }) => {
                             </MuiLink>
                         </Link>
                     </Grid>
-                    <Grid item xs={7} lg={12}>
+                    <Grid item xs={9} lg={14}>
                         <Typography
                             variant="caption"
                             sx={{ lineHeight: "50%", fontWeight: Fonts.FW_300 }}
@@ -208,7 +205,9 @@ const Footer = ({ bottom, landing }) => {
                             </Grid>
                         </Grid>
                     </Grid>
-                    <Grid item xs={12} mt={2}>
+                </Grid>
+                <Grid container>
+                    <Grid item xs={14} mt={2}>
                         This site is protected by reCAPTCHA and the Google{" "}
                         <MuiLink
                             href="https://policies.google.com/privacy"

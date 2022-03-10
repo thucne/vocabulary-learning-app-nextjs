@@ -1,11 +1,9 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
 
-import Image from "next/image";
-
 import {
-    Button, Dialog, DialogContent, DialogContentText, DialogTitle,
-    Box, IconButton, Typography, Grow, Grid, Tabs, Tab, TabList,
-    DialogActions
+    Button, Dialog, DialogContent, DialogTitle,
+    IconButton, Typography, Grid,
+    DialogActions, CircularProgress
 } from '@mui/material';
 
 import {
@@ -69,7 +67,7 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
     useEffect(() => {
         let canRun = true;
         const run = async () => {
-            if (wordIndex < optimizedWordList.length && wordIndex >= 0) {
+            if (wordIndex < optimizedWordList.length && wordIndex >= 0 && canRun) {
                 setLoadingAudio(true);
                 setAudioUrl("");
                 getAudioUrl(optimizedWordList[wordIndex].audio, (url) => {
@@ -295,13 +293,13 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
                                     </Typography>
 
                                     {
-                                        !loadingAudio && <IconButton
+                                        !loadingAudio ? <IconButton
                                             disabled={!optimizedWordList?.[wordIndex]?.audio}
                                             onClick={() => audioRef.current.play()}
                                             sx={{ fontSize: Fonts.FS_16, height: '25px', width: '25px', ml: 1 }}
                                         >
                                             <VolumeUpIcon fontSize='inherit' />
-                                        </IconButton>
+                                        </IconButton> : <CircularProgress size={16} sx={{ ml: 1 }} />
                                     }
 
                                     <audio ref={audioRef}>

@@ -47,7 +47,7 @@ const Private = ({ children, MetaTag }) => {
                 );
                 return;
             }
-            
+
             setLogin(true);
         };
         validate().then(() => setValidate(true));
@@ -130,13 +130,15 @@ const Private = ({ children, MetaTag }) => {
                         </div>
                     </div>
                 </div>
-                <MetaTag />
+                {typeof MetaTag === "function" && <MetaTag />}
+                {typeof MetaTag === "object" && MetaTag}
             </>
         );
     } else {
         return (
             <>
-                <MetaTag />
+                {typeof MetaTag === "function" && <MetaTag />}
+                {typeof MetaTag === "object" && MetaTag}
                 {children}
             </>
         );

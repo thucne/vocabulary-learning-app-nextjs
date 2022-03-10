@@ -64,7 +64,7 @@ const ImageGallery = (props) => {
                         align="center"
                         sx={{ fontSize: Fonts.FS_27, fontWeight: Fonts.FW_400 }}
                     >
-                        Personal Image Library
+                        Image Library
                     </Typography>
                     <Typography
                         variant="h2"
@@ -72,7 +72,7 @@ const ImageGallery = (props) => {
                         align="center"
                         sx={{ fontSize: Fonts.FS_16, fontWeight: Fonts.FW_400, mt: 2 }}
                     >
-                        Display all infomation about your personal image library
+                        Select an image to view its details
                     </Typography>
                 </Grid>
 

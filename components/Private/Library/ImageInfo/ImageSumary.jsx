@@ -86,10 +86,10 @@ const ImageSumary = (props) => {
                                     <Grid item xs={9} {...Props.GIRSC}>
                                         {
                                             info[3] ?
-                                                <Link href={!illustration.public ? `/word/${info[1]}/${illustration.vipId}` : `/word/public/${info[1]}/${illustration.vipId}`} passHref>
+                                                <Link href={!illustration.public ? `/word/${encodeURIComponent(info[1])}/${illustration.vipId}` : `/word/public/${encodeURIComponent(info[1])}/${illustration.vipId}`} passHref>
                                                     <MuiLink
                                                         target="_blank"
-                                                        rel={!illustration.public ? `/word/${info[1]}/${illustration.vipId}` : `/word/public/${info[1]}/${illustration.vipId}`}
+                                                        rel={!illustration.public ? `/word/${encodeURIComponent(info[1])}/${illustration.vipId}` : `/word/public/${encodeURIComponent(info[1])}/${illustration.vipId}`}
                                                         sx={styles.textValue}
                                                         underline="hover"
                                                         className="overflowTypography"
