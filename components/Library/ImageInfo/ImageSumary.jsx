@@ -19,8 +19,6 @@ const ImageSumary = (props) => {
 
     const { illustration, value, index } = props;
 
-    console.log(illustration);
-
     const infoData = [
         ["Illustration", illustration.word, true, true],
         ["Name", illustration.name],
@@ -81,16 +79,16 @@ const ImageSumary = (props) => {
                                     <Grid item xs={9} {...Props.GIRSC}>
                                         {
                                             info[3] ?
-                                                <Link href={`/word/${info[1]}`} passHref>
+                                                <Link href={!illustration.public ? `/word/${info[1]}/${illustration.vipId}` : `/word/public/${info[1]}/${illustration.vipId}`} passHref>
                                                     <MuiLink
                                                         target="_blank"
-                                                        rel={`/word/${info[1]}`}
+                                                        rel={!illustration.public ? `/word/${info[1]}/${illustration.vipId}` : `/word/public/${info[1]}/${illustration.vipId}`}
                                                         sx={styles.textValue}
                                                         underline="hover"
                                                         className="overflowTypography"
                                                         title={`Open "${info[1]}" in new tab`}
                                                     >
-                                                        {info[1]}&nbsp;<OpenInNewIcon sx={{fontSize: Fonts.FS_14}} />
+                                                        {info[1]}&nbsp;<OpenInNewIcon sx={{ fontSize: Fonts.FS_14 }} />
                                                     </MuiLink>
                                                 </Link> :
                                                 <Typography sx={{ ...styles.textValue }}>
