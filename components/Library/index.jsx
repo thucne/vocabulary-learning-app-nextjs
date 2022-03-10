@@ -30,7 +30,7 @@ const Library = () => {
 
     const commonProps = {
         currentImg,
-        handleClose,
+        handleClose
     };
 
     return (

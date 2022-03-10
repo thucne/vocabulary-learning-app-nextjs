@@ -11,11 +11,11 @@ import { Box } from "@mui/system";
 import { Fonts, Props } from "@styles";
 import { getPastelColor, getSizeImage, useThisToGetSizesFromRef, useWindowSize } from '@utils';
 
-import Image from "@components/LoadingImage";
+import LoadingImage from "@components/LoadingImage";
 
 const ImageGallery = (props) => {
 
-    const { illustrationsList, setCurrentImg } = props;
+    const { illustrationsList, setCurrentImg, vips } = props;
     const [imgSizes, setImgSizes] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -76,24 +76,27 @@ const ImageGallery = (props) => {
                     </Typography>
                 </Grid>
 
-                <Grid item xs={12} {...Props.GIRCC} sx={{ p: 5 }}>
-                    <Box sx={{ width: ["100%", "80%"] }}>
+                <Grid item xs={12} {...Props.GIRCC} sx={{ mt: [2, 3, 4] }}>
+                    <Box sx={{ width: ["100%", "95%"] }}>
 
                         <ImageList variant="masonry" cols={cols} gap={8} ref={myRef}>
                             {!loading && illustrationsList.map((illustration, index) => (
                                 <ImageListItem key={index}>
                                     {
-                                        !isNaN(imgSizes?.[index]?.height * 248 / imgSizes?.[index]?.width) && <Image
-                                            src={`${illustration.formats.small.url}`}
-                                            loading="lazy"
-                                            width={248}
-                                            height={imgSizes[index]?.height * 248 / imgSizes[index]?.width}
-                                            alt={illustration?.name || 'Photo'}
-                                            onClick={() => setCurrentImg(illustration)}
-                                            quality={100}
-                                            bgColor={getPastelColor()}
-                                            draggable={false}
-                                        />
+                                        !isNaN(imgSizes?.[index]?.height * 248 / imgSizes?.[index]?.width) && <label title={`Word: ${illustration.word}. Photo: ${illustration.name}` || 'Photo'}>
+                                            <LoadingImage
+                                                src={`${illustration.formats.small.url}`}
+                                                loading="lazy"
+                                                width={248}
+                                                height={imgSizes[index]?.height * 248 / imgSizes[index]?.width}
+                                                alt={illustration?.name || 'Photo'}
+                                                onClick={() => setCurrentImg(illustration)}
+                                                quality={100}
+                                                bgColor={getPastelColor()}
+                                                draggable={false}
+                                                className="cursorPointer"
+                                            />
+                                        </label>
                                     }
                                 </ImageListItem>
                             ))}

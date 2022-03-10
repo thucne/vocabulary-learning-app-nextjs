@@ -747,8 +747,10 @@ export const getIllustrationsList = (userData = {}) => {
 
     let wordList = [...userData.vips];
 
-    return wordList.filter((item) => item.illustration)
-        .map(item => item.illustration);
+    const illustration = wordList.filter((item) => item.illustration)
+        .map(item => ({ ...item.illustration, word: item.vip, public: item.public, vipId: item.id }));
+
+    return illustration;
 }
 
 export const getAllImageFormats = image => {

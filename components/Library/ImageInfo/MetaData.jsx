@@ -59,7 +59,6 @@ const MetaData = (props) => {
                 <Box sx={{ p: 3 }}>
 
                     {/* Origin  */}
-
                     <Box>
                         <Grid ref={buttonRef} item xs={12}>
                             <Button
@@ -205,14 +204,14 @@ const InfoExpand = ({ format, openSecsons, isBreak }) => {
 
 const styles = ({
     keyText: {
-        fontWeight: Fonts.FW_500,
-        fontSize: [Fonts.FS_12, Fonts.FS_14, Fonts.FS_16],
+        fontWeight: Fonts.FW_600,
+        fontSize: [Fonts.FS_12, Fonts.FS_14],
     },
     valueText: {
-        fontSize: [Fonts.FS_12, Fonts.FS_14, Fonts.FS_16],
+        fontSize: [Fonts.FS_12, Fonts.FS_14],
     },
     link: {
-        fontSize: [Fonts.FS_12, Fonts.FS_14, Fonts.FS_16],
+        fontSize: [Fonts.FS_12, Fonts.FS_14],
     },
     info: {
         display: "flex",

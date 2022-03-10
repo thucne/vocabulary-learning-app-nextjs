@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
 
-import Link from 'next/link'
+import Link from 'next/link';
 
 import Index from "@components/LoadingImage";
 import { Divider, Grid, ListItem, Typography, Link as MuiLink, IconButton } from "@mui/material";
 
-import { ContentCopy as ContentCopyIcon } from "@mui/icons-material";
+import { ContentCopy as ContentCopyIcon, OpenInNew as OpenInNewIcon } from "@mui/icons-material";
 
 import { Box } from "@mui/system";
 import { Fonts, Props } from "@styles";
@@ -19,14 +19,17 @@ const ImageSumary = (props) => {
 
     const { illustration, value, index } = props;
 
+    console.log(illustration);
+
     const infoData = [
+        ["Illustration", illustration.word, true, true],
         ["Name", illustration.name],
         ["Format", illustration.ext],
         ["File size", `${formatBytes(illustration.size * 1024)}`],
         [
             "Dimensions",
             `${illustration.width} x ${illustration.height}`,
-            { break: true },
+            true,
         ],
         ["Uploaded", moment(illustration.updatedAt).format("MMM DD, YYYY hh:mm a")],
         ["Created", moment(illustration.createdAt).format("MMM DD, YYYY hh:mm a"), true],
@@ -59,25 +62,41 @@ const ImageSumary = (props) => {
                             src={photo}
                             layout="fill"
                             objectFit="contain"
-                            className="transparentBg"
+                            // className="transparentBg"
+                            className="transparentCheckerboardPattern"
                             bgColor="transparent"
                         />
                     </div>
 
                     {infoData.map((info, index) => (
                         <Box key={index}>
-                            <ListItem>
+                            <ListItem sx={{ px: 0 }}>
                                 <Grid container>
-                                    <Grid item xs={4}>
+                                    <Grid item xs={3}>
                                         <Typography sx={{ ...styles.textKey }}>
                                             {info[0]}
                                         </Typography>
                                     </Grid>
 
-                                    <Grid item xs={8}>
-                                        <Typography sx={{ ...styles.textValue }}>
-                                            {info[1]}
-                                        </Typography>
+                                    <Grid item xs={9} {...Props.GIRSC}>
+                                        {
+                                            info[3] ?
+                                                <Link href={`/word/${info[1]}`} passHref>
+                                                    <MuiLink
+                                                        target="_blank"
+                                                        rel={`/word/${info[1]}`}
+                                                        sx={styles.textValue}
+                                                        underline="hover"
+                                                        className="overflowTypography"
+                                                        title={`Open "${info[1]}" in new tab`}
+                                                    >
+                                                        {info[1]}&nbsp;<OpenInNewIcon sx={{fontSize: Fonts.FS_14}} />
+                                                    </MuiLink>
+                                                </Link> :
+                                                <Typography sx={{ ...styles.textValue }}>
+                                                    {info[1]}
+                                                </Typography>
+                                        }
                                     </Grid>
                                 </Grid>
                             </ListItem>
@@ -86,15 +105,15 @@ const ImageSumary = (props) => {
                     ))}
 
                     <Box>
-                        <ListItem>
+                        <ListItem sx={{ px: 0 }}>
                             <Grid container>
-                                <Grid item xs={4}>
+                                <Grid item xs={3}>
                                     <Typography sx={{ ...styles.textKey }}>
                                         URL
                                     </Typography>
                                 </Grid>
 
-                                <Grid item xs={8}>
+                                <Grid item xs={9}  {...Props.GIRBC}>
                                     <Link href={illustration.url} passHref>
                                         <MuiLink
                                             target="_blank"
@@ -123,11 +142,13 @@ const ImageSumary = (props) => {
 
 const styles = ({
     textKey: {
-        fontWeight: Fonts.FW_800,
-        fontSize: [Fonts.FS_12, Fonts.FS_14, Fonts.FS_16],
+        fontWeight: Fonts.FW_600,
+        fontSize: [Fonts.FS_12, Fonts.FS_14],
     },
     textValue: {
-        fontSize: [Fonts.FS_12, Fonts.FS_14, Fonts.FS_16],
+        fontSize: [Fonts.FS_12, Fonts.FS_14],
+        display: 'flex',
+        alignItems: 'center',
     },
     image: {
         position: "relative",
