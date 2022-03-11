@@ -9,17 +9,6 @@ import { API } from '@config';
 import { deepExtractObjectStrapi } from '@utils';
 
 const PublicWord = ({ vip, relatedVips, params }) => {
-    // const router = useRouter();
-
-    // if (router.isFallback) {
-    //     return <Layout noMeta tabName={'Public Word'}>
-    //         <Meta />
-    //     </Layout>
-    // }
-
-    console.log(relatedVips);
-    console.log(vip);
-
     return (
         <Layout noMeta tabName={vip?.vip}>
             <MetaTag vip={vip} params={params} />
