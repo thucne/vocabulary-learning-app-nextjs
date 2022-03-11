@@ -811,12 +811,85 @@ export function formatBytes(bytes, decimals = 2) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
-export const getWordList = (userData,set=0, limit=8,  )=>{
-    if(!userData?.vips?.length) return [];
-    
-    let tempt =[...userData.vips]
+export const getWordList = (userData, set = 0, limit = 8,) => {
+    if (!userData?.vips?.length) return [];
+
+    let tempt = [...userData.vips]
 
     let skip = set * limit;
-    let sliced = tempt.slice(skip, skip+limit)
-     return sliced
+    let sliced = tempt.slice(skip, skip + limit)
+
+    // modify createdAt for more flexible
+    mockCreatedAt(sliced)
+
+    return sliced
+}
+
+export const mockCreatedAt = (wordList) => {
+    wordList.map((item, index) => {
+        wordList[index].createdAt = generateRandomDate()
+    })
+}
+
+export const generateRandomDate = () => {
+    // random day from last month
+    let randomPastDay = Math.floor(Math.random() * 30)
+
+    let now = new Date()
+    let past = new Date(now.getTime() - randomPastDay * 24 * 60 * 60 * 1000)
+
+    return past.toISOString()
+}
+
+export const gruopWordByDatePeriod = wordList => {
+    // sort by date
+    wordList.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+
+    // calculate days from now
+    wordList.map((item, index) => (
+        wordList[index] = {
+            ...item,
+            fromNow: moment({ hours: 0 }).diff(item.createdAt, 'days')
+        }
+    ))
+
+    const dateLabels = [
+        {
+            date: 'lastYear',
+            range: [31, 365]
+        },
+        {
+            date: "lastMonth",
+            range: [8, 30]
+        },
+        {
+            date: "lastWeek",
+            range: [2, 8]
+        },
+        {
+            date: "yesterday",
+            range: [1, 2]
+        },
+        {
+            date: "today",
+            range: [0, 1],
+        },
+    ]
+
+    let processedData = []
+
+    // group word by date dateLabels
+    dateLabels.map((item, index) => {
+        let temp = wordList.filter(word => {
+            return word.fromNow < item.range[1] && word.fromNow >= item.range[0]
+        })
+        if (temp.length) {
+            processedData.push({
+                date: item.date,
+                data: temp
+            })
+        }
+    })
+
+    return processedData
 }

@@ -7,6 +7,7 @@ import {
   useLayoutEffect,
 } from "react";
 
+import { useDispatch, useSelector } from "react-redux";
 import {
   Container,
   Grid,
@@ -16,46 +17,44 @@ import {
   Paper,
   TextField,
 } from "@mui/material";
-
-import { useDispatch, useSelector } from "react-redux";
+import { Box } from "@mui/system";
 
 import { Fonts, Colors, Props, SXs } from "@styles";
-import { getWordList } from "@utils";
-import { Box } from "@mui/system";
+import { generateRandomDate, getWordList, gruopWordByDatePeriod } from "@utils";
+
+import DateLabesSection from "./DateLabelsSection";
 
 const WordList = () => {
   const userData = useSelector((state) => state.userData);
-  const initWordList = useMemo(() => getWordList(userData), [userData]);
 
-  const listRef = useRef(null);
+  const initWordList = useMemo(() => getWordList(userData), [userData]);
 
   const [wordList, setWordList] = useState(initWordList);
   const [set, setSet] = useState(0);
   const [endOfList, setEndOfList] = useState(false);
+
+  const listRef = useRef(null);
+
   useEffect(() => {
     //scroll to bottom
- 
     if (listRef.current.scrollHeight === listRef.current.clientHeight) {
       listRef.current.scrollTop = listRef.current.scrollHeight;
     } else {
       listRef.current.scrollTop =
         listRef.current.scrollHeight - listRef.current.clientHeight;
     }
-
-    console.log(listRef.current.scrollTop);
   }, [userData]);
 
   useEffect(() => {
-    setWordList(getWordList(userData), [userData]);
+    setWordList(getWordList(userData));
   }, [userData]);
 
   const handleScroll = () => {
-
     if (listRef.current.scrollTop === 0) {
       let fetchList = getWordList(userData, set + 1);
-      if(fetchList.length === 0){
+      if (fetchList.length === 0) {
         setEndOfList(true);
-        return
+        return;
       }
       setWordList((state) => [...fetchList, ...state]);
       setSet((state) => state + 1);
@@ -93,13 +92,12 @@ const WordList = () => {
             >
               <Box
                 ref={listRef}
-                onScroll={handleScroll}
+                onScroll={handleScroll }
                 sx={{ width: "100%", height: "100%", overflowY: "auto" }}
               >
-                {wordList.map((word, index) => (
-                  <div key={index} style={{ height: "100px" }}>
-                    {word.vip} - {new Date(word.createdAt).toLocaleString()}
-                  </div>
+         
+                {gruopWordByDatePeriod(wordList).map((wordsSection, index) => (
+                  <DateLabesSection key={index} dateSegment={wordsSection} />
                 ))}
               </Box>
             </Grid>
