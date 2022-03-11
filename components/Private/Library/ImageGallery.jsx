@@ -81,7 +81,7 @@ const ImageGallery = (props) => {
 
                         <ImageList variant="masonry" cols={cols} gap={8} ref={myRef}>
                             {!loading && illustrationsList.map((illustration, index) => {
-                                const photo = illustration?.formats?.small?.url || illustration?.formats?.medium?.url || illustration?.formats?.large?.url || illustration.url;
+                                const photo = illustration?.formats?.small?.url || illustration?.formats?.medium?.url || illustration?.formats?.large?.url || illustration?.url;
                                 return (
                                     <ImageListItem key={index}>
                                         {

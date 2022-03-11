@@ -37,7 +37,7 @@ const ImageSumary = (props) => {
         ["Created", moment(illustration.createdAt).format("MMM DD, YYYY hh:mm a"), true],
     ];
 
-    const photo = illustration?.formats?.small?.url || illustration?.formats?.medium?.url || illustration?.formats?.large?.url || illustration.url;
+    const photo = illustration?.formats?.small?.url || illustration?.formats?.medium?.url || illustration?.formats?.large?.url || illustration?.url;
 
     const dispatch = useDispatch();
 
