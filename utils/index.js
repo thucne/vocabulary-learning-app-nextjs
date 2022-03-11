@@ -811,12 +811,62 @@ export function formatBytes(bytes, decimals = 2) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
-export const getWordList = (userData,set=0, limit=8,  )=>{
-    if(!userData?.vips?.length) return [];
-    
-    let tempt =[...userData.vips]
+export const getWordList = (userData, set = 0, limit = 8,) => {
+    if (!userData?.vips?.length) return [];
+
+    let tempt = [...userData.vips]
 
     let skip = set * limit;
-    let sliced = tempt.slice(skip, skip+limit)
-     return sliced
+    let sliced = tempt.slice(skip, skip + limit)
+    return sliced
+}
+
+export const deepExtractObjectStrapi = (object, options = {}) => {
+    const {
+        minify,
+        minifyFields = [],
+        minifyPhoto = []
+    } = options;
+
+    // flatten strapi object
+
+    const allKeys = Object.keys(object);
+
+    if (_.isEqual(allKeys, ['id', 'attributes'])) {
+        return { id: object.id, ...deepExtractObjectStrapi(object.attributes, options) };
+    } else {
+
+        const photoData = allKeys.filter(key => {
+            return minifyPhoto?.length ? minifyPhoto.includes(key) : false;
+        }).map(key => {
+            const temp = object[key]?.data?.attributes;
+            const photo = temp?.formats?.small?.url || temp?.formats?.medium?.url || temp?.formats?.large?.url || temp?.url;
+            return { [key]: photo || null }
+        })
+
+        // check if each key is an Strapi object - includes "data", "id" or "attributes"
+        const strapiArrays = allKeys.filter(key => {
+            return object[key]?.data;
+        }).map(key => {
+            const data = object[key]?.data;
+            return {
+                [key]: data && data.length
+                    ? data.map(i => deepExtractObjectStrapi(i, options))
+                    : deepExtractObjectStrapi(data, options)
+            }
+        });
+
+        const nullData = allKeys.filter(key => {
+            return object[key]?.data === null;
+        }).map(key => ({ [key]: null }));
+
+        // convert to object
+        const strapiObject = _.merge({}, ...strapiArrays);
+        const nullObject = _.merge({}, ...nullData);
+        const photoObject = _.merge({}, ...photoData);
+
+        const returnObject = { ...object, ...strapiObject, ...nullObject, ...photoObject };
+
+        return minify ? _.omit(returnObject, minifyFields ? minifyFields : ['createdAt', 'updatedAt']) : returnObject;
+    }
 }
