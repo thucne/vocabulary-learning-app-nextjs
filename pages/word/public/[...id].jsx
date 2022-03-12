@@ -21,8 +21,7 @@ const PublicWord = ({ vip, relatedVips, params }) => {
 
 const MetaTag = ({ vip, params }) => {
 
-    const illustration = vip?.illustration?.data?.attributes;
-    const photo = illustration?.formats?.medium?.url || illustration?.formats?.large?.url || illustration?.url || illustration?.formats?.small?.url;
+    const photo = vip?.illustration;
     const firstMeaning = vip?.meanings?.english[0] || vip?.meanings?.vietnamese[0];
 
     return (
