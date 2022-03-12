@@ -756,13 +756,14 @@ export const getIllustrationsList = (userData = {}) => {
 }
 
 export const getAllImageFormats = image => {
-    if (!image) return null;
+
+    if (!image || _.isEmpty(image?.formats)) return {};
 
     let opens = {};
 
     const arrayOrder = ['origin', 'large', 'medium', 'small', 'thumbnail'];
 
-    const formatArrays = Object.entries(image.formats).sort((a, b) => arrayOrder.indexOf(a[0]) - arrayOrder.indexOf(b[0]));
+    const formatArrays = Object.entries(image?.formats).sort((a, b) => arrayOrder.indexOf(a[0]) - arrayOrder.indexOf(b[0]));
 
     formatArrays.map((item, index) => {
         opens[item[0]] = index == 0 ? true : false
@@ -962,13 +963,13 @@ export const sortRelatedVips = (vip, relatedVips) => {
     const evidences = [];
 
     const sortedRelatedVips = _.isArray(relatedVips) ? relatedVips.sort((a, b) => {
-        const aTags = _.isArray(a?.tags) ? a.tags.flatMap(item => item.name) : [];
-        const aType2 = _.isArray(a?.type2) ? a.type2.flatMap(item => item.name) : [];
+        const aTags = _.isArray(a?.tags) ? a.tags.flatMap(item => item.name) : null;
+        const aType2 = _.isArray(a?.type2) ? a.type2.flatMap(item => item.name) : null;
         const aType1 = a?.type1;
         const aSynonyms = a?.synonyms;
 
-        const bTags = _.isArray(b?.tags) ? b.tags.flatMap(item => item.name) : [];
-        const bType2 = _.isArray(b?.type2) ? b.tags.flatMap(item => item.name) : [];
+        const bTags = _.isArray(b?.tags) ? b.tags.flatMap(item => item.name) : null;
+        const bType2 = _.isArray(b?.type2) ? b.tags.flatMap(item => item.name) : null;
         const bType1 = b?.type1;
         const bSynonyms = b?.synonyms;
 
@@ -982,19 +983,41 @@ export const sortRelatedVips = (vip, relatedVips) => {
         const bType1Intersection = bType1 === vipType1 ? 1 : 0;
         const bSynonymsIntersection = bSynonyms === vipSynonyms ? 1 : 0;
 
-        const aPriority = -(aTagsIntersection.length + aType2Intersection.length + aType1Intersection + aSynonymsIntersection);
-        const bPriority = -(bTagsIntersection.length + bType2Intersection.length + bType1Intersection + bSynonymsIntersection);
+        const aPriority = -(aTagsIntersection.length + aType2Intersection.length * 0.1 + aType1Intersection + aSynonymsIntersection);
+        const bPriority = -(bTagsIntersection.length + bType2Intersection.length * 0.1 + bType1Intersection + bSynonymsIntersection);
 
         if (!evidences.find(item => item.id === a.id)) {
-            evidences.push({ id: a.id, priority: aPriority });
+            evidences.push({
+                id: a.id, priority: aPriority, details: {
+                    aTagsIntersection,
+                    aType2Intersection,
+                    aType1Intersection,
+                    aSynonymsIntersection,
+                    aTags,
+                    aType2
+                }
+            });
         }
 
         if (!evidences.find(item => item.id === b.id)) {
-            evidences.push({ id: b.id, priority: bPriority });
+            evidences.push({
+                id: b.id, priority: bPriority, details: {
+                    bTagsIntersection,
+                    bType2Intersection,
+                    bType1Intersection,
+                    bSynonymsIntersection,
+                    bTags,
+                    bType2
+                }
+            });
         }
 
         return aPriority - bPriority > 0 ? 1 : (aPriority - bPriority < 0 ? -1 : 0);
     }) : [];
 
-    return sortedRelatedVips.map(item => ({ ...item, priority: evidences.find(ev => ev.id === item.id)?.priority }));
+    return sortedRelatedVips.map(item => ({
+        ...item,
+        priority: evidences.find(ev => ev.id === item.id)?.priority,
+        details: evidences.find(ev => ev.id === item.id)?.details
+    }));
 }

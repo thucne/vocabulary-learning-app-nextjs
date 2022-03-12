@@ -13,10 +13,8 @@ import VolumeUpRoundedIcon from '@mui/icons-material/VolumeUpRounded';
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded';
 
-import { styled } from '@mui/system';
-
 import { Props, SXs, Fonts, Colors } from '@styles';
-import { getAudioUrl, getPastelColor, useThisToGetSizesFromRef } from '@utils';
+import { getAudioUrl, useThisToGetSizesFromRef } from '@utils';
 import { AUDIO_ALT } from '@consts';
 import LoadingImage from '@components/LoadingImage';
 
@@ -26,7 +24,6 @@ import _ from 'lodash';
 const PublicWord = ({ vip, relatedVips }) => {
     const [audioUrl, setAudioUrl] = useState("");
     const [loadingAudio, setLoadingAudio] = useState(false);
-    const bgColor = getPastelColor();
 
     const audioRef = useRef(null);
     const gridRef = useRef(null);
@@ -51,16 +48,14 @@ const PublicWord = ({ vip, relatedVips }) => {
     const splitWord = vip.vip?.split(" ");
     const regex = new RegExp(splitWord.join("|"), "gi");
 
-    const actualRelatedVips = relatedVips?.filter(item => item?.priority < 0) || [];
-    const moreRelatedVips = relatedVips?.filter(item => item?.priority >= 0) || [];
+    const actualRelatedVips = relatedVips?.filter(item => item?.priority < -2) || [];
+    const moreRelatedVips = relatedVips?.filter(item => item?.priority >= -2) || [];
 
     const gridSizes = useThisToGetSizesFromRef(gridRef, {
         revalidate: 1000,
         terminalCondition: ({ width }) => width !== 0,
         falseCondition: ({ width }) => width === 0,
     });
-
-    console.log(actualRelatedVips, moreRelatedVips);
 
     useEffect(() => {
         let canRun = true;
@@ -98,7 +93,11 @@ const PublicWord = ({ vip, relatedVips }) => {
                 <Grid item xs={12}>
 
                     {/* main word */}
-                    <Typography variant="h4" component="h1" className='overflowTypography'>
+                    <Typography variant="h4" component="h1" className='overflowTypography'
+                        sx={{
+                            color: theme => theme.palette.publicWord3.main,
+                        }}
+                    >
                         {vip.vip}
                     </Typography>
 
@@ -146,7 +145,7 @@ const PublicWord = ({ vip, relatedVips }) => {
                     <Grid container {...Props.GCRSC}>
                         <Grid item xs={12} {...Props.GIRSC} mt={1} sx={{
                             position: 'relative',
-                            color: (theme) => theme.palette.publicWord2.main
+                            color: (theme) => theme.palette.mainPublicWord.main
                         }}>
 
                             <Typography variant="body2" sx={{ letterSpacing: '-0.5px' }}>
@@ -159,7 +158,7 @@ const PublicWord = ({ vip, relatedVips }) => {
                                     onClick={() => audioRef.current.play()}
                                     sx={{ fontSize: Fonts.FS_16, height: '25px', width: '25px', ml: 0.5 }}
                                 >
-                                    <VolumeUpRoundedIcon fontSize='inherit' sx={{ color: (theme) => theme.palette.publicWord2.main }} />
+                                    <VolumeUpRoundedIcon fontSize='inherit' sx={{ color: (theme) => theme.palette.mainPublicWord.main }} />
                                 </IconButton> : <CircularProgress size={16} sx={{ ml: 0.5 }} />
                             }
 
@@ -171,8 +170,8 @@ const PublicWord = ({ vip, relatedVips }) => {
                     </Grid>
 
                     <Divider sx={{ my: 2 }} textAlign='right'>
-                        <Tooltip title="Add this word to my list" arrow>
-                            <IconButton aria-label='Add this word to my list' sx={{
+                        <Tooltip title="Clone this word" arrow>
+                            <IconButton aria-label='Clone this word' sx={{
                                 backgroundColor: Colors.LOGO_YELLOW,
                                 borderRadius: "12px",
                                 py: 0,
@@ -210,7 +209,6 @@ const PublicWord = ({ vip, relatedVips }) => {
                                         layout='fill'
                                         objectFit='contain'
                                         draggable={false}
-                                        bgColor={bgColor}
                                     />
                                 </div>
                             )
@@ -220,7 +218,7 @@ const PublicWord = ({ vip, relatedVips }) => {
                                 <Typography key={`english-${index}`} variant="body1" mt={index !== 0 ? 1 : 0} sx={{
                                     fontWeight: Fonts.FW_500,
                                     fontSize: Fonts.FS_18,
-                                    color: (theme) => theme.palette.publicWord2.main,
+                                    color: (theme) => theme.palette.mainPublicWord.main,
                                 }}>
                                     → {item}
                                 </Typography>
@@ -237,7 +235,7 @@ const PublicWord = ({ vip, relatedVips }) => {
                                 <Typography key={`vietnamese-${index}`} variant="body1" mt={index !== 0 ? 1 : 0} sx={{
                                     fontWeight: Fonts.FW_500,
                                     fontSize: Fonts.FS_18,
-                                    color: (theme) => theme.palette.publicWord2.main
+                                    color: (theme) => theme.palette.mainPublicWord.main
                                 }}>
                                     → {item}
                                 </Typography>
@@ -254,7 +252,7 @@ const PublicWord = ({ vip, relatedVips }) => {
                                 <Typography key={`example-${index}`} variant="body1" mt={index !== 0 ? 1 : 0} ml={1} sx={{
                                     fontWeight: Fonts.FW_400,
                                     fontSize: Fonts.FS_17,
-                                    color: (theme) => theme.palette.publicWord2.main
+                                    color: (theme) => theme.palette.mainPublicWord.main
                                 }}>
                                     &bull; <i>
                                         {
@@ -291,7 +289,7 @@ const PublicWord = ({ vip, relatedVips }) => {
                         }}>
                             Synonyms
                         </Typography>
-                        <Grid container {...Props.GCRSC} spacing={2}>
+                        <Grid container {...Props.GCRSC} spacing={1} mt={0.5}>
                             {
                                 synonyms.map((item, index) => (
                                     <Grid item key={`synonyms-${index}`} {...Props.GIRCC}>
@@ -321,7 +319,7 @@ const PublicWord = ({ vip, relatedVips }) => {
                         }}>
                             Antonyms
                         </Typography>
-                        <Grid container {...Props.GCRSC} spacing={2}>
+                        <Grid container {...Props.GCRSC} spacing={1} mt={0.5}>
                             {
                                 antonyms.map((item, index) => (
                                     <Grid item key={`antonyms-${index}`} {...Props.GIRCC}>
@@ -343,7 +341,67 @@ const PublicWord = ({ vip, relatedVips }) => {
                 }
 
                 {
+                    (!!actualRelatedVips.length || !!moreRelatedVips.length) && <Grid item xs={12} sx={{
+                        bgcolor: `relatedPaper.main`,
+                        p: 2,
+                        borderRadius: '4px',
+                        overflow: 'hidden',
+                    }}>
+                        <Typography variant="body1" sx={{
+                            fontWeight: Fonts.FW_700,
+                            fontSize: Fonts.FS_14,
+                            color: (theme) => theme.palette.publicWord2.main,
+                            mb: 1, mr: 1,
+                            display: 'inline'
+                        }}>
+                            Related Words
+                        </Typography>
+
+                        {/* Chú thích */}
+                        <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: 'rgba(63, 81, 181, 0.52)', display: 'inline-block', margin: '0px 5px' }} />
+                        <Typography variant="caption" sx={{
+                            fontSize: Fonts.FS_10,
+                            color: 'rgba(63, 81, 181, 0.52)',
+                            mb: 1,
+                            display: 'inline'
+                        }}>
+                            Related
+                        </Typography>
+
+                        <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: 'rgba(155, 49, 77, 0.52)', display: 'inline-block', margin: '0px 5px' }} />
+                        <Typography variant="caption" sx={{
+                            fontSize: Fonts.FS_10,
+                            color: 'rgba(63, 81, 181, 0.52)',
+                            mb: 1,
+                            display: 'inline'
+                        }}>
+                            More
+                        </Typography>
+
+
+                        <Grid container spacing={1} {...Props.GCRSC} mt={1}>
+                            {
+
+                                !!actualRelatedVips.length && actualRelatedVips.map((item, index) => (
+                                    <Grid ref={gridRef} item xs={4} sm={2} key={`actual-related-vip-${index}`}>
+                                        <RelatedVip vip={item} gridSizes={gridSizes} actual={true} />
+                                    </Grid>
+                                ))
+                            }
+                            {
+                                !!moreRelatedVips.length && moreRelatedVips.map((item, index) => (
+                                    <Grid ref={gridRef} item xs={4} sm={2} key={`more-related-vip-${index}`}>
+                                        <RelatedVip vip={item} gridSizes={gridSizes} />
+                                    </Grid>
+                                ))
+                            }
+                        </Grid>
+                    </Grid>
+                }
+
+                {
                     !!tags?.length && <Grid item xs={12}>
+                        <Divider sx={{ my: 2 }} />
                         <Typography variant="body1" sx={{
                             fontWeight: Fonts.FW_700,
                             fontSize: Fonts.FS_14,
@@ -351,7 +409,7 @@ const PublicWord = ({ vip, relatedVips }) => {
                         }}>
                             Keywords
                         </Typography>
-                        <Grid container {...Props.GCRSC} spacing={2}>
+                        <Grid container {...Props.GCRSC} spacing={1} mt={0.5}>
                             {
                                 tags.map((item, index) => (
                                     <Grid item key={`tag-${index}`} {...Props.GIRCC}>
@@ -371,85 +429,22 @@ const PublicWord = ({ vip, relatedVips }) => {
                         <Divider sx={{ my: 2 }} />
                     </Grid>
                 }
-
-                {
-                    (!!actualRelatedVips.length || !!moreRelatedVips.length) && <Grid item xs={12} sx={{
-                        backgroundColor: `${Colors.LOGO_YELLOW}50`,
-                        p: 2,
-                        borderRadius: '4px',
-                        overflow: 'hidden',
-                    }}>
-                        <Typography variant="body1" sx={{
-                            fontWeight: Fonts.FW_700,
-                            fontSize: Fonts.FS_14,
-                            color: (theme) => theme.palette.publicWord2.main,
-                            mb: 1
-                        }}>
-                            Related Words
-                        </Typography>
-                        {
-                            !!actualRelatedVips.length && <Grid
-                                container
-                                columns={[12, 12, 12]}
-                                spacing={1}
-                                {...Props.GCRSC}
-                            >
-                                {
-                                    actualRelatedVips.map((item, index) => (
-                                        <Grid ref={gridRef} item xs={4} sm={2} key={`related-vip-${index}`}>
-                                            <RelatedVip vip={item} gridSizes={gridSizes} actual={true} />
-                                        </Grid>
-                                    ))
-                                }
-                            </Grid>
-                        }
-                    </Grid>
-                }
             </Grid>
         </Container>
     );
 };
-
-const DarkBackGround = ({ actual }) => <div style={{
-    backgroundColor: actual ? 'rgba(63, 81, 181, 0.52)' : 'rgba(155, 49, 77, 0.52)',
-    width: '100%',
-    height: '100%',
-    position: 'absolute',
-    zIndex: 1
-}}>
-</div>;
 
 const RelatedVip = ({ vip, gridSizes, actual = false }) => {
     return (
         <Paper sx={{
             width: _.isNumber(gridSizes?.width) ? `calc(${gridSizes.width}px - 0.5rem)` : 100,
             height: _.isNumber(gridSizes?.width) ? `calc(${gridSizes.width}px - 0.5rem)` : 100,
-            borderRadius: '4px',
-            position: 'relative',
-            overflow: 'hidden',
             background: `url(${vip?.illustration}) center center / cover no-repeat`,
-            color: Colors.WHITE,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexDirection: 'column',
+            ...styles.relatedWords
         }}>
             <DarkBackGround actual={actual} />
             <Link href={!vip?.public ? `/word/${encodeURIComponent(vip?.vip)}/${vip?.id}` : `/word/public/${encodeURIComponent(vip?.vip)}/${vip?.id}`} passHref>
-                <IconButton sx={{
-                    color: Colors.WHITE,
-                    fontSize: Fonts.FS_14,
-                    border: '1px solid rgba(255, 255, 255, 0.5)',
-                    borderRadius: '4px',
-                    zIndex: 1,
-                    "& .MuiTouchRipple-root span": {
-                        borderRadius: "4px",
-                    },
-                    position: 'absolute',
-                    right: '5px',
-                    top: '5px',
-                    p: 0.5
-                }}>
+                <IconButton sx={styles.openInNew}>
                     <OpenInNewRoundedIcon color='inherit' fontSize="inherit" />
                 </IconButton>
             </Link>
@@ -461,6 +456,45 @@ const RelatedVip = ({ vip, gridSizes, actual = false }) => {
             </Typography>
         </Paper>
     )
+}
+
+const DarkBackGround = ({ actual }) => <div style={{
+    backgroundColor: actual ? 'rgba(63, 81, 181, 0.52)' : 'rgba(155, 49, 77, 0.52)',
+    ...styles.darkBG
+}} />;
+
+
+const styles = {
+    openInNew: {
+        color: Colors.WHITE,
+        fontSize: Fonts.FS_20,
+        border: '1px solid rgba(255, 255, 255, 0.5)',
+        borderRadius: '4px',
+        zIndex: 1,
+        "& .MuiTouchRipple-root span": {
+            borderRadius: "4px",
+        },
+        position: 'absolute',
+        right: '5px',
+        top: '5px',
+        p: 0.5
+    },
+    relatedWords: {
+        borderRadius: '4px',
+        position: 'relative',
+        overflow: 'hidden',
+        color: Colors.WHITE,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'column',
+    },
+    darkBG: {
+        width: '100%',
+        height: '100%',
+        position: 'absolute',
+        zIndex: 1
+    }
 }
 
 export default PublicWord;
