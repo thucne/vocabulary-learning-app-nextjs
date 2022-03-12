@@ -12,6 +12,8 @@ import _ from 'lodash';
 import axios from 'axios';
 import moment from 'moment';
 
+import { NO_PHOTO } from "@consts";
+
 export const isAuth = () => {
     if (typeof window !== "undefined") {
         if (localStorage.getItem("vip-user")) {
@@ -902,6 +904,9 @@ export const deepExtractObjectStrapi = (object, options = {}) => {
     } = options;
 
     // flatten strapi object
+    if (!_.isObject(object) || _.isEmpty(object)) {
+        return null;
+    }
 
     const allKeys = Object.keys(object);
 
@@ -919,8 +924,8 @@ export const deepExtractObjectStrapi = (object, options = {}) => {
                     ? data.map(i => deepExtractObjectStrapi(i, options))
                     : deepExtractObjectStrapi(data, options)
             }
-        }); 
-        
+        });
+
 
         const nullData = allKeys.filter(key => {
             return _.isObject(object[key]?.data) && _.isEmpty(object[key]?.data);
@@ -930,7 +935,7 @@ export const deepExtractObjectStrapi = (object, options = {}) => {
             return minifyPhoto?.length ? minifyPhoto.includes(key) : false;
         }).map(key => {
             const temp = object[key]?.data?.attributes;
-            const photo = temp?.formats?.small?.url || temp?.formats?.medium?.url || temp?.formats?.large?.url || temp?.url;
+            const photo = temp?.formats?.small?.url || temp?.formats?.medium?.url || temp?.formats?.large?.url || temp?.url || NO_PHOTO;
             return { [key]: photo || null }
         })
 
@@ -943,4 +948,53 @@ export const deepExtractObjectStrapi = (object, options = {}) => {
 
         return minify ? _.omit(returnObject, minifyFields ? minifyFields : ['createdAt', 'updatedAt']) : returnObject;
     }
+}
+
+export const sortRelatedVips = (vip, relatedVips) => {
+
+    const vipTags = _.isArray(vip?.tags) ? vip.tags.flatMap(item => item.name) : [];
+    const vipType2 = _.isArray(vip?.type2) ? vip.type2.flatMap(item => item.name) : [];
+    const vipType1 = vip?.type1;
+    const vipSynonyms = vip?.synonyms;
+
+    // sort related vips
+
+    const evidences = [];
+
+    const sortedRelatedVips = _.isArray(relatedVips) ? relatedVips.sort((a, b) => {
+        const aTags = _.isArray(a?.tags) ? a.tags.flatMap(item => item.name) : [];
+        const aType2 = _.isArray(a?.type2) ? a.type2.flatMap(item => item.name) : [];
+        const aType1 = a?.type1;
+        const aSynonyms = a?.synonyms;
+
+        const bTags = _.isArray(b?.tags) ? b.tags.flatMap(item => item.name) : [];
+        const bType2 = _.isArray(b?.type2) ? b.tags.flatMap(item => item.name) : [];
+        const bType1 = b?.type1;
+        const bSynonyms = b?.synonyms;
+
+        const aTagsIntersection = _.intersection(aTags, vipTags);
+        const aType2Intersection = _.intersection(aType2, vipType2);
+        const aType1Intersection = aType1 === vipType1 ? 1 : 0;
+        const aSynonymsIntersection = aSynonyms === vipSynonyms ? 1 : 0;
+
+        const bTagsIntersection = _.intersection(bTags, vipTags);
+        const bType2Intersection = _.intersection(bType2, vipType2);
+        const bType1Intersection = bType1 === vipType1 ? 1 : 0;
+        const bSynonymsIntersection = bSynonyms === vipSynonyms ? 1 : 0;
+
+        const aPriority = -(aTagsIntersection.length + aType2Intersection.length + aType1Intersection + aSynonymsIntersection);
+        const bPriority = -(bTagsIntersection.length + bType2Intersection.length + bType1Intersection + bSynonymsIntersection);
+
+        if (!evidences.find(item => item.id === a.id)) {
+            evidences.push({ id: a.id, priority: aPriority });
+        }
+
+        if (!evidences.find(item => item.id === b.id)) {
+            evidences.push({ id: b.id, priority: bPriority });
+        }
+
+        return aPriority - bPriority > 0 ? 1 : (aPriority - bPriority < 0 ? -1 : 0);
+    }) : [];
+
+    return sortedRelatedVips.map(item => ({ ...item, priority: evidences.find(ev => ev.id === item.id)?.priority }));
 }

@@ -6,9 +6,10 @@ import Layout from "@layouts";
 import Meta from "@meta";
 import PublicWordComponent from "@components/Words/Public";
 import { API } from '@config';
-import { deepExtractObjectStrapi } from '@utils';
+import { deepExtractObjectStrapi, sortRelatedVips } from '@utils';
 
 const PublicWord = ({ vip, relatedVips, params }) => {
+
     return (
         <Layout noMeta tabName={vip?.vip}>
             <MetaTag vip={vip} params={params} />
@@ -65,16 +66,23 @@ export async function getStaticProps(ctx) {
     const formattedRelatedVips = relatedVips
         .map(item => deepExtractObjectStrapi(item, {
             minify: true,
-            minifyFields: ['tags', 'meanings', 'examples', 'audio', 'synonyms', 'antonyms', 'lastReview', 'lastReviewOK'],
+            minifyFields: ['lastReview', 'lastReviewOK', , 'antonyms', 'audio', 'createdAt', 'updatedAt'],
             minifyPhoto: ['illustration']
         }));
 
-    const randomTenRelatedVips = formattedRelatedVips.sort(() => 0.5 - Math.random()).slice(0, 10);
+    const sortedRelatedVips = sortRelatedVips(matchedVip, formattedRelatedVips);
+
+    const minifiedRelatedVips = sortedRelatedVips.map(item => deepExtractObjectStrapi(item, {
+        minify: true,
+        minifyFields: ['tags', 'meanings', 'examples', 'synonyms']
+    }));
+
+    const randomSixRelatedVips = minifiedRelatedVips.slice(0, 6);
 
     return {
         props: {
             vip: matchedVip,
-            relatedVips: randomTenRelatedVips,
+            relatedVips: randomSixRelatedVips,
             params: ctx.params,
         },
         revalidate: 60

@@ -85,6 +85,7 @@ const ListContent = ({ form, formField, label, handleDeleteItem }) => {
                                     height: 20,
                                     fontSize: "inherit",
                                     color: "red",
+                                    mr: 1
                                 }}
                             >
                                 <DeleteForeverIcon fontSize="inherit" />
@@ -134,6 +135,7 @@ const ListContent = ({ form, formField, label, handleDeleteItem }) => {
                                                         width: 20,
                                                         height: 20,
                                                         fontSize: "inherit",
+                                                        mr: 1
                                                     }}
                                                 >
                                                     <RemoveCircleIcon fontSize="inherit" />
