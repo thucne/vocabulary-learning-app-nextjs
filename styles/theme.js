@@ -36,6 +36,12 @@ const MyTheme = (mode) => ({
     drawer: {
         main: mode === "light" ? Colors.GRAY_5 : Colors.WHITE,
     },
+    publicWord1: {
+        main: mode === "light" ? Colors.LOGO_RED : Colors.WHITE,
+    },
+    publicWord2: {
+        main: mode === "light" ? Colors.BLUE_PUBLIC_WORDS : Colors.WHITE,
+    }
 });
 
 export default MyTheme;

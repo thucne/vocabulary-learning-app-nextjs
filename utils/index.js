@@ -818,7 +818,7 @@ export const getWordList = (userData, set = 0, limit = 8,) => {
 
     let skip = set * limit;
     let sliced = tempt.slice(skip, skip + limit)
-    
+
     // modify createdAt for more flexible
     mockCreatedAt(sliced)
 
@@ -909,14 +909,6 @@ export const deepExtractObjectStrapi = (object, options = {}) => {
         return { id: object.id, ...deepExtractObjectStrapi(object.attributes, options) };
     } else {
 
-        const photoData = allKeys.filter(key => {
-            return minifyPhoto?.length ? minifyPhoto.includes(key) : false;
-        }).map(key => {
-            const temp = object[key]?.data?.attributes;
-            const photo = temp?.formats?.small?.url || temp?.formats?.medium?.url || temp?.formats?.large?.url || temp?.url;
-            return { [key]: photo || null }
-        })
-
         // check if each key is an Strapi object - includes "data", "id" or "attributes"
         const strapiArrays = allKeys.filter(key => {
             return object[key]?.data;
@@ -927,11 +919,20 @@ export const deepExtractObjectStrapi = (object, options = {}) => {
                     ? data.map(i => deepExtractObjectStrapi(i, options))
                     : deepExtractObjectStrapi(data, options)
             }
-        });
+        }); 
+        
 
         const nullData = allKeys.filter(key => {
-            return object[key]?.data === null;
+            return _.isObject(object[key]?.data) && _.isEmpty(object[key]?.data);
         }).map(key => ({ [key]: null }));
+
+        const photoData = allKeys.filter(key => {
+            return minifyPhoto?.length ? minifyPhoto.includes(key) : false;
+        }).map(key => {
+            const temp = object[key]?.data?.attributes;
+            const photo = temp?.formats?.small?.url || temp?.formats?.medium?.url || temp?.formats?.large?.url || temp?.url;
+            return { [key]: photo || null }
+        })
 
         // convert to object
         const strapiObject = _.merge({}, ...strapiArrays);

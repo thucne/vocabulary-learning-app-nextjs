@@ -159,3 +159,7 @@ export const BG_MAIN_DARK = "#2a3eb1";
 // Image background
 export const IMG_GREY_DARK = "#263238";
 export const IMG_GREY = "#F6F9FC";
+
+
+// blue public words
+export const BLUE_PUBLIC_WORDS = "#1d2a57";
