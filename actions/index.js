@@ -168,3 +168,18 @@ export const updateUser = (data, id) => async (dispatch) => {
         .then((res) => handleCommonResponse(res))
         .catch((err) => handleServerError(err));
 };
+
+export const subscribeVip = (id, token) => async (dispatch) => {
+    if (!getJWT()) {
+        return { error: "Empty jwt." };
+    }
+    return await axios
+        .put(`${API}/api/users/subscribe/${id}`, { token }, {
+            headers: {
+                Authorization: `Bearer ${getJWT()}`,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then((res) => handleCommonResponse(res))
+        .catch((err) => handleServerError(err));
+}

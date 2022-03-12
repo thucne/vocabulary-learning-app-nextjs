@@ -17,7 +17,11 @@ import { Props, SXs, Fonts, Colors } from '@styles';
 import { getAudioUrl, useThisToGetSizesFromRef } from '@utils';
 import { AUDIO_ALT } from '@consts';
 import LoadingImage from '@components/LoadingImage';
+import { subscribeVip } from "@actions";
+import * as t from '@consts';
+import { RECAPTCHA } from '@config';
 
+import { useSelector, useDispatch } from "react-redux";
 import parser from 'html-react-parser';
 import _ from 'lodash';
 
@@ -27,6 +31,9 @@ const PublicWord = ({ vip, relatedVips }) => {
 
     const audioRef = useRef(null);
     const gridRef = useRef(null);
+
+    const dispatch = useDispatch();
+    const recaptcha = useSelector(state => state.recaptcha);
 
     const type1 = vip?.type1;
     const type2 = vip?.type2;
@@ -79,6 +86,26 @@ const PublicWord = ({ vip, relatedVips }) => {
         return () => canRun = false;
 
     }, [audio]);
+
+    const handleSubscribe = (e) => {
+        e?.preventDefault();
+
+        if (window?.adHocFetch && recaptcha === true && window.grecaptcha) {
+            grecaptcha.ready(function () {
+                grecaptcha
+                    .execute(`${RECAPTCHA}`, { action: "vip_authentication" })
+                    .then(function (token) {
+                        adHocFetch({
+                            dispatch,
+                            action: subscribeVip(vip?.id, token),
+                            onSuccess: (data) => console.log(data),
+                            onError: (error) => console.log(error),
+                            snackbarMessageOnSuccess: "Update infomation success!",
+                        });
+                    });
+            });
+        }
+    }
 
     return (
         <Container maxWidth="md">
@@ -170,8 +197,8 @@ const PublicWord = ({ vip, relatedVips }) => {
                     </Grid>
 
                     <Divider sx={{ my: 2 }} textAlign='right'>
-                        <Tooltip title="Clone this word" arrow>
-                            <IconButton aria-label='Clone this word' sx={{
+                        <Tooltip title="Add this word to my word list" arrow>
+                            <IconButton aria-label='Add this word to my word list' sx={{
                                 backgroundColor: Colors.LOGO_YELLOW,
                                 borderRadius: "12px",
                                 py: 0,
@@ -183,7 +210,7 @@ const PublicWord = ({ vip, relatedVips }) => {
                                     borderRadius: "12px",
                                     py: 0
                                 },
-                            }}>
+                            }} onClick={handleSubscribe}>
                                 <PlaylistAddIcon color='white' />
                             </IconButton>
                         </Tooltip>
