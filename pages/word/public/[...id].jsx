@@ -14,22 +14,22 @@ import _ from 'lodash';
 
 const PublicWord = ({ vip, relatedVips, params }) => {
 
-    if (_.isEmpty(vip)) {
-        return (
-            <Layout tabName={"Private word"}>
-                <ErrorPage
-                    title="Word Not Found | VIP"
-                    errorMessage="Not Found"
-                    message="The word you are looking for does not exist."
-                    illustration={NO_PHOTO}
-                    redirectTo={{
-                        title: "Dashboard",
-                        link: "/dashboard",
-                    }}
-                />
-            </Layout>
-        )
-    }
+    // if (_.isEmpty(vip)) {
+    //     return (
+    //         <Layout tabName={"Private word"}>
+    //             <ErrorPage
+    //                 title="Word Not Found | VIP"
+    //                 errorMessage="Not Found"
+    //                 message="The word you are looking for does not exist."
+    //                 illustration={NO_PHOTO}
+    //                 redirectTo={{
+    //                     title: "Dashboard",
+    //                     link: "/dashboard",
+    //                 }}
+    //             />
+    //         </Layout>
+    //     )
+    // }
 
     return (
         <Layout noMeta tabName={vip?.vip}>
