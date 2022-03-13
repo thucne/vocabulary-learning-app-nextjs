@@ -919,8 +919,8 @@ export const deepExtractObjectStrapi = (object, options = {}) => {
                     ? data.map(i => deepExtractObjectStrapi(i, options))
                     : deepExtractObjectStrapi(data, options)
             }
-        }); 
-        
+        });
+
 
         const nullData = allKeys.filter(key => {
             return _.isObject(object[key]?.data) && _.isEmpty(object[key]?.data);
@@ -943,4 +943,9 @@ export const deepExtractObjectStrapi = (object, options = {}) => {
 
         return minify ? _.omit(returnObject, minifyFields ? minifyFields : ['createdAt', 'updatedAt']) : returnObject;
     }
+}
+
+
+export const generateVipLink = (status, vip,id) => {
+    return status ? `/word/public/${vip}/${id}` : `/word/${vip}/${id}`
 }

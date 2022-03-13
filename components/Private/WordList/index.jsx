@@ -23,6 +23,7 @@ import { Fonts, Colors, Props, SXs } from "@styles";
 import { generateRandomDate, getWordList, gruopWordByDatePeriod } from "@utils";
 
 import DateLabesSection from "./DateLabelsSection";
+import EditForm from "./EditForm";
 
 const WordList = () => {
   const userData = useSelector((state) => state.userData);
@@ -32,7 +33,8 @@ const WordList = () => {
   const [wordList, setWordList] = useState(initWordList);
   const [set, setSet] = useState(0);
   const [endOfList, setEndOfList] = useState(false);
-
+  const [open, setOpen] = useState(false);
+  const [currentWord, setCurrentWord] = useState(null);
   const listRef = useRef(null);
 
   useEffect(() => {
@@ -48,6 +50,15 @@ const WordList = () => {
   useEffect(() => {
     setWordList(getWordList(userData));
   }, [userData]);
+
+  const handleCloseDialog = () => {
+    setOpen(false);
+    setCurrentWord(null)
+  };
+
+  const handleOpenDialog = () => {
+    setOpen(true);
+  };
 
   const handleScroll = () => {
     if (listRef.current.scrollTop === 0) {
@@ -92,18 +103,31 @@ const WordList = () => {
             >
               <Box
                 ref={listRef}
-                onScroll={handleScroll }
+                onScroll={handleScroll}
                 sx={{ width: "100%", height: "100%", overflowY: "auto" }}
               >
-         
                 {gruopWordByDatePeriod(wordList).map((wordsSection, index) => (
-                  <DateLabesSection key={index} dateSegment={wordsSection} />
+                  <DateLabesSection
+                    key={index}
+                    dateSegment={wordsSection}
+                    setCurrentWord={setCurrentWord}
+                    setOpen={setOpen}
+                  />
                 ))}
               </Box>
             </Grid>
           </Grid>
         </Grid>
       </Grid>
+
+      {currentWord && (
+        <EditForm
+          open={open}
+          handleClose={handleCloseDialog}
+          word={currentWord}
+          setOpen={setOpen}
+        />
+      )}
     </Container>
   );
 };

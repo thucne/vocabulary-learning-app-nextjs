@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import { Box } from "@mui/system";
 import WordInfo from "./WordInfo";
@@ -15,11 +15,13 @@ import { Colors } from "@styles";
  * @function DateLabesSection
  **/
 
-function DateLabesSection({ dateSegment }) {
-
+function DateLabesSection({ dateSegment, setCurrentWord,setOpen }) {
+    
   const [checkList, setScheckList] = useState(
     Array.from(Array(dateSegment.data.length).keys()).map(() => false)
   );
+
+
 
   const [isCheckAll, setIsCheckAll] = useState(false);
 
@@ -28,6 +30,7 @@ function DateLabesSection({ dateSegment }) {
     newCheckList[index] = !newCheckList[index];
     setScheckList(newCheckList);
   };
+
 
   const handleCheckAll = () => {
     if (isCheckAll) {
@@ -68,6 +71,8 @@ function DateLabesSection({ dateSegment }) {
           word={word}
           checked={checkList[index]}
           handleCheckBox={handleCheckSingleBox}
+          setCurrentWord={setCurrentWord}
+          setOpen={setOpen}
         />
       ))}
     </React.Fragment>
