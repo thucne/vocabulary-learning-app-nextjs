@@ -945,6 +945,76 @@ export const deepExtractObjectStrapi = (object, options = {}) => {
     }
 }
 
+export const sortRelatedVips = (vip, relatedVips) => {
+
+    const vipTags = _.isArray(vip?.tags) ? vip.tags.flatMap(item => item.name) : [];
+    const vipType2 = _.isArray(vip?.type2) ? vip.type2.flatMap(item => item.name) : [];
+    const vipType1 = vip?.type1;
+    const vipSynonyms = vip?.synonyms;
+
+    // sort related vips
+
+    const evidences = [];
+
+    const sortedRelatedVips = _.isArray(relatedVips) ? relatedVips.sort((a, b) => {
+        const aTags = _.isArray(a?.tags) ? a.tags.flatMap(item => item.name) : null;
+        const aType2 = _.isArray(a?.type2) ? a.type2.flatMap(item => item.name) : null;
+        const aType1 = a?.type1;
+        const aSynonyms = a?.synonyms;
+
+        const bTags = _.isArray(b?.tags) ? b.tags.flatMap(item => item.name) : null;
+        const bType2 = _.isArray(b?.type2) ? b.tags.flatMap(item => item.name) : null;
+        const bType1 = b?.type1;
+        const bSynonyms = b?.synonyms;
+
+        const aTagsIntersection = _.intersection(aTags, vipTags);
+        const aType2Intersection = _.intersection(aType2, vipType2);
+        const aType1Intersection = aType1 === vipType1 ? 1 : 0;
+        const aSynonymsIntersection = aSynonyms === vipSynonyms ? 1 : 0;
+
+        const bTagsIntersection = _.intersection(bTags, vipTags);
+        const bType2Intersection = _.intersection(bType2, vipType2);
+        const bType1Intersection = bType1 === vipType1 ? 1 : 0;
+        const bSynonymsIntersection = bSynonyms === vipSynonyms ? 1 : 0;
+
+        const aPriority = -(aTagsIntersection.length + aType2Intersection.length * 0.1 + aType1Intersection + aSynonymsIntersection);
+        const bPriority = -(bTagsIntersection.length + bType2Intersection.length * 0.1 + bType1Intersection + bSynonymsIntersection);
+
+        if (!evidences.find(item => item.id === a.id)) {
+            evidences.push({
+                id: a.id, priority: aPriority, details: {
+                    aTagsIntersection,
+                    aType2Intersection,
+                    aType1Intersection,
+                    aSynonymsIntersection,
+                    aTags,
+                    aType2
+                }
+            });
+        }
+
+        if (!evidences.find(item => item.id === b.id)) {
+            evidences.push({
+                id: b.id, priority: bPriority, details: {
+                    bTagsIntersection,
+                    bType2Intersection,
+                    bType1Intersection,
+                    bSynonymsIntersection,
+                    bTags,
+                    bType2
+                }
+            });
+        }
+
+        return aPriority - bPriority > 0 ? 1 : (aPriority - bPriority < 0 ? -1 : 0);
+    }) : [];
+
+    return sortedRelatedVips.map(item => ({
+        ...item,
+        priority: evidences.find(ev => ev.id === item.id)?.priority,
+        details: evidences.find(ev => ev.id === item.id)?.details
+    }));
+}
 
 export const generateVipLink = (status, vip,id) => {
     return status ? `/word/public/${vip}/${id}` : `/word/${vip}/${id}`
