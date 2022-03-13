@@ -904,7 +904,11 @@ export const deepExtractObjectStrapi = (object = {}, options = {}) => {
         } = options;
 
         // flatten strapi object
-        if (_.isObject(object?.data)) {
+        if (Object.keys(object).includes('data') && _.isNull(object?.data)) {
+            return null;
+        }
+
+        if (Object.keys(object).includes('data') && _.isObject(object?.data)) {
             object = object.data
         }
 

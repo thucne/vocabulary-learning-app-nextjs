@@ -5,6 +5,9 @@ import { withRouter } from 'next/router';
 import Layout from "@layouts";
 import Meta from "@meta";
 import PublicWordComponent from "@components/Words/Public";
+import LoadingOrNotFound from '@components/Words/LoadingOrNotFound';
+import ErrorPage from "@components/Error";
+
 import { API } from '@config';
 import { deepExtractObjectStrapi, sortRelatedVips, getJWT } from '@utils';
 import Private from '@components/Auth/Private';
@@ -12,7 +15,6 @@ import { fetcherJWT } from '@actions';
 import { Props, Fonts, Colors } from '@styles';
 import { NO_PHOTO } from '@consts';
 
-import ErrorPage from "@components/Error";
 import qs from 'qs';
 
 import {
@@ -39,7 +41,7 @@ const PrivateWord = ({ router = { query: {} } }) => {
         },
         pagination: {
             page: 1,
-            pageSize: 100
+            pageSize: 1000
         }
     }
 
@@ -123,67 +125,6 @@ const PrivateWord = ({ router = { query: {} } }) => {
         </Private>
     );
 };
-
-const LoadingOrNotFound = () => (
-    <Container maxWidth="md">
-        <Grid container {...Props.GCRSC}>
-            <Grid item xs={12} mt={2}>
-                <Typography variant="caption">
-                    <Skeleton width="50%" />
-                </Typography>
-                <Divider sx={{ my: 2 }} />
-            </Grid>
-
-            <Grid item xs={12}>
-
-                {/* main word */}
-                <Typography variant="h4" component="h1" className='overflowTypography'
-                    sx={{
-                        color: theme => theme.palette.publicWord3.main,
-                    }}
-                >
-                    <Skeleton width="20%" />
-                </Typography>
-
-                {/* type2 */}
-                <Grid container {...Props.GCRSC} spacing={0.5} mt={1}>
-                    <Typography sx={{
-                        fontWeight: Fonts.FW_500,
-                        fontSize: Fonts.FS_14,
-                        px: 0.5,
-                        mr: 1,
-                        borderRadius: '0.25rem',
-                    }}>
-                        <Skeleton width={30} />
-                    </Typography>
-                </Grid>
-
-                {/* audio */}
-                <Grid container {...Props.GCRSC}>
-                    <Grid item xs={12} {...Props.GIRSC} mt={1} sx={{
-                        position: 'relative',
-                        color: (theme) => theme.palette.mainPublicWord.main
-                    }}>
-
-                        <Typography variant="body2" sx={{ letterSpacing: '-0.5px' }}>
-                            <Skeleton width={50} />
-                        </Typography>
-
-                    </Grid>
-                </Grid>
-
-                <Divider sx={{ my: 2 }}>
-                </Divider>
-
-            </Grid>
-
-            <Grid item xs={12}>
-                <Skeleton height={100} />
-            </Grid>
-
-        </Grid>
-    </Container >
-)
 
 const MetaTag = ({ vip, params }) => {
 

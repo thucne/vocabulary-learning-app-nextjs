@@ -3,12 +3,33 @@ import React from 'react';
 import Layout from "@layouts";
 import Meta from "@meta";
 import PublicWordComponent from "@components/Words/Public";
+import ErrorPage from "@components/Error";
+
 import { API } from '@config';
 import { deepExtractObjectStrapi, sortRelatedVips } from '@utils';
+import { NO_PHOTO } from '@consts';
 
 import qs from 'qs';
+import _ from 'lodash';
 
 const PublicWord = ({ vip, relatedVips, params }) => {
+    console.log(vip);
+    if (_.isEmpty(vip)) {
+        return (
+            <Layout tabName={"Private word"}>
+                <ErrorPage
+                    title="Word Not Found | VIP"
+                    errorMessage="Word Not Found"
+                    message="The word you are looking for does not exist."
+                    illustration={NO_PHOTO}
+                    redirectTo={{
+                        title: "Go to Homepage",
+                        link: "/",
+                    }}
+                />
+            </Layout>
+        )
+    }
 
     return (
         <Layout noMeta tabName={vip?.vip}>
@@ -63,7 +84,7 @@ export async function getStaticProps(ctx) {
         },
         pagination: {
             page: 1,
-            pageSize: 100
+            pageSize: 1000
         }
     }
 
