@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { useRouter } from 'next/router';
+
 import Layout from "@layouts";
 import Meta from "@meta";
 import PublicWordComponent from "@components/Words/Public";
@@ -13,23 +15,24 @@ import qs from 'qs';
 import _ from 'lodash';
 
 const PublicWord = ({ vip, relatedVips, params }) => {
+    const router = useRouter();
 
-    // if (_.isEmpty(vip)) {
-    //     return (
-    //         <Layout tabName={"Private word"}>
-    //             <ErrorPage
-    //                 title="Word Not Found | VIP"
-    //                 errorMessage="Not Found"
-    //                 message="The word you are looking for does not exist."
-    //                 illustration={NO_PHOTO}
-    //                 redirectTo={{
-    //                     title: "Dashboard",
-    //                     link: "/dashboard",
-    //                 }}
-    //             />
-    //         </Layout>
-    //     )
-    // }
+    if (router.isFallback || _.isEmpty(vip)) {
+        return (
+            <Layout tabName={"Private word"}>
+                <ErrorPage
+                    title="Word Not Found | VIP"
+                    errorMessage="Not Found"
+                    message="The word you are looking for does not exist."
+                    illustration={NO_PHOTO}
+                    redirectTo={{
+                        title: "Dashboard",
+                        link: "/dashboard",
+                    }}
+                />
+            </Layout>
+        )
+    }
 
     return (
         <Layout noMeta tabName={vip?.vip}>
@@ -50,8 +53,8 @@ const MetaTag = ({ vip, params }) => {
             title={`${vip?.vip} - VIP`}
             description={firstMeaning}
             image={photo}
-            url={`/word/public/${params.id[0]}/${params.id[1]}`}
-            canonical={`/word/public/${params.id[0]}/${params.id[1]}`}
+            url={`/word/public/${params?.id?.[0]}/${params?.id?.[1]}`}
+            canonical={`/word/public/${params?.id?.[0]}/${params?.id?.[1]}`}
             publishedTime={vip?.createdAt}
             modifiedTime={vip?.updatedAt}
         />
@@ -67,7 +70,7 @@ export async function getStaticPaths() {
 
     return {
         paths,
-        fallback: true,
+        fallback: 'blocking',
     };
 }
 
