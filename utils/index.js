@@ -12,8 +12,6 @@ import _ from 'lodash';
 import axios from 'axios';
 import moment from 'moment';
 
-import { NO_PHOTO } from "@consts";
-
 export const isAuth = () => {
     if (typeof window !== "undefined") {
         if (localStorage.getItem("vip-user")) {
@@ -756,14 +754,13 @@ export const getIllustrationsList = (userData = {}) => {
 }
 
 export const getAllImageFormats = image => {
-
-    if (!image || _.isEmpty(image?.formats)) return {};
+    if (!image) return null;
 
     let opens = {};
 
     const arrayOrder = ['origin', 'large', 'medium', 'small', 'thumbnail'];
 
-    const formatArrays = Object.entries(image?.formats).sort((a, b) => arrayOrder.indexOf(a[0]) - arrayOrder.indexOf(b[0]));
+    const formatArrays = Object.entries(image.formats).sort((a, b) => arrayOrder.indexOf(a[0]) - arrayOrder.indexOf(b[0]));
 
     formatArrays.map((item, index) => {
         opens[item[0]] = index == 0 ? true : false
@@ -905,9 +902,6 @@ export const deepExtractObjectStrapi = (object, options = {}) => {
     } = options;
 
     // flatten strapi object
-    if (!_.isObject(object) || _.isEmpty(object)) {
-        return null;
-    }
 
     const allKeys = Object.keys(object);
 
@@ -936,7 +930,7 @@ export const deepExtractObjectStrapi = (object, options = {}) => {
             return minifyPhoto?.length ? minifyPhoto.includes(key) : false;
         }).map(key => {
             const temp = object[key]?.data?.attributes;
-            const photo = temp?.formats?.small?.url || temp?.formats?.medium?.url || temp?.formats?.large?.url || temp?.url || NO_PHOTO;
+            const photo = temp?.formats?.small?.url || temp?.formats?.medium?.url || temp?.formats?.large?.url || temp?.url;
             return { [key]: photo || null }
         })
 
@@ -1020,4 +1014,8 @@ export const sortRelatedVips = (vip, relatedVips) => {
         priority: evidences.find(ev => ev.id === item.id)?.priority,
         details: evidences.find(ev => ev.id === item.id)?.details
     }));
+}
+
+export const generateVipLink = (status, vip,id) => {
+    return status ? `/word/public/${vip}/${id}` : `/word/${vip}/${id}`
 }
