@@ -63,7 +63,14 @@ const MetaTag = ({ vip, params }) => {
 
 export async function getStaticPaths() {
 
-    const res = await fetch(`${API}/api/vips`);
+    const querySearchRelated = {
+        pagination: {
+            page: 1,
+            pageSize: 1000
+        }
+    }
+
+    const res = await fetch(`${API}/api/vips?${qs.stringify(querySearchRelated, { encodeValuesOnly: true })}`);
     const data = (await res.json()).data;
 
     const paths = !!data?.length ? data.map(item => ({ params: { id: [item.attributes.vip, item.id.toString()] } })) : [];
