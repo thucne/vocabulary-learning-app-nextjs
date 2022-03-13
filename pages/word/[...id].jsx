@@ -118,7 +118,7 @@ const PrivateWord = ({ router = { query: {} } }) => {
 
     return (
         <Private>
-            <Layout noMeta tabName={vip?.vip}>
+            <Layout noMeta tabName={matchedVip?.vip}>
                 <MetaTag vip={matchedVip} params={router?.query} />
                 <PrivateWordComponent vip={matchedVip} params={router?.query} relatedVips={randomSixRelatedVips} />
             </Layout>
