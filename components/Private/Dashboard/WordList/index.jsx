@@ -24,6 +24,7 @@ import { useSettings } from "@utils";
 import _, { isEqual } from "lodash";
 
 import Router from 'next/router';
+import Link from 'next/link';
 
 const WordListBlock = () => {
     const [sizes, setSizes] = useState({ width: 0, height: 0 });
@@ -156,7 +157,7 @@ const EachChild = ({ word, width }) => {
     }
 
     return (
-        <Tooltip title="Open this word" arrow>
+        <Link href={word?.public ? `/word/public/${word?.vip}/${word?.id}` : `/word/${word?.vip}/${word?.id}`} passHref>
             <div
                 style={{
                     display: "flex",
@@ -164,7 +165,6 @@ const EachChild = ({ word, width }) => {
                     flexDirection: "column",
                     cursor: "pointer",
                 }}
-                onClick={() => Router.push(word?.public ? `/word/public/${word?.vip}/${word?.id}` : `/word/${word?.vip}/${word?.id}`)}
             >
                 <div
                     style={{
@@ -212,7 +212,7 @@ const EachChild = ({ word, width }) => {
                     </Grid>
                 )}
             </div>
-        </Tooltip>
+        </Link>
     );
 };
 

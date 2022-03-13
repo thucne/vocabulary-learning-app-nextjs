@@ -990,8 +990,8 @@ export const sortRelatedVips = (vip, relatedVips) => {
         const bType1Intersection = !_.isEmpty(bType1) && !_.isEmpty(vipType1) ? (bType1 === vipType1 ? 1 : 0) : 0;
         const bSynonymsIntersection = !_.isEmpty(bSynonyms) && !_.isEmpty(vipSynonyms) ? (bSynonyms === vipSynonyms ? 1 : 0) : 0;
 
-        const aVipIntersection = a.vip === vip.vip ? 1 : 0;
-        const bVipIntersection = b.vip === vip.vip ? 1 : 0;
+        const aVipIntersection = a?.vip === vip?.vip ? 1 : 0;
+        const bVipIntersection = b?.vip === vip?.vip ? 1 : 0;
 
         const aPriority = -(aTagsIntersection.length + aType2Intersection.length * 0.1 + aType1Intersection * 0.2 + aSynonymsIntersection * 2 + aVipIntersection * 2.1);
         const bPriority = -(bTagsIntersection.length + bType2Intersection.length * 0.1 + bType1Intersection * 0.2 + bSynonymsIntersection * 2 + bVipIntersection * 2.1);
