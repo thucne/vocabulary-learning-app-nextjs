@@ -13,6 +13,8 @@ import { getPastelColor, getSizeImage, useThisToGetSizesFromRef, useWindowSize }
 
 import LoadingImage from "@components/LoadingImage";
 
+const bgColor = getPastelColor();
+
 const ImageGallery = (props) => {
 
     const { illustrationsList, setCurrentImg, vips } = props;
@@ -94,7 +96,7 @@ const ImageGallery = (props) => {
                                                     alt={illustration?.name || 'Photo'}
                                                     onClick={() => setCurrentImg(illustration)}
                                                     quality={100}
-                                                    bgColor={getPastelColor()}
+                                                    bgColor={bgColor}
                                                     draggable={false}
                                                     className="cursorPointer"
                                                 />
