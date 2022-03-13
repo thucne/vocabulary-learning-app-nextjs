@@ -38,6 +38,9 @@ export default function SwitchListSecondary() {
     const userData = useSelector((state) => state?.userData);
 
     const checked = useSettings(userData, true);
+
+    console.log(checked);
+
     const handledChecked = useSettings(userData);
 
     const [syncing, setSyncing] = useState(false);
@@ -84,7 +87,7 @@ export default function SwitchListSecondary() {
     const handleChange = (value, selectionValue) => async () =>
         await toggleSettings(value, selectionValue, checked, callBackFunction);
 
-    const getItem = (name) => checked?.find((item) => item.includes(`${name}`));
+    const getItem = (name) => _.isArray(checked) ? checked.find((item) => item.includes(`${name}`)) : undefined;
 
     const isExist = (name) => {
         const temp = getItem(name);
