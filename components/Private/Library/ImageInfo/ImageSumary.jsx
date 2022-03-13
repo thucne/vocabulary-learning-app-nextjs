@@ -8,7 +8,9 @@ import { Divider, Grid, ListItem, Typography, Link as MuiLink, IconButton } from
 import {
     ContentCopy as ContentCopyIcon,
     OpenInNew as OpenInNewIcon,
-    Image as ImageIcon
+    Image as ImageIcon,
+    OpenInFull as OpenInFullIcon,
+    ArrowCircleRightOutlined as ArrowCircleRightOutlinedIcon,
 } from "@mui/icons-material";
 
 import { Box } from "@mui/system";
@@ -88,14 +90,13 @@ const ImageSumary = (props) => {
                                             info[3] ?
                                                 <Link href={!illustration.public ? `/word/${encodeURIComponent(info[1])}/${illustration.vipId}` : `/word/public/${encodeURIComponent(info[1])}/${illustration.vipId}`} passHref>
                                                     <MuiLink
-                                                        target="_blank"
                                                         rel={!illustration.public ? `/word/${encodeURIComponent(info[1])}/${illustration.vipId}` : `/word/public/${encodeURIComponent(info[1])}/${illustration.vipId}`}
                                                         sx={styles.textValue}
                                                         underline="hover"
                                                         className="overflowTypography"
-                                                        title={`Open "${info[1]}" in new tab`}
+                                                        title={`Open "${info[1]}"`}
                                                     >
-                                                        {info[1]}&nbsp;<OpenInNewIcon sx={{ fontSize: Fonts.FS_14 }} />
+                                                        {info[1]}&nbsp;<ArrowCircleRightOutlinedIcon sx={{ fontSize: [Fonts.FS_12, Fonts.FS_14] }} />
                                                     </MuiLink>
                                                 </Link> :
                                                 <Typography sx={{ ...styles.textValue }}>
@@ -128,7 +129,7 @@ const ImageSumary = (props) => {
                                             className="overflowTypography"
                                             title="Open image in new tab"
                                         >
-                                            {shortenLink(illustration.url, 10)}&nbsp;<OpenInNewIcon sx={{ fontSize: Fonts.FS_14 }} />
+                                            {shortenLink(illustration.url, 10)}&nbsp;<OpenInNewIcon sx={{ fontSize: [Fonts.FS_12, Fonts.FS_14] }} />
                                         </MuiLink>
                                     </Link>
 

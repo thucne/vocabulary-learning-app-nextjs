@@ -57,15 +57,16 @@ export async function getStaticProps(ctx) {
     const allVips = await fetch(`${API}/api/vips?populate=*`);
     const vips = (await allVips.json())?.data;
 
-    const matchedVip = deepExtractObjectStrapi(!id ? vips.find(item => item.attributes.vip === vip) : vips.find(item => item.id.toString() === id), {
+    const matchedVip = deepExtractObjectStrapi(!id ? vips.find(item => item?.attributes?.vip === vip) : vips.find(item => item?.id?.toString() === id), {
         minifyPhoto: ['illustration']
     });
+    
     const relatedVips = vips.filter(item => !id ? item.attributes.vip !== vip : item.id.toString() !== id);
 
     const formattedRelatedVips = relatedVips
         .map(item => deepExtractObjectStrapi(item, {
             minify: true,
-            minifyFields: ['lastReview', 'lastReviewOK', , 'antonyms', 'audio', 'createdAt', 'updatedAt'],
+            minifyFields: ['lastReview', 'lastReviewOK', 'antonyms', 'audio', 'createdAt', 'updatedAt'],
             minifyPhoto: ['illustration']
         }));
 

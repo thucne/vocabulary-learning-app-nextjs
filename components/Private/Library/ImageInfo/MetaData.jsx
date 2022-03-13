@@ -189,7 +189,7 @@ const InfoExpand = ({ format, openSecsons, isBreak }) => {
                                 className="overflowTypography"
                                 title="Open image in new tab"
                             >
-                                {shortenLink(format[1].url, 10)}&nbsp;<OpenInNewIcon sx={{ fontSize: Fonts.FS_14 }} />
+                                {shortenLink(format[1].url, 10)}&nbsp;<OpenInNewIcon sx={{ fontSize: [Fonts.FS_12, Fonts.FS_14] }} />
                             </MuiLink>
                         </Link>
 

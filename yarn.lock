@@ -613,10 +613,10 @@
     clsx "^1.1.1"
     core-js "^3.21.1"
 
-"@tallis/react-mui-scroll-view@^0.0.5":
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/@tallis/react-mui-scroll-view/-/react-mui-scroll-view-0.0.5.tgz#2f10fa701e1e4963813e50cdaf2202e53cf25a90"
-  integrity sha512-yuIdMXkDIJ1UZmRekV6Y5PRLgkn5W6EgQahbQkzYW5Yn8nVuh/bYNeQSR/m4caT7H5SmaPJK7Hb9huS15o+etA==
+"@tallis/react-mui-scroll-view@^0.0.7":
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/@tallis/react-mui-scroll-view/-/react-mui-scroll-view-0.0.7.tgz#6ff3a353ba15a2b2702c1f3e87354db56df249e7"
+  integrity sha512-STD4wwg/PHZ9ijaZb+SG43EZSSVlAGWeJ3qrdDtRkB/0nPpYwQZ6iWC07/EA2t5Xdhy75HN9mkXDKDSd3aOkpg==
   dependencies:
     "@babel/preset-react" "^7.16.7"
     core-js "^3.21.1"

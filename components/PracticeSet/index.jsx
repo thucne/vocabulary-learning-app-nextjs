@@ -426,4 +426,4 @@ const FinishDialog = ({ handlePrevious, handleUpdateVIP, handleClose, loading })
     );
 };
 
-export default React.memo(WordCard);
+export default WordCard;

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useMemo, useEffect, useCallback } from "react";
 
-import { Container, Grid, Typography, IconButton, Stack, Alert } from "@mui/material";
+import { Container, Grid, Typography, IconButton, Stack, Alert, Tooltip } from "@mui/material";
 
 import { useTheme } from "@mui/material/styles";
 
@@ -21,7 +21,9 @@ import ScrollPaper from "@tallis/react-mui-scroll-view";
 
 import CreateNewWord from "@components/WordForm";
 import { useSettings } from "@utils";
-import { isEqual } from "lodash";
+import _, { isEqual } from "lodash";
+
+import Router from 'next/router';
 
 const WordListBlock = () => {
     const [sizes, setSizes] = useState({ width: 0, height: 0 });
@@ -30,7 +32,48 @@ const WordListBlock = () => {
         state.userData?.vips?.length > 0 ? state.userData.vips : []
     );
 
-    const wordList = useMemo(() => wordListRaw, [wordListRaw]);
+    const subscribedWordListRaw = useSelector((state) =>
+        state.userData?.subscribedVips?.length > 0 ? state.userData.subscribedVips : []
+    );
+
+    const wordList = useMemo(() => _.unionWith(wordListRaw, subscribedWordListRaw, _.isEqual), [wordListRaw, subscribedWordListRaw]);
+
+    const config = (sizes, setSizes) => ({
+        mui: {
+            Grid,
+            Container,
+            IconButton,
+            Stack,
+            ArrowBackIcon,
+            ArrowForwardIcon,
+        },
+        buttonIconStyle: {
+            // backgroundColor: theme.palette.scroll_button.main,
+            ...SXs.MUI_NAV_ICON_BUTTON,
+        },
+        iconStyle: {
+            fontSize: Fonts.FS_20,
+        },
+        getElementSizes: (data) => {
+            if (!isEqual(sizes, data)) {
+                setSizes(data);
+            }
+        },
+        elementStyle: {
+            "&:hover": { filter: "brightness(1)" }
+        },
+        containerStyle: {
+            maxWidth: "100%",
+        },
+        gridItemSize: {
+            xs: 6,
+            sm: 4,
+            md: 3,
+            lg: 2,
+        },
+        showScrollbar: true,
+        React,
+    });
 
     return (
         <Container maxWidth="lg" disableGutters>
@@ -108,94 +151,69 @@ const EachChild = ({ word, width }) => {
         word?.illustration?.url ||
         IMAGE_ALT;
 
+    if (_.isEmpty(word)) {
+        return <div />;
+    }
+
     return (
-        <div
-            style={{ display: "flex", alignItems: "center", flexDirection: "column" }}
-        >
+        <Tooltip title="Open this word" arrow>
             <div
                 style={{
-                    position: "relative",
-                    width: `calc(${width}px - ${theme.spacing(3)})`,
-                    height: `calc(${width}px - ${theme.spacing(3)})`,
-                    overflow: "hidden",
-                    borderRadius: "10px",
+                    display: "flex",
+                    alignItems: "center",
+                    flexDirection: "column",
+                    cursor: "pointer",
                 }}
+                onClick={() => Router.push(word?.public ? `/word/public/${word?.vip}/${word?.id}` : `/word/${word?.vip}/${word?.id}`)}
             >
-                <LoadingImage
-                    src={photo}
-                    alt="Illustration"
-                    layout="fill"
-                    objectFit={objectFit}
-                    draggable={false}
-                    doneLoading={() => setLoading(false)}
-                />
+                <div
+                    style={{
+                        position: "relative",
+                        width: `calc(${width}px - ${theme.spacing(3)})`,
+                        height: `calc(${width}px - ${theme.spacing(3)})`,
+                        overflow: "hidden",
+                        borderRadius: "10px",
+                    }}
+                >
+                    <LoadingImage
+                        src={photo}
+                        alt="Illustration"
+                        layout="fill"
+                        objectFit={objectFit}
+                        draggable={false}
+                        doneLoading={() => setLoading(false)}
+                    />
+                </div>
+                {!loading && (
+                    <Grid item>
+                        <Typography
+                            sx={{
+                                fontWeight: Fonts.FW_500,
+                                fontSize: [Fonts.FS_18],
+                                mt: 2,
+                            }}
+                            className="overflowTypography"
+                        >
+                            {word?.vip}
+                        </Typography>
+                    </Grid>
+                )}
+                {!loading && (
+                    <Grid item>
+                        <Typography
+                            sx={{
+                                fontWeight: Fonts.FW_500,
+                                fontSize: [Fonts.FS_13],
+                            }}
+                            className="overflowTypography"
+                        >
+                            {word?.pronounce}
+                        </Typography>
+                    </Grid>
+                )}
             </div>
-            {!loading && (
-                <Grid item>
-                    <Typography
-                        sx={{
-                            fontWeight: Fonts.FW_500,
-                            fontSize: [Fonts.FS_18],
-                            mt: 2,
-                        }}
-                        className="overflowTypography"
-                    >
-                        {word?.vip}
-                    </Typography>
-                </Grid>
-            )}
-            {!loading && (
-                <Grid item>
-                    <Typography
-                        sx={{
-                            fontWeight: Fonts.FW_500,
-                            fontSize: [Fonts.FS_13],
-                        }}
-                        className="overflowTypography"
-                    >
-                        {word?.pronounce}
-                    </Typography>
-                </Grid>
-            )}
-        </div>
+        </Tooltip>
     );
 };
-
-const config = (sizes, setSizes) => ({
-    mui: {
-        Grid,
-        Container,
-        IconButton,
-        Stack,
-        ArrowBackIcon,
-        ArrowForwardIcon,
-    },
-    buttonIconStyle: {
-        // backgroundColor: theme.palette.scroll_button.main,
-        ...SXs.MUI_NAV_ICON_BUTTON,
-    },
-    iconStyle: {
-        fontSize: Fonts.FS_20,
-    },
-    getElementSizes: (data) => {
-        if (!isEqual(sizes, data)) {
-            setSizes(data);
-        }
-    },
-    elementStyle: {
-        // "&:hover": { filter: "brightness(1)" }
-    },
-    containerStyle: {
-        maxWidth: "100%",
-    },
-    gridItemSize: {
-        xs: 6,
-        sm: 4,
-        md: 3,
-        lg: 2,
-    },
-    showScrollbar: true,
-    React,
-});
 
 export default WordListBlock;

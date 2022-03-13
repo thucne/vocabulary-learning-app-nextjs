@@ -52,7 +52,7 @@ const PublicWord = ({ vip, relatedVips }) => {
 
     const photo = vip?.illustration;
 
-    const splitWord = vip.vip?.split(" ");
+    const splitWord = vip?.vip?.split(" ");
     const regex = new RegExp(splitWord.join("|"), "gi");
 
     const actualRelatedVips = relatedVips?.filter(item => item?.priority < -2) || [];
@@ -112,7 +112,12 @@ const PublicWord = ({ vip, relatedVips }) => {
             <Grid container {...Props.GCRSC}>
                 <Grid item xs={12} mt={2}>
                     <Typography variant="caption">
-                        <i>You are viewing a public word.</i>
+                        <i>
+                            You are viewing a public word.
+                            <Typography variant="caption">
+                                &nbsp;[Author: {<MuiLink href={`/user/${vip?.author?.username}`}>{vip?.author?.name}</MuiLink>}]
+                            </Typography>
+                        </i>
                     </Typography>
                     <Divider sx={{ my: 2 }} />
                 </Grid>
@@ -456,6 +461,7 @@ const PublicWord = ({ vip, relatedVips }) => {
                         <Divider sx={{ my: 2 }} />
                     </Grid>
                 }
+
             </Grid>
         </Container>
     );

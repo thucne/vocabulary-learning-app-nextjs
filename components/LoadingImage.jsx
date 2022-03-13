@@ -1,19 +1,31 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
 
 import Image from "next/image";
 
 import { Skeleton } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
+import { IMAGE_ALT } from "@consts";
+
+const defaultImg = {
+    src: IMAGE_ALT,
+    alt: 'No image',
+    layout: 'fill',
+    draggable: false
+}
+
 const Index = (props) => {
     const theme = useTheme();
     const [loading, setLoading] = useState(true);
-
-    if (!props?.src) {
-        return <div>No Image Found!</div>;
-    }
+    const [localProps, setLocalProps] = useState(defaultImg);
 
     const { doneLoading, bgColor, ...imgProps } = props;
+
+    useEffect(() => {
+        if (!_.isEqual(localProps, imgProps)) {
+            setLocalProps(imgProps);
+        }
+    }, [imgProps, localProps]);
 
     return (
         <>
@@ -26,13 +38,13 @@ const Index = (props) => {
                     backgroundColor: bgColor || theme.palette.img_bg.main,
                 }}
             >
-                {/* eslint-disable-next-line jsx-a11y/alt-text */}
                 <Image
-                    {...imgProps}
+                    alt="Loading Image"
+                    {...localProps}
                     onLoadingComplete={() => {
                         setLoading(false);
-                        if (typeof props?.doneLoading === "function") {
-                            props?.doneLoading();
+                        if (_.isFunction(doneLoading)) {
+                            doneLoading();
                         }
                     }}
                 />

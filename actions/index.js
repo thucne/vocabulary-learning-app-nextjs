@@ -183,3 +183,18 @@ export const subscribeVip = (id, token) => async (dispatch) => {
         .then((res) => handleCommonResponse(res))
         .catch((err) => handleServerError(err));
 }
+
+export const unsubscribeVip = (id, token) => async (dispatch) => {
+    if (!getJWT()) {
+        return { error: "Empty jwt." };
+    }
+    return await axios
+        .put(`${API}/api/users/unsubscribe/${id}`, { token }, {
+            headers: {
+                Authorization: `Bearer ${getJWT()}`,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then((res) => handleCommonResponse(res))
+        .catch((err) => handleServerError(err));
+}

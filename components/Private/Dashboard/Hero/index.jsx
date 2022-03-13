@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 
 import {
     Container,
@@ -25,7 +25,10 @@ const Welcome = () => {
     const status = checkPractiseStatus(userData);
     const { practicesPerDay = 1 } = settings;
 
-    const wordList = userData?.vips ? userData.vips : [];
+    const rawWordList = useMemo(() => userData?.vips ? userData.vips : [], [userData]);
+    const subscribedWordList = useMemo(() => userData?.subscribedVips ? userData.subscribedVips : [],[userData]);
+
+    const wordList = useMemo(() => _.unionWith(rawWordList, subscribedWordList, _.isEqual), [rawWordList, subscribedWordList]);
 
     const getText = () => {
         if (wordList.length === 0) {

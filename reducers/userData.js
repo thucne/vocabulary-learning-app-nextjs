@@ -1,5 +1,5 @@
 import * as t from "@consts";
-import { isEqual, cloneDeep } from "lodash";
+import _, { isEqual, cloneDeep } from "lodash";
 
 const userData = (state = {}, action) => {
     switch (action.type) {
@@ -12,7 +12,7 @@ const userData = (state = {}, action) => {
             const newState = cloneDeep(action.payload);
 
             return !isEqual(oldState, newState)
-                ? { ...state, ...action.payload }
+                ? { ...state, ...action.payload}
                 : state;
 
         default:
