@@ -90,10 +90,10 @@ const MetaData = (props) => {
                             "origin",
                             illustration
                         ]} openSecsons={openSecsons} />
-                        {index !== formatArrays.length - 1 && <Divider sx={{ my: 1 }} />}
+                        {index !== formatArrays?.length - 1 && <Divider sx={{ my: 1 }} />}
                     </Box>
 
-                    {formatArrays.map((format, index) => (
+                    {formatArrays?.map((format, index) => (
                         <Box key={index}>
                             <Grid key={index} item xs={12}>
                                 <Button

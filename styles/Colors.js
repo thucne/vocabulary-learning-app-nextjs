@@ -161,5 +161,9 @@ export const IMG_GREY_DARK = "#263238";
 export const IMG_GREY = "#F6F9FC";
 
 
-// blue public words
+// public words
 export const BLUE_PUBLIC_WORDS = "#1d2a57";
+export const BLUE_PUBLIC_WORDS_DARK = "#6573c3";
+export const RED_PUBLIC_WORDS_DARK = "#ed4b82";
+export const YELLOW_PUBLIC_WORDS_DARK = "#ffff8d";
+export const MAIN_PUBLIC_WORDS_DARK = "#66b2ff";

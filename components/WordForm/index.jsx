@@ -732,14 +732,14 @@ export default function CreateNewWord({ open = false, setOpen }) {
                                                 }
                                             />
                                         </Paper>
-                                        <FormHelperText>
+                                        <FormHelperText sx={{ width: photoSizes?.width * 0.7, textAlign: 'center' }}>
                                             {Math.ceil(isOver10MB / 1024 / 1024) > 10
                                                 ? "File size is over 10MB."
                                                 : isOver10MB
                                                     ? `This file's size is ${Math.ceil(
                                                         isOver10MB / 1024 / 1024
                                                     )}MB.`
-                                                    : "Should be in square shape. MUST smaller 10MB in size."}
+                                                    : "Should be in square shape. MUST be smaller 10MB in size."}
                                         </FormHelperText>
                                     </FormControl>
                                 </Grid>
@@ -896,8 +896,8 @@ const UploadIconIllustration = () => {
             objectFit="contain"
             priority={true}
             draggable={false}
-            width={180}
-            height={180}
+            width={130}
+            height={130}
             bgColor="transparent"
         />
     );

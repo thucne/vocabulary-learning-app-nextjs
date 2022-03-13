@@ -9,4 +9,8 @@ module.exports = {
             "img.upxi.me",
         ],
     },
+    experimental: {
+        // Enables the styled-components SWC transform
+        styledComponents: true
+    }
 };
