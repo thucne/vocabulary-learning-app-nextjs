@@ -40,13 +40,13 @@ const MyTheme = (mode) => ({
         main: mode === "light" ? Colors.LOGO_RED : Colors.RED_PUBLIC_WORDS_DARK,
     },
     publicWord2: {
-        main: mode === "light" ? Colors.BLUE_PUBLIC_WORDS : Colors.BLUE_PUBLIC_WORDS_DARK,
+        main: mode === "light" ? Colors.BLUE_PUBLIC_WORDS : Colors.WHITE,
     },
     publicWord3: {
         main: mode === "light" ? Colors.BLUE_PUBLIC_WORDS : Colors.YELLOW_PUBLIC_WORDS_DARK,
     },
     relatedPaper: {
-        main: mode === "light" ? `${Colors.LOGO_YELLOW}50` : Colors.YELLOW_PUBLIC_WORDS_DARK,
+        main: mode === "light" ? `${Colors.LOGO_YELLOW}80` : Colors.IMG_GREY_DARK,
     },
     mainPublicWord: {
         main: mode === "light" ? Colors.BLUE_PUBLIC_WORDS : Colors.MAIN_PUBLIC_WORDS_DARK,

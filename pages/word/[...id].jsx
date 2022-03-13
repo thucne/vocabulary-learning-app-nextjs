@@ -4,7 +4,7 @@ import { withRouter } from 'next/router';
 
 import Layout from "@layouts";
 import Meta from "@meta";
-import PublicWordComponent from "@components/Words/Public";
+import PrivateWordComponent from "@components/Words/Private";
 import LoadingOrNotFound from '@components/Words/LoadingOrNotFound';
 import ErrorPage from "@components/Error";
 
@@ -102,13 +102,13 @@ const PrivateWord = ({ router = { query: {} } }) => {
             <Private>
                 <Layout tabName={"Private word"}>
                     <ErrorPage
-                        title="Word Not Found | VIP"
+                        title="Not Found | VIP"
                         errorMessage="Word Not Found"
                         message="The word you are looking for does not exist."
                         illustration={NO_PHOTO}
                         redirectTo={{
-                            title: "Go to Homepage",
-                            link: "/",
+                            title: "Dashboard",
+                            link: "/dashboard",
                         }}
                     />
                 </Layout>
@@ -120,7 +120,7 @@ const PrivateWord = ({ router = { query: {} } }) => {
         <Private>
             <Layout noMeta tabName={vip?.vip}>
                 <MetaTag vip={matchedVip} params={router?.query} />
-                <PublicWordComponent vip={matchedVip} params={router?.query} relatedVips={randomSixRelatedVips} />
+                <PrivateWordComponent vip={matchedVip} params={router?.query} relatedVips={randomSixRelatedVips} />
             </Layout>
         </Private>
     );

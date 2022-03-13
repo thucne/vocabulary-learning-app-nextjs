@@ -6,19 +6,16 @@ import Router from 'next/router';
 import {
     Container, Grid, Typography, Divider,
     Link as MuiLink, CircularProgress, IconButton,
-    Chip, Tooltip, Paper, Stack
+    Tooltip, Paper
 } from '@mui/material';
 
 import VolumeUpRoundedIcon from '@mui/icons-material/VolumeUpRounded';
-import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded';
-import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove';
 
 import { Props, SXs, Fonts, Colors } from '@styles';
 import { getAudioUrl, useThisToGetSizesFromRef } from '@utils';
 import { AUDIO_ALT, NO_PHOTO } from '@consts';
 import LoadingImage from '@components/LoadingImage';
-import { subscribeVip, unsubscribeVip } from "@actions";
 import * as t from '@consts';
 import { RECAPTCHA } from '@config';
 
@@ -26,7 +23,7 @@ import { useSelector, useDispatch } from "react-redux";
 import parser from 'html-react-parser';
 import _ from 'lodash';
 
-const PublicWord = ({ vip, relatedVips }) => {
+const PrivateWord = ({ vip, relatedVips }) => {
     const [audioUrl, setAudioUrl] = useState("");
     const [loadingAudio, setLoadingAudio] = useState(false);
 
@@ -95,56 +92,13 @@ const PublicWord = ({ vip, relatedVips }) => {
 
     }, [audio]);
 
-    const handleSubscribe = (e) => {
-        e?.preventDefault();
-
-        if (window?.adHocFetch && recaptcha === true && window.grecaptcha) {
-            grecaptcha.ready(function () {
-                grecaptcha
-                    .execute(`${RECAPTCHA}`, { action: "vip_authentication" })
-                    .then(function (token) {
-                        adHocFetch({
-                            dispatch,
-                            action: subscribeVip(vip?.id, token),
-                            onSuccess: (data) => console.log(data),
-                            onError: (error) => console.log(error),
-                            snackbarMessageOnSuccess: "Subscribed!",
-                        });
-                    });
-            });
-        }
-    }
-
-    const handleUnsubscribe = (e) => {
-        e?.preventDefault();
-
-        if (window?.adHocFetch && recaptcha === true && window.grecaptcha) {
-            grecaptcha.ready(function () {
-                grecaptcha
-                    .execute(`${RECAPTCHA}`, { action: "vip_authentication" })
-                    .then(function (token) {
-                        adHocFetch({
-                            dispatch,
-                            action: unsubscribeVip(vip?.id, token),
-                            onSuccess: (data) => console.log(data),
-                            onError: (error) => console.log(error),
-                            snackbarMessageOnSuccess: "Unsubscribed!",
-                        });
-                    });
-            });
-        }
-    }
-
     return (
         <Container maxWidth="md">
             <Grid container {...Props.GCRSC}>
                 <Grid item xs={12} mt={2}>
                     <Typography variant="caption">
                         <i>
-                            You are viewing a public word.
-                            <Typography variant="caption">
-                                &nbsp;[Author: {<MuiLink href={`/user/${vip?.author?.username}`}>{vip?.author?.name}</MuiLink>}]
-                            </Typography>
+                            Private word. Only you can see this word.
                         </i>
                     </Typography>
                     <Divider sx={{ my: 2 }} />
@@ -229,44 +183,7 @@ const PublicWord = ({ vip, relatedVips }) => {
                         </Grid>
                     </Grid>
 
-                    <Divider sx={{ my: 2 }} textAlign='right'>
-                        <Tooltip title="Subscribe to this word" arrow>
-                            <IconButton aria-label='Subscribe to this word' sx={{
-                                backgroundColor: Colors.LOGO_YELLOW,
-                                borderRadius: "12px",
-                                py: 0,
-                                "&:hover": {
-                                    backgroundColor: Colors.LOGO_YELLOW,
-                                    filter: 'brightness(80%)'
-                                },
-                                "& .MuiTouchRipple-root span": {
-                                    borderRadius: "12px",
-                                    py: 0
-                                },
-                            }} onClick={handleSubscribe}>
-                                <PlaylistAddIcon color='white' />
-                            </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Unsubscribe from this word" arrow>
-                            <IconButton aria-label='Unsubscribe from this word' sx={{
-                                backgroundColor: Colors.LOGO_BLUE,
-                                borderRadius: "12px",
-                                py: 0,
-                                ml: 1,
-                                "&:hover": {
-                                    backgroundColor: Colors.LOGO_BLUE,
-                                    filter: 'brightness(80%)'
-                                },
-                                "& .MuiTouchRipple-root span": {
-                                    borderRadius: "12px",
-                                    py: 0
-                                },
-                            }} onClick={handleUnsubscribe}>
-                                <PlaylistRemoveIcon color='white' />
-                            </IconButton>
-                        </Tooltip>
-                    </Divider>
-
+                    <Divider sx={{ my: 2 }} />
                 </Grid>
 
                 {
@@ -425,36 +342,36 @@ const PublicWord = ({ vip, relatedVips }) => {
                         borderRadius: '4px',
                         overflow: 'hidden',
                     }}>
-                        <Typography variant="body1" sx={{
-                            fontWeight: Fonts.FW_700,
-                            fontSize: Fonts.FS_14,
-                            color: (theme) => theme.palette.publicWord2.main,
-                            mb: 1, mr: 1,
-                            display: 'inline'
-                        }}>
-                            Related Words
-                        </Typography>
+                        <Grid container {...Props.GCRBC}>
+                            <Typography variant="body1" sx={{
+                                fontWeight: Fonts.FW_700,
+                                fontSize: Fonts.FS_14,
+                                color: (theme) => theme.palette.publicWord2.main,
+                                mr: 1,
+                            }}>
+                                Related Words
+                            </Typography>
 
-                        {/* Chú thích */}
-                        <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: 'rgba(63, 81, 181, 0.52)', display: 'inline-block', margin: '0px 5px' }} />
-                        <Typography variant="caption" sx={{
-                            fontSize: Fonts.FS_10,
-                            color: 'rgba(63, 81, 181, 0.72)',
-                            mb: 1,
-                            display: 'inline'
-                        }}>
-                            Related
-                        </Typography>
+                            <Grid item {...Props.GIRCC}>
+                                {/* Chú thích */}
+                                <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: 'rgba(63, 81, 181, 0.52)' }} />
+                                <Typography variant="caption" sx={{
+                                    color: 'rgba(63, 81, 181, 0.72)',
+                                    ml: 0.5,
+                                    mr: 1
+                                }}>
+                                    Related
+                                </Typography>
 
-                        <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: 'rgba(155, 49, 77, 0.52)', display: 'inline-block', margin: '0px 5px' }} />
-                        <Typography variant="caption" sx={{
-                            fontSize: Fonts.FS_10,
-                            color: 'rgba(155, 49, 77, 0.52)',
-                            mb: 1,
-                            display: 'inline'
-                        }}>
-                            More
-                        </Typography>
+                                <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: 'rgba(155, 49, 77, 0.52)' }} />
+                                <Typography variant="caption" sx={{
+                                    color: 'rgba(155, 49, 77, 0.52)',
+                                    ml: 0.5,
+                                }}>
+                                    More
+                                </Typography>
+                            </Grid>
+                        </Grid>
 
 
                         <Grid container spacing={1} {...Props.GCRSC} mt={1}>
@@ -576,4 +493,4 @@ const styles = {
     }
 }
 
-export default PublicWord;
+export default PrivateWord;

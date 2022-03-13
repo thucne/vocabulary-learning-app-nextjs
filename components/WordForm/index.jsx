@@ -77,7 +77,13 @@ export default function CreateNewWord({ open = false, setOpen }) {
     const windowSize = useWindowSize();
     const dispatch = useDispatch();
 
+    const recaptcha = useSelector((state) => state.recaptcha);
+    const userData = useSelector((state) => state.userData);
+
+    const settings = useSettings(userData);
+
     const photoRef = useRef(null);
+    const vipRef = useRef(null);
     const [photo, setPhoto] = useState(null);
     const [isOver10MB, setIsOver10MB] = useState(false);
 
@@ -93,11 +99,6 @@ export default function CreateNewWord({ open = false, setOpen }) {
 
     const [opens, setOpens] = useState(initOpens);
 
-    const recaptcha = useSelector((state) => state.recaptcha);
-    const userData = useSelector((state) => state.userData);
-
-    const settings = useSettings(userData);
-
     const resetWhole = () => {
         setTemptInput(initTempInputs);
         setForm(initForm(settings?.publicWords));
@@ -107,6 +108,11 @@ export default function CreateNewWord({ open = false, setOpen }) {
         setIsOver10MB(false);
         setFetchingAPI(false);
         setOpens(initOpens);
+        if (vipRef.current) {
+            vipRef.current.value = "";
+            vipRef.current.focus();
+        }
+        setOpen(false);
     };
 
 
@@ -193,7 +199,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
                             onError: (error) => console.log(error),
                             onStarting: () => setLoading(true),
                             onFinally: () => setLoading(false),
-                            snackbarMessageOnSuccess: "Added!",
+                            snackbarMessageOnSuccess: "Added new word successfully!",
                         });
                     });
             });
@@ -382,6 +388,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
                             <Grid container>
                                 <Grid item xs={12}>
                                     <TextField
+                                        inputRef={vipRef}
                                         autoFocus
                                         required
                                         fullWidth

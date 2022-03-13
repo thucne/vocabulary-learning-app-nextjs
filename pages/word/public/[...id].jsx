@@ -13,18 +13,18 @@ import qs from 'qs';
 import _ from 'lodash';
 
 const PublicWord = ({ vip, relatedVips, params }) => {
-    console.log(vip);
+
     if (_.isEmpty(vip)) {
         return (
             <Layout tabName={"Private word"}>
                 <ErrorPage
                     title="Word Not Found | VIP"
-                    errorMessage="Word Not Found"
+                    errorMessage="Not Found"
                     message="The word you are looking for does not exist."
                     illustration={NO_PHOTO}
                     redirectTo={{
-                        title: "Go to Homepage",
-                        link: "/",
+                        title: "Dashboard",
+                        link: "/dashboard",
                     }}
                 />
             </Layout>
@@ -67,7 +67,7 @@ export async function getStaticPaths() {
 
     return {
         paths,
-        fallback: 'blocking',
+        fallback: true,
     };
 }
 

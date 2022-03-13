@@ -960,8 +960,8 @@ export const deepExtractObjectStrapi = (object = {}, options = {}) => {
 
 export const sortRelatedVips = (vip, relatedVips) => {
 
-    const vipTags = _.isArray(vip?.tags) ? vip.tags.flatMap(item => item.name) : [];
-    const vipType2 = _.isArray(vip?.type2) ? vip.type2.flatMap(item => item.name) : [];
+    const vipTags = _.isArray(vip?.tags) && !_.isEmpty(vip?.tags) ? vip.tags.flatMap(item => item.name) : [];
+    const vipType2 = _.isArray(vip?.type2) && !_.isEmpty(vip?.type2) ? vip.type2.flatMap(item => item.name) : [];
     const vipType1 = vip?.type1;
     const vipSynonyms = vip?.synonyms;
 
@@ -970,28 +970,31 @@ export const sortRelatedVips = (vip, relatedVips) => {
     const evidences = [];
 
     const sortedRelatedVips = _.isArray(relatedVips) ? relatedVips.sort((a, b) => {
-        const aTags = _.isArray(a?.tags) ? a.tags.flatMap(item => item.name) : null;
-        const aType2 = _.isArray(a?.type2) ? a.type2.flatMap(item => item.name) : null;
+        const aTags = _.isArray(a?.tags) && !_.isEmpty(a?.tags) ? a.tags.flatMap(item => item.name) : null;
+        const aType2 = _.isArray(a?.type2) && !_.isEmpty(a?.type2) ? a.type2?.flatMap(item => item.name) : null;
         const aType1 = a?.type1;
         const aSynonyms = a?.synonyms;
 
-        const bTags = _.isArray(b?.tags) ? b.tags.flatMap(item => item.name) : null;
-        const bType2 = _.isArray(b?.type2) ? b.tags.flatMap(item => item.name) : null;
+        const bTags = _.isArray(b?.tags) && !_.isEmpty(b?.tags) ? b.tags.flatMap(item => item.name) : null;
+        const bType2 = _.isArray(b?.type2) && !_.isEmpty(b?.type2) ? b.type2.flatMap(item => item.name) : null;
         const bType1 = b?.type1;
         const bSynonyms = b?.synonyms;
 
         const aTagsIntersection = _.intersection(aTags, vipTags);
         const aType2Intersection = _.intersection(aType2, vipType2);
-        const aType1Intersection = aType1 === vipType1 ? 1 : 0;
-        const aSynonymsIntersection = aSynonyms === vipSynonyms ? 1 : 0;
+        const aType1Intersection = !_.isEmpty(aType1) && !_.isEmpty(vipType1) ? (aType1 === vipType1 ? 1 : 0) : 0;
+        const aSynonymsIntersection = !_.isEmpty(aSynonyms) && !_.isEmpty(vipSynonyms) ? (aSynonyms === vipSynonyms ? 1 : 0) : 0;
 
         const bTagsIntersection = _.intersection(bTags, vipTags);
         const bType2Intersection = _.intersection(bType2, vipType2);
-        const bType1Intersection = bType1 === vipType1 ? 1 : 0;
-        const bSynonymsIntersection = bSynonyms === vipSynonyms ? 1 : 0;
+        const bType1Intersection = !_.isEmpty(bType1) && !_.isEmpty(vipType1) ? (bType1 === vipType1 ? 1 : 0) : 0;
+        const bSynonymsIntersection = !_.isEmpty(bSynonyms) && !_.isEmpty(vipSynonyms) ? (bSynonyms === vipSynonyms ? 1 : 0) : 0;
 
-        const aPriority = -(aTagsIntersection.length + aType2Intersection.length * 0.1 + aType1Intersection + aSynonymsIntersection);
-        const bPriority = -(bTagsIntersection.length + bType2Intersection.length * 0.1 + bType1Intersection + bSynonymsIntersection);
+        const aVipIntersection = a.vip === vip.vip ? 1 : 0;
+        const bVipIntersection = b.vip === vip.vip ? 1 : 0;
+
+        const aPriority = -(aTagsIntersection.length + aType2Intersection.length * 0.1 + aType1Intersection * 0.2 + aSynonymsIntersection * 2 + aVipIntersection * 2.1);
+        const bPriority = -(bTagsIntersection.length + bType2Intersection.length * 0.1 + bType1Intersection * 0.2 + bSynonymsIntersection * 2 + bVipIntersection * 2.1);
 
         if (!evidences.find(item => item.id === a.id)) {
             evidences.push({
