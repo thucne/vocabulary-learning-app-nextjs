@@ -1,12 +1,12 @@
 import React from 'react';
 
-import { useRouter } from 'next/router';
-
 import Layout from "@layouts";
 import Meta from "@meta";
 import PublicWordComponent from "@components/Words/Public";
 import { API } from '@config';
 import { deepExtractObjectStrapi, sortRelatedVips } from '@utils';
+
+import qs from 'qs';
 
 const PublicWord = ({ vip, relatedVips, params }) => {
 
@@ -54,13 +54,29 @@ export async function getStaticProps(ctx) {
 
     const { id: [vip, id] } = ctx.params;
 
-    const allVips = await fetch(`${API}/api/vips?populate=*`);
+    const querySearchRelated = {
+        populate: '*',
+        filters: {
+            id: {
+                $ne: id,
+            }
+        },
+        pagination: {
+            page: 1,
+            pageSize: 100
+        }
+    }
+
+    const allVips = await fetch(`${API}/api/vips?${qs.stringify(querySearchRelated, { encodeValuesOnly: true })}`);
     const vips = (await allVips.json())?.data;
 
-    const matchedVip = deepExtractObjectStrapi(!id ? vips.find(item => item?.attributes?.vip === vip) : vips.find(item => item?.id?.toString() === id), {
+    const foundVipRaw = await fetch(`${API}/api/vips/${id}?populate=*`);
+    const foundVip = await foundVipRaw.json();
+
+    const matchedVip = deepExtractObjectStrapi(foundVip, {
         minifyPhoto: ['illustration']
     });
-    
+
     const relatedVips = vips.filter(item => !id ? item.attributes.vip !== vip : item.id.toString() !== id);
 
     const formattedRelatedVips = relatedVips

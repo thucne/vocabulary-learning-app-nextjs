@@ -84,30 +84,6 @@ const Welcome = () => {
                         </Typography>
                     </Box>
                 </Grid>
-
-                <Grid
-                    item
-                    xs={12}
-                    sm={3}
-                    sx={{
-                        display: "flex",
-                        justifyContent: "flex-end",
-                        alignItems: "center",
-                    }}
-                >
-                    <Box
-                        sx={{
-                            width: "100%",
-                            display: "flex",
-                            justifyContent: ["flex-start", "flex-end"],
-                            padding: "10px 0",
-                        }}
-                    >
-                        <IconButton sx={SXs.MUI_NAV_ICON_BUTTON} onClick={() => { }}>
-                            <CachedIcon sx={{ color: Colors.LOGO_BLUE }} />
-                        </IconButton>
-                    </Box>
-                </Grid>
             </Grid>
             {
                 wordList?.length > 0 && (

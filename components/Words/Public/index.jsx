@@ -54,7 +54,7 @@ const PublicWord = ({ vip, relatedVips }) => {
     const photo = vip?.illustration;
 
     const splitWord = vip?.vip?.split(" ");
-    const regex = new RegExp(splitWord.join("|"), "gi");
+    const regex = new RegExp(splitWord?.join("|"), "gi");
 
     const actualRelatedVips = relatedVips?.filter(item => item?.priority < -2) || [];
     const moreRelatedVips = relatedVips?.filter(item => item?.priority >= -2) || [];
@@ -157,7 +157,7 @@ const PublicWord = ({ vip, relatedVips }) => {
                     {/* type2 */}
                     <Grid container {...Props.GCRSC} spacing={0.5} mt={1}>
                         {
-                            !!type1.length && <Grid item {...Props.GIRCC}>
+                            !!type1?.length && <Grid item {...Props.GIRCC}>
                                 <Link href={`/type1/${type1}`} passHref>
                                     <Tooltip title="Go to definition">
                                         <MuiLink underline='hover' sx={{

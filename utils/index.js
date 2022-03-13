@@ -894,55 +894,64 @@ export const gruopWordByDatePeriod = wordList => {
     return processedData
 }
 
-export const deepExtractObjectStrapi = (object, options = {}) => {
-    const {
-        minify,
-        minifyFields = [],
-        minifyPhoto = []
-    } = options;
+export const deepExtractObjectStrapi = (object = {}, options = {}) => {
 
-    // flatten strapi object
+    if (_.isObject(object) && !_.isEmpty(object)) {
+        const {
+            minify,
+            minifyFields = [],
+            minifyPhoto = []
+        } = options;
 
-    const allKeys = Object.keys(object);
+        // flatten strapi object
+        if (_.isObject(object?.data)) {
+            object = object.data
+        }
 
-    if (_.isEqual(allKeys, ['id', 'attributes'])) {
-        return { id: object.id, ...deepExtractObjectStrapi(object.attributes, options) };
+        const allKeys = Object.keys(object);
+
+        if (_.isEqual(allKeys, ['id', 'attributes'])) {
+            return { id: object.id, ...deepExtractObjectStrapi(object.attributes, options) };
+        } else {
+
+            // check if each key is an Strapi object - includes "data", "id" or "attributes"
+            const strapiArrays = allKeys.filter(key => {
+                return object[key]?.data;
+            }).map(key => {
+                const data = object[key]?.data;
+                return {
+                    [key]: data && data.length
+                        ? data.map(i => deepExtractObjectStrapi(i, options))
+                        : deepExtractObjectStrapi(data, options)
+                }
+            });
+
+
+            const nullData = allKeys.filter(key => {
+                return _.isObject(object[key]?.data) && _.isEmpty(object[key]?.data);
+            }).map(key => ({ [key]: null }));
+
+            const photoData = allKeys.filter(key => {
+                return minifyPhoto?.length ? minifyPhoto.includes(key) : false;
+            }).map(key => {
+                const temp = object[key]?.data?.attributes;
+                const photo = temp?.formats?.small?.url || temp?.formats?.medium?.url || temp?.formats?.large?.url || temp?.url;
+                return { [key]: photo || null }
+            })
+
+            // convert to object
+            const strapiObject = _.merge({}, ...strapiArrays);
+            const nullObject = _.merge({}, ...nullData);
+            const photoObject = _.merge({}, ...photoData);
+
+            const returnObject = { ...object, ...strapiObject, ...nullObject, ...photoObject };
+
+            return minify ? _.omit(returnObject, minifyFields ? minifyFields : ['createdAt', 'updatedAt']) : returnObject;
+        }
     } else {
-
-        // check if each key is an Strapi object - includes "data", "id" or "attributes"
-        const strapiArrays = allKeys.filter(key => {
-            return object[key]?.data;
-        }).map(key => {
-            const data = object[key]?.data;
-            return {
-                [key]: data && data.length
-                    ? data.map(i => deepExtractObjectStrapi(i, options))
-                    : deepExtractObjectStrapi(data, options)
-            }
-        });
-
-
-        const nullData = allKeys.filter(key => {
-            return _.isObject(object[key]?.data) && _.isEmpty(object[key]?.data);
-        }).map(key => ({ [key]: null }));
-
-        const photoData = allKeys.filter(key => {
-            return minifyPhoto?.length ? minifyPhoto.includes(key) : false;
-        }).map(key => {
-            const temp = object[key]?.data?.attributes;
-            const photo = temp?.formats?.small?.url || temp?.formats?.medium?.url || temp?.formats?.large?.url || temp?.url;
-            return { [key]: photo || null }
-        })
-
-        // convert to object
-        const strapiObject = _.merge({}, ...strapiArrays);
-        const nullObject = _.merge({}, ...nullData);
-        const photoObject = _.merge({}, ...photoData);
-
-        const returnObject = { ...object, ...strapiObject, ...nullObject, ...photoObject };
-
-        return minify ? _.omit(returnObject, minifyFields ? minifyFields : ['createdAt', 'updatedAt']) : returnObject;
+        return null;
     }
+
 }
 
 export const sortRelatedVips = (vip, relatedVips) => {
@@ -1016,6 +1025,6 @@ export const sortRelatedVips = (vip, relatedVips) => {
     }));
 }
 
-export const generateVipLink = (status, vip,id) => {
+export const generateVipLink = (status, vip, id) => {
     return status ? `/word/public/${vip}/${id}` : `/word/${vip}/${id}`
 }
