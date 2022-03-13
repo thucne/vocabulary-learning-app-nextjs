@@ -61,7 +61,12 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
     const { objectFit = "contain" } = useSettings(userData);
 
     useEffect(() => {
-        setWordIndex(0);
+        let canset = true;
+        if (canset) {
+            setWordIndex(0);
+        }
+
+        return () => canset = false;
     }, [optimizedWordList.length, open]);
 
     useEffect(() => {

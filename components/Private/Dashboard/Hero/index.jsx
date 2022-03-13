@@ -25,10 +25,7 @@ const Welcome = () => {
     const status = checkPractiseStatus(userData);
     const { practicesPerDay = 1 } = settings;
 
-    const rawWordList = useMemo(() => userData?.vips ? userData.vips : [], [userData]);
-    const subscribedWordList = useMemo(() => userData?.subscribedVips ? userData.subscribedVips : [],[userData]);
-
-    const wordList = useMemo(() => _.unionWith(rawWordList, subscribedWordList, _.isEqual), [rawWordList, subscribedWordList]);
+    const wordList = useMemo(() => userData?.vips ? userData.vips : [], [userData]);
 
     const getText = () => {
         if (wordList.length === 0) {

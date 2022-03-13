@@ -12,12 +12,13 @@ import {
 import VolumeUpRoundedIcon from '@mui/icons-material/VolumeUpRounded';
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded';
+import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove';
 
 import { Props, SXs, Fonts, Colors } from '@styles';
 import { getAudioUrl, useThisToGetSizesFromRef } from '@utils';
-import { AUDIO_ALT } from '@consts';
+import { AUDIO_ALT, NO_PHOTO } from '@consts';
 import LoadingImage from '@components/LoadingImage';
-import { subscribeVip } from "@actions";
+import { subscribeVip, unsubscribeVip } from "@actions";
 import * as t from '@consts';
 import { RECAPTCHA } from '@config';
 
@@ -100,7 +101,27 @@ const PublicWord = ({ vip, relatedVips }) => {
                             action: subscribeVip(vip?.id, token),
                             onSuccess: (data) => console.log(data),
                             onError: (error) => console.log(error),
-                            snackbarMessageOnSuccess: "Update infomation success!",
+                            snackbarMessageOnSuccess: "Subscribed!",
+                        });
+                    });
+            });
+        }
+    }
+
+    const handleUnsubscribe = (e) => {
+        e?.preventDefault();
+
+        if (window?.adHocFetch && recaptcha === true && window.grecaptcha) {
+            grecaptcha.ready(function () {
+                grecaptcha
+                    .execute(`${RECAPTCHA}`, { action: "vip_authentication" })
+                    .then(function (token) {
+                        adHocFetch({
+                            dispatch,
+                            action: unsubscribeVip(vip?.id, token),
+                            onSuccess: (data) => console.log(data),
+                            onError: (error) => console.log(error),
+                            snackbarMessageOnSuccess: "Unsubscribed!",
                         });
                     });
             });
@@ -202,8 +223,8 @@ const PublicWord = ({ vip, relatedVips }) => {
                     </Grid>
 
                     <Divider sx={{ my: 2 }} textAlign='right'>
-                        <Tooltip title="Add this word to my word list" arrow>
-                            <IconButton aria-label='Add this word to my word list' sx={{
+                        <Tooltip title="Subscribe to this word" arrow>
+                            <IconButton aria-label='Subscribe to this word' sx={{
                                 backgroundColor: Colors.LOGO_YELLOW,
                                 borderRadius: "12px",
                                 py: 0,
@@ -217,6 +238,24 @@ const PublicWord = ({ vip, relatedVips }) => {
                                 },
                             }} onClick={handleSubscribe}>
                                 <PlaylistAddIcon color='white' />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Unsubscribe from this word" arrow>
+                            <IconButton aria-label='Unsubscribe from this word' sx={{
+                                backgroundColor: Colors.LOGO_BLUE,
+                                borderRadius: "12px",
+                                py: 0,
+                                ml: 1,
+                                "&:hover": {
+                                    backgroundColor: Colors.LOGO_BLUE,
+                                    filter: 'brightness(80%)'
+                                },
+                                "& .MuiTouchRipple-root span": {
+                                    borderRadius: "12px",
+                                    py: 0
+                                },
+                            }} onClick={handleUnsubscribe}>
+                                <PlaylistRemoveIcon color='white' />
                             </IconButton>
                         </Tooltip>
                     </Divider>
@@ -393,7 +432,7 @@ const PublicWord = ({ vip, relatedVips }) => {
                         <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: 'rgba(63, 81, 181, 0.52)', display: 'inline-block', margin: '0px 5px' }} />
                         <Typography variant="caption" sx={{
                             fontSize: Fonts.FS_10,
-                            color: 'rgba(63, 81, 181, 0.52)',
+                            color: 'rgba(63, 81, 181, 0.72)',
                             mb: 1,
                             display: 'inline'
                         }}>
@@ -403,7 +442,7 @@ const PublicWord = ({ vip, relatedVips }) => {
                         <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: 'rgba(155, 49, 77, 0.52)', display: 'inline-block', margin: '0px 5px' }} />
                         <Typography variant="caption" sx={{
                             fontSize: Fonts.FS_10,
-                            color: 'rgba(63, 81, 181, 0.52)',
+                            color: 'rgba(155, 49, 77, 0.52)',
                             mb: 1,
                             display: 'inline'
                         }}>
@@ -472,7 +511,7 @@ const RelatedVip = ({ vip, gridSizes, actual = false }) => {
         <Paper sx={{
             width: _.isNumber(gridSizes?.width) ? `calc(${gridSizes.width}px - 0.5rem)` : 100,
             height: _.isNumber(gridSizes?.width) ? `calc(${gridSizes.width}px - 0.5rem)` : 100,
-            background: `url(${vip?.illustration}) center center / cover no-repeat`,
+            background: `url(${vip?.illustration || NO_PHOTO}) center center / cover no-repeat`,
             ...styles.relatedWords
         }}>
             <DarkBackGround actual={actual} />
@@ -492,7 +531,7 @@ const RelatedVip = ({ vip, gridSizes, actual = false }) => {
 }
 
 const DarkBackGround = ({ actual }) => <div style={{
-    backgroundColor: actual ? 'rgba(63, 81, 181, 0.52)' : 'rgba(155, 49, 77, 0.52)',
+    backgroundColor: actual ? 'rgba(63, 81, 181, 0.72)' : 'rgba(155, 49, 77, 0.72)',
     ...styles.darkBG
 }} />;
 

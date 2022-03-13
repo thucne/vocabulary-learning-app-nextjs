@@ -11,7 +11,7 @@ import {
 } from "@mui/icons-material";
 
 import { Fonts, SXs, Colors } from "@styles";
-import { IMAGE_ALT } from "@consts";
+import { IMAGE_ALT, NO_PHOTO } from "@consts";
 
 import LoadingImage from "@components/LoadingImage";
 import { useSelector } from "react-redux";
@@ -149,7 +149,7 @@ const EachChild = ({ word, width }) => {
     const photo =
         word?.illustration?.formats?.small?.url ||
         word?.illustration?.url ||
-        IMAGE_ALT;
+        NO_PHOTO;
 
     if (_.isEmpty(word)) {
         return <div />;
