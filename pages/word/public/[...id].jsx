@@ -8,7 +8,7 @@ import PublicWordComponent from "@components/Words/Public";
 import ErrorPage from "@components/Error";
 
 import { API } from '@config';
-import { deepExtractObjectStrapi, sortRelatedVips } from '@utils';
+import { deepExtractObjectStrapi, getNRelatedVips } from '@utils';
 import { NO_PHOTO } from '@consts';
 
 import qs from 'qs';
@@ -45,8 +45,6 @@ const PublicWord = ({ vip, relatedVips, params }) => {
 
 const MetaTag = ({ vip, params }) => {
     
-    console.log('vip', vip);
-
     const photo = vip?.illustration;
     const firstMeaning = vip?.meanings?.english[0] || vip?.meanings?.vietnamese[0];
 
@@ -87,22 +85,6 @@ export async function getStaticProps(ctx) {
 
     const { id: [vip, id] } = ctx.params;
 
-    const querySearchRelated = {
-        populate: '*',
-        filters: {
-            id: {
-                $ne: id,
-            }
-        },
-        pagination: {
-            page: 1,
-            pageSize: 1000
-        }
-    }
-
-    const allVips = await fetch(`${API}/api/vips?${qs.stringify(querySearchRelated, { encodeValuesOnly: true })}`);
-    const vips = (await allVips.json())?.data;
-
     const foundVipRaw = await fetch(`${API}/api/vips/${id}?populate=*`);
     const foundVip = await foundVipRaw.json();
 
@@ -110,23 +92,7 @@ export async function getStaticProps(ctx) {
         minifyPhoto: ['illustration']
     });
 
-    const relatedVips = vips.filter(item => !id ? item.attributes.vip !== vip : item.id.toString() !== id);
-
-    const formattedRelatedVips = relatedVips
-        .map(item => deepExtractObjectStrapi(item, {
-            minify: true,
-            minifyFields: ['lastReview', 'lastReviewOK', 'antonyms', 'audio', 'createdAt', 'updatedAt'],
-            minifyPhoto: ['illustration']
-        }));
-
-    const sortedRelatedVips = sortRelatedVips(matchedVip, formattedRelatedVips);
-
-    const minifiedRelatedVips = sortedRelatedVips.map(item => deepExtractObjectStrapi(item, {
-        minify: true,
-        minifyFields: ['tags', 'meanings', 'examples', 'synonyms']
-    }));
-
-    const randomSixRelatedVips = minifiedRelatedVips.slice(0, 6);
+    const randomSixRelatedVips = _.isObject(matchedVip) && !_.isEmpty(matchedVip) && await getNRelatedVips(matchedVip, 6);
 
     return {
         props: {

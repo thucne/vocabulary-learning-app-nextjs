@@ -6,16 +6,20 @@ import Router from 'next/router';
 import {
     Container, Grid, Typography, Divider,
     Link as MuiLink, CircularProgress, IconButton,
-    Tooltip, Paper
+    Chip, Tooltip, Paper, Stack
 } from '@mui/material';
 
 import VolumeUpRoundedIcon from '@mui/icons-material/VolumeUpRounded';
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded';
+import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove';
+import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 
 import { Props, SXs, Fonts, Colors } from '@styles';
-import { getAudioUrl, useThisToGetSizesFromRef } from '@utils';
+import { getAudioUrl, useThisToGetSizesFromRef, getNRelatedVips } from '@utils';
 import { AUDIO_ALT, NO_PHOTO } from '@consts';
 import LoadingImage from '@components/LoadingImage';
+import { subscribeVip, unsubscribeVip } from "@actions";
 import * as t from '@consts';
 import { RECAPTCHA } from '@config';
 
@@ -23,9 +27,11 @@ import { useSelector, useDispatch } from "react-redux";
 import parser from 'html-react-parser';
 import _ from 'lodash';
 
-const PrivateWord = ({ vip, relatedVips }) => {
+const PrivateWord = ({ vip, relatedVips: externalRelatedVips }) => {
     const [audioUrl, setAudioUrl] = useState("");
     const [loadingAudio, setLoadingAudio] = useState(false);
+    const [relatedVips, setRelatedVips] = useState([]);
+    const [fetchingRelatedVips, setFetchingRelatedVips] = useState(false);
 
     const audioRef = useRef(null);
     const gridRef = useRef(null);
@@ -92,13 +98,67 @@ const PrivateWord = ({ vip, relatedVips }) => {
 
     }, [audio]);
 
+    useEffect(() => {
+        if (_.isEqual(relatedVips, [])) {
+            setRelatedVips(externalRelatedVips);
+        }
+    }, [externalRelatedVips, relatedVips]);
+
+    const handleSubscribe = (e) => {
+        e?.preventDefault();
+
+        if (window?.adHocFetch && recaptcha === true && window.grecaptcha) {
+            grecaptcha.ready(function () {
+                grecaptcha
+                    .execute(`${RECAPTCHA}`, { action: "vip_authentication" })
+                    .then(function (token) {
+                        adHocFetch({
+                            dispatch,
+                            action: subscribeVip(vip?.id, token),
+                            onSuccess: (data) => console.log(data),
+                            onError: (error) => console.log(error),
+                            snackbarMessageOnSuccess: "Subscribed!",
+                        });
+                    });
+            });
+        }
+    }
+
+    const handleUnsubscribe = (e) => {
+        e?.preventDefault();
+
+        if (window?.adHocFetch && recaptcha === true && window.grecaptcha) {
+            grecaptcha.ready(function () {
+                grecaptcha
+                    .execute(`${RECAPTCHA}`, { action: "vip_authentication" })
+                    .then(function (token) {
+                        adHocFetch({
+                            dispatch,
+                            action: unsubscribeVip(vip?.id, token),
+                            onSuccess: (data) => console.log(data),
+                            onError: (error) => console.log(error),
+                            snackbarMessageOnSuccess: "Unsubscribed!",
+                        });
+                    });
+            });
+        }
+    }
+
+    const refreshRelatedVips = async (e) => {
+        e?.preventDefault();
+        setFetchingRelatedVips(true);
+        const newRelatedVips = await getNRelatedVips(vip, 6, true);
+        setFetchingRelatedVips(false);
+        setRelatedVips(newRelatedVips);
+    };
+
     return (
         <Container maxWidth="md">
             <Grid container {...Props.GCRSC}>
                 <Grid item xs={12} mt={2}>
                     <Typography variant="caption">
                         <i>
-                            Private word. Only you can see this word.
+                            Private word. Only you can see this.
                         </i>
                     </Typography>
                     <Divider sx={{ my: 2 }} />
@@ -342,14 +402,34 @@ const PrivateWord = ({ vip, relatedVips }) => {
                         borderRadius: '4px',
                         overflow: 'hidden',
                     }}>
+
                         <Grid container {...Props.GCRBC}>
                             <Typography variant="body1" sx={{
                                 fontWeight: Fonts.FW_700,
                                 fontSize: Fonts.FS_14,
                                 color: (theme) => theme.palette.publicWord2.main,
                                 mr: 1,
+                                alignIitems: 'center',
                             }}>
                                 Related Words
+                                <label title="Refresh">
+                                    <IconButton
+                                        aria-label='Refresh'
+                                        size="small"
+                                        sx={{
+                                            color: 'inherit',
+                                            ml: 1,
+                                        }}
+                                        onClick={refreshRelatedVips}
+                                        disabled={fetchingRelatedVips}
+                                    >
+                                        {
+                                            fetchingRelatedVips
+                                                ? <CircularProgress size="18px" sx={{ color: 'inherit' }} />
+                                                : <RefreshRoundedIcon sx={{ fontSize: 'inherit' }} />
+                                        }
+                                    </IconButton>
+                                </label>
                             </Typography>
 
                             <Grid item {...Props.GIRCC}>

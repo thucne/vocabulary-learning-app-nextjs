@@ -12,7 +12,7 @@ import {
     Alert as MuiAlert,
     Backdrop,
     LinearProgress,
-    Typography,
+    Button
 } from "@mui/material";
 import { useSelector, useDispatch } from "react-redux";
 import { styled } from "@mui/system";
@@ -22,6 +22,11 @@ import { RECAPTCHA } from "@config";
 
 import Meta from "@components/Meta";
 import Navigation from "@components/Navigation";
+import ConfirmDialog from "components/ConfirmDialog";
+
+import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
+
+import { SXs } from '@styles';
 
 const TransitionRight = (props) => {
     return <Slide {...props} direction="left" />;
@@ -38,7 +43,7 @@ const StyledProgess = styled(LinearProgress)({
     },
 });
 
-const Layout = ({ children, login = false, landing = false, noMeta = false, tabName = "" }) => {
+const Layout = ({ children, login = false, landing = false, noMeta = false, tabName = "", noBack = false }) => {
     const router = useRouter();
     const [openMessage, setOpenMessage] = useState(false);
 
@@ -46,6 +51,7 @@ const Layout = ({ children, login = false, landing = false, noMeta = false, tabN
     const snackbar = useSelector((state) => state.snackbar);
     const linear = useSelector((state) => state.linear);
     const backdrop = useSelector((state) => state.backdrop);
+    const confirmDialog = useSelector((state) => state?.confirmDialog);
 
     useEffect(() => {
         if (router?.query?.message) {
@@ -72,7 +78,6 @@ const Layout = ({ children, login = false, landing = false, noMeta = false, tabN
         if (reason === "clickaway") {
             return;
         }
-
         setOpenMessage(false);
     };
 
@@ -84,6 +89,28 @@ const Layout = ({ children, login = false, landing = false, noMeta = false, tabN
                 pointerEvents: backdrop?.show ? "none" : "auto",
             }}
         >
+            <ConfirmDialog
+                open={!confirmDialog?.show}
+                data={confirmDialog?.data}
+                handleClose={() => dispatch({ type: t.HIDE_CONFIRM_DIALOG })}
+            />
+            {
+                !login && !landing && router?.asPath !== "/" && !noBack && <Button
+                    sx={{
+                        position: "fixed",
+                        zIndex: "1000",
+                        bottom: "1rem",
+                        left: "1rem",
+                        ...SXs.COMMON_BUTTON_STYLES
+                    }}
+                    onClick={() => router.back()}
+                    startIcon={<ArrowBackRoundedIcon />}
+                    size="small"
+                    variant="outlined"
+                >
+                    Back
+                </Button>
+            }
             {
                 !noMeta && <Meta />
             }

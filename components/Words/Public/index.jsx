@@ -13,9 +13,10 @@ import VolumeUpRoundedIcon from '@mui/icons-material/VolumeUpRounded';
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded';
 import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove';
+import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 
 import { Props, SXs, Fonts, Colors } from '@styles';
-import { getAudioUrl, useThisToGetSizesFromRef } from '@utils';
+import { getAudioUrl, useThisToGetSizesFromRef, getNRelatedVips } from '@utils';
 import { AUDIO_ALT, NO_PHOTO } from '@consts';
 import LoadingImage from '@components/LoadingImage';
 import { subscribeVip, unsubscribeVip } from "@actions";
@@ -26,9 +27,11 @@ import { useSelector, useDispatch } from "react-redux";
 import parser from 'html-react-parser';
 import _ from 'lodash';
 
-const PublicWord = ({ vip, relatedVips }) => {
+const PublicWord = ({ vip, relatedVips: externalRelatedVips }) => {
     const [audioUrl, setAudioUrl] = useState("");
     const [loadingAudio, setLoadingAudio] = useState(false);
+    const [relatedVips, setRelatedVips] = useState([]);
+    const [fetchingRelatedVips, setFetchingRelatedVips] = useState(false);
 
     const audioRef = useRef(null);
     const gridRef = useRef(null);
@@ -95,6 +98,12 @@ const PublicWord = ({ vip, relatedVips }) => {
 
     }, [audio]);
 
+    useEffect(() => {
+        if (_.isEqual(relatedVips, [])) {
+            setRelatedVips(externalRelatedVips);
+        }
+    }, [externalRelatedVips, relatedVips]);
+
     const handleSubscribe = (e) => {
         e?.preventDefault();
 
@@ -134,6 +143,14 @@ const PublicWord = ({ vip, relatedVips }) => {
             });
         }
     }
+
+    const refreshRelatedVips = async (e) => {
+        e?.preventDefault();
+        setFetchingRelatedVips(true);
+        const newRelatedVips = await getNRelatedVips(vip, 6, true);
+        setFetchingRelatedVips(false);
+        setRelatedVips(newRelatedVips);
+    };
 
     return (
         <Container maxWidth="md">
@@ -425,36 +442,56 @@ const PublicWord = ({ vip, relatedVips }) => {
                         borderRadius: '4px',
                         overflow: 'hidden',
                     }}>
-                        <Typography variant="body1" sx={{
-                            fontWeight: Fonts.FW_700,
-                            fontSize: Fonts.FS_14,
-                            color: (theme) => theme.palette.publicWord2.main,
-                            mb: 1, mr: 1,
-                            display: 'inline'
-                        }}>
-                            Related Words
-                        </Typography>
 
-                        {/* Chú thích */}
-                        <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: 'rgba(63, 81, 181, 0.52)', display: 'inline-block', margin: '0px 5px' }} />
-                        <Typography variant="caption" sx={{
-                            fontSize: Fonts.FS_10,
-                            color: 'rgba(63, 81, 181, 0.72)',
-                            mb: 1,
-                            display: 'inline'
-                        }}>
-                            Related
-                        </Typography>
+                        <Grid container {...Props.GCRBC}>
+                            <Typography variant="body1" sx={{
+                                fontWeight: Fonts.FW_700,
+                                fontSize: Fonts.FS_14,
+                                color: (theme) => theme.palette.publicWord2.main,
+                                mr: 1,
+                                alignIitems: 'center',
+                            }}>
+                                Related Words
+                                <label title="Refresh">
+                                    <IconButton
+                                        aria-label='Refresh'
+                                        size="small"
+                                        sx={{
+                                            color: 'inherit',
+                                            ml: 1,
+                                        }}
+                                        onClick={refreshRelatedVips}
+                                        disabled={fetchingRelatedVips}
+                                    >
+                                        {
+                                            fetchingRelatedVips
+                                                ? <CircularProgress size="18px" sx={{ color: 'inherit' }} />
+                                                : <RefreshRoundedIcon sx={{ fontSize: 'inherit' }} />
+                                        }
+                                    </IconButton>
+                                </label>
+                            </Typography>
 
-                        <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: 'rgba(155, 49, 77, 0.52)', display: 'inline-block', margin: '0px 5px' }} />
-                        <Typography variant="caption" sx={{
-                            fontSize: Fonts.FS_10,
-                            color: 'rgba(155, 49, 77, 0.52)',
-                            mb: 1,
-                            display: 'inline'
-                        }}>
-                            More
-                        </Typography>
+                            <Grid item {...Props.GIRCC}>
+                                {/* Chú thích */}
+                                <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: 'rgba(63, 81, 181, 0.52)' }} />
+                                <Typography variant="caption" sx={{
+                                    color: 'rgba(63, 81, 181, 0.72)',
+                                    ml: 0.5,
+                                    mr: 1
+                                }}>
+                                    Related
+                                </Typography>
+
+                                <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: 'rgba(155, 49, 77, 0.52)' }} />
+                                <Typography variant="caption" sx={{
+                                    color: 'rgba(155, 49, 77, 0.52)',
+                                    ml: 0.5,
+                                }}>
+                                    More
+                                </Typography>
+                            </Grid>
+                        </Grid>
 
 
                         <Grid container spacing={1} {...Props.GCRSC} mt={1}>

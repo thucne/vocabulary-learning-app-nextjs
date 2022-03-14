@@ -7,6 +7,7 @@ import tabName from "./tabName";
 import bgColor from "./bgColor";
 import userData from "./userData";
 import recaptcha from "./recaptcha";
+import confirmDialog from "./confirmDialog";
 
 const rootReducer = combineReducers({
     user,
@@ -17,6 +18,7 @@ const rootReducer = combineReducers({
     bgColor,
     userData,
     recaptcha,
+    confirmDialog
 });
 
 export default rootReducer;

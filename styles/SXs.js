@@ -14,6 +14,22 @@ export const MUI_NAV_ICON_BUTTON = {
     },
 };
 
+export const MUI_NAV_ICON_BUTTON_CUSTOM = (width = "40px", height = "40px") => ({
+    width: width,
+    height: height,
+    borderRadius: "10px",
+    border: (theme) => `1px solid ${theme.palette.mui_button.main}`,
+    "& .MuiTouchRipple-root span": {
+        borderRadius: "10px",
+    },
+    "&.MuiButton-root": {
+        textTransform: "none !important",
+    },
+    "&.MuiLoadingButton-root": {
+        textTransform: "none !important",
+    },
+})
+
 
 export const MUI_NAV_BUTTON = {
     mr: 1,

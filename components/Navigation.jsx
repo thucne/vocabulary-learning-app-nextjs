@@ -103,7 +103,7 @@ function ResponsiveDrawer(props) {
     const tabName = useSelector((state) => state?.tabName);
     const bgColor = useSelector((state) => state?.bgColor);
     const userData = useSelector((state) => state?.userData);
-
+    
     const [width, height] = useWindowSize(appBarRef);
 
     const trigger = useScrollTrigger({

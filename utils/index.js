@@ -7,11 +7,12 @@ import {
 } from "react";
 import Router from "next/router";
 import { logout, updateSettings } from "@actions";
-import { RECAPTCHA } from '@config';
+import { RECAPTCHA, API } from '@config';
+
 import _ from 'lodash';
-import axios from 'axios';
 import moment from 'moment';
 import { NO_PHOTO, NO_PHOTO_SEO } from "@consts";
+import qs from 'qs';
 
 export const isAuth = () => {
     if (typeof window !== "undefined") {
@@ -998,9 +999,9 @@ export const sortRelatedVips = (vip, relatedVips) => {
         const aPriority = -(aTagsIntersection.length + aType2Intersection.length * 0.1 + aType1Intersection * 0.2 + aSynonymsIntersection * 2 + aVipIntersection * 2.1);
         const bPriority = -(bTagsIntersection.length + bType2Intersection.length * 0.1 + bType1Intersection * 0.2 + bSynonymsIntersection * 2 + bVipIntersection * 2.1);
 
-        if (!evidences.find(item => item.id === a.id)) {
+        if (!evidences.find(item => item?.id === a?.id)) {
             evidences.push({
-                id: a.id, priority: aPriority, details: {
+                id: a?.id, priority: aPriority, details: {
                     aTagsIntersection,
                     aType2Intersection,
                     aType1Intersection,
@@ -1011,9 +1012,9 @@ export const sortRelatedVips = (vip, relatedVips) => {
             });
         }
 
-        if (!evidences.find(item => item.id === b.id)) {
+        if (!evidences.find(item => item?.id === b?.id)) {
             evidences.push({
-                id: b.id, priority: bPriority, details: {
+                id: b?.id, priority: bPriority, details: {
                     bTagsIntersection,
                     bType2Intersection,
                     bType1Intersection,
@@ -1036,4 +1037,42 @@ export const sortRelatedVips = (vip, relatedVips) => {
 
 export const generateVipLink = (status, vip, id) => {
     return status ? `/word/public/${vip}/${id}` : `/word/${vip}/${id}`
+}
+
+export const getNRelatedVips = async (matchedVip, n = 6, random = false) => {
+    const querySearchRelated = {
+        populate: '*',
+        filters: {
+            id: {
+                $ne: matchedVip?.id,
+            }
+        },
+        pagination: {
+            page: 1,
+            pageSize: 1000
+        }
+    }
+
+    const allVips = await fetch(`${API}/api/vips?${qs.stringify(querySearchRelated, { encodeValuesOnly: true })}`);
+    const relatedVips = (await allVips.json())?.data;
+
+    const formattedRelatedVips = relatedVips
+        .map(item => deepExtractObjectStrapi(item, {
+            minify: true,
+            minifyFields: ['lastReview', 'lastReviewOK', 'antonyms', 'audio', 'createdAt', 'updatedAt'],
+            minifyPhoto: ['illustration']
+        }));
+
+    const sortedRelatedVips = sortRelatedVips(matchedVip, formattedRelatedVips);
+
+    const minifiedRelatedVips = sortedRelatedVips.map(item => deepExtractObjectStrapi(item, {
+        minify: true,
+        minifyFields: ['tags', 'meanings', 'examples', 'synonyms']
+    }));
+
+    const randomNRelatedVips = random
+        ? minifiedRelatedVips.sort(() => 0.5 - Math.random()).slice(0, _.isInteger(n) && n > 0 ? n : 6)
+        : minifiedRelatedVips.slice(0, _.isInteger(n) && n > 0 ? n : 6);
+
+    return randomNRelatedVips;
 }
