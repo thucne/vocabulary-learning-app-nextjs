@@ -101,7 +101,7 @@ export async function getStaticProps(ctx) {
     const randomWord = words[Math.floor(Math.random() * words.length)];
 
     const randomPhoto = await fetch(RANDOM_QUERY(randomWord));
-    const randomPhotoData = await randomPhoto.json();
+    const randomPhotoData = await randomPhoto?.json().catch(err => console.log(err)) || {};
 
     return {
         props: {
