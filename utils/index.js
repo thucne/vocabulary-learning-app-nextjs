@@ -336,8 +336,8 @@ export function useWindowSize() {
 }
 
 export const groupBy = function (xs, key) {
-    return xs.reduce(function (rv, x) {
-        (rv[x[key]] = rv[x[key]] || []).push(x);
+    return xs?.reduce(function (rv, x) {
+        (rv[x[key]] = rv[x[key]] || [])?.push(x);
         return rv;
     }, {});
 };
@@ -352,8 +352,8 @@ export const handleDictionaryData = (
 
     const allPronounces =
         firstData?.phonetics
-            .filter((item) => item?.audio && item?.text)
-            .sort((a, b) => {
+            ?.filter((item) => item?.audio && item?.text)
+            ?.sort((a, b) => {
                 // sort by order of -us, -uk, -au in audio
                 const aOrder = a?.audio?.includes("-us")
                     ? 0
@@ -374,7 +374,7 @@ export const handleDictionaryData = (
     const allTypes =
         firstData?.meanings
             ?.map((item) => item?.partOfSpeech)
-            .filter((item) => {
+            ?.filter((item) => {
                 const found = vocabTypes.find((each) => each.value === item);
                 const index = vocabTypes.indexOf(found);
                 return index !== -1;

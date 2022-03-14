@@ -5,7 +5,7 @@ const confirmDialog = (state = { show: false }, action) => {
         case t.SHOW_CONFIRM_DIALOG:
             return { show: true, data: action?.payload };
         case t.HIDE_CONFIRM_DIALOG:
-            return { show: false, data: {} };
+            return { ...state, show: false };
         default:
             return { ...state };
     }

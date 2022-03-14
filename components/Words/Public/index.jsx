@@ -14,11 +14,13 @@ import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded';
 import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove';
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
+import ShareIcon from '@mui/icons-material/Share';
 
 import { Props, SXs, Fonts, Colors } from '@styles';
 import { getAudioUrl, useThisToGetSizesFromRef, getNRelatedVips } from '@utils';
 import { AUDIO_ALT, NO_PHOTO } from '@consts';
 import LoadingImage from '@components/LoadingImage';
+import RandomWord from '@components/Words/RandomWord';
 import { subscribeVip, unsubscribeVip } from "@actions";
 import * as t from '@consts';
 import { RECAPTCHA } from '@config';
@@ -30,6 +32,7 @@ import _ from 'lodash';
 const PublicWord = ({ vip, relatedVips: externalRelatedVips }) => {
     const [audioUrl, setAudioUrl] = useState("");
     const [loadingAudio, setLoadingAudio] = useState(false);
+
     const [relatedVips, setRelatedVips] = useState([]);
     const [fetchingRelatedVips, setFetchingRelatedVips] = useState(false);
 
@@ -81,14 +84,18 @@ const PublicWord = ({ vip, relatedVips: externalRelatedVips }) => {
             if (canRun) {
                 setLoadingAudio(true);
                 setAudioUrl("");
-                getAudioUrl(audio, (url) => {
-                    setAudioUrl(url);
-                    if (audioRef.current) {
-                        audioRef.current.pause();
-                        audioRef.current.load();
-                    }
+                if (_.isEmpty(audio)) {
                     setLoadingAudio(false);
-                });
+                } else {
+                    getAudioUrl(audio, (url) => {
+                        setAudioUrl(url);
+                        if (audioRef.current) {
+                            audioRef.current.pause();
+                            audioRef.current.load();
+                        }
+                        setLoadingAudio(false);
+                    });
+                }
             }
         }
 
@@ -107,50 +114,96 @@ const PublicWord = ({ vip, relatedVips: externalRelatedVips }) => {
     const handleSubscribe = (e) => {
         e?.preventDefault();
 
-        if (window?.adHocFetch && recaptcha === true && window.grecaptcha) {
-            grecaptcha.ready(function () {
-                grecaptcha
-                    .execute(`${RECAPTCHA}`, { action: "vip_authentication" })
-                    .then(function (token) {
-                        adHocFetch({
-                            dispatch,
-                            action: subscribeVip(vip?.id, token),
-                            onSuccess: (data) => console.log(data),
-                            onError: (error) => console.log(error),
-                            snackbarMessageOnSuccess: "Subscribed!",
+        const nextAction = () => {
+            if (window?.adHocFetch && recaptcha === true && window.grecaptcha) {
+                grecaptcha.ready(function () {
+                    grecaptcha
+                        .execute(`${RECAPTCHA}`, { action: "vip_authentication" })
+                        .then(function (token) {
+                            adHocFetch({
+                                dispatch,
+                                action: subscribeVip(vip?.id, token),
+                                onSuccess: () => dispatch({ type: t.HIDE_CONFIRM_DIALOG }),
+                                onError: (error) => console.log(error),
+                                snackbarMessageOnSuccess: "Subscribed!",
+                            });
                         });
-                    });
-            });
+                });
+            }
         }
+
+        dispatch({
+            type: t.SHOW_CONFIRM_DIALOG,
+            payload: {
+                title: "Note",
+                message: "Subscribe means you will follow this word, and note that when the publicity of this word is set to private, you will not be able to see this word anymore.",
+                onNext: nextAction,
+                nextText: "Subscribe",
+            }
+        })
     }
 
     const handleUnsubscribe = (e) => {
         e?.preventDefault();
 
-        if (window?.adHocFetch && recaptcha === true && window.grecaptcha) {
-            grecaptcha.ready(function () {
-                grecaptcha
-                    .execute(`${RECAPTCHA}`, { action: "vip_authentication" })
-                    .then(function (token) {
-                        adHocFetch({
-                            dispatch,
-                            action: unsubscribeVip(vip?.id, token),
-                            onSuccess: (data) => console.log(data),
-                            onError: (error) => console.log(error),
-                            snackbarMessageOnSuccess: "Unsubscribed!",
+        const nextAction = () => {
+            if (window?.adHocFetch && recaptcha === true && window.grecaptcha) {
+                grecaptcha.ready(function () {
+                    grecaptcha
+                        .execute(`${RECAPTCHA}`, { action: "vip_authentication" })
+                        .then(function (token) {
+                            adHocFetch({
+                                dispatch,
+                                action: unsubscribeVip(vip?.id, token),
+                                onSuccess: () => dispatch({ type: t.HIDE_CONFIRM_DIALOG }),
+                                onError: (error) => console.log(error),
+                                snackbarMessageOnSuccess: "Unsubscribed!",
+                            });
                         });
-                    });
-            });
+                });
+            }
         }
+
+        dispatch({
+            type: t.SHOW_CONFIRM_DIALOG,
+            payload: {
+                title: "Warning",
+                message: "Are you sure you want to unsubscribe?",
+                onNext: nextAction,
+                nextText: "Unsubscribe",
+                type: "warning"
+            }
+        })
     }
 
     const refreshRelatedVips = async (e) => {
         e?.preventDefault();
+
         setFetchingRelatedVips(true);
         const newRelatedVips = await getNRelatedVips(vip, 6, true);
         setFetchingRelatedVips(false);
         setRelatedVips(newRelatedVips);
+
     };
+
+    const handleShare = (e) => {
+        e?.preventDefault();
+
+        if (navigator.share) {
+            navigator.share({
+                title: 'WebShare API Demo',
+                url: window.location.href,
+            }).then(() => {
+                dispatch({ type: t.SHOW_SNACKBAR, payload: { message: "Shared!" } });
+            })
+                .catch(console.error);
+        } else {
+            // copy link to clipboard
+            navigator.clipboard.writeText(window.location.href)
+                .then(() => dispatch({ type: t.SHOW_SNACKBAR, payload: { message: "URL copied!" } }))
+                .catch(() => dispatch({ type: t.SHOW_SNACKBAR, payload: { message: "Failed to copy!", type: "error" } }));
+        }
+    }
 
     return (
         <Container maxWidth="md">
@@ -164,19 +217,28 @@ const PublicWord = ({ vip, relatedVips: externalRelatedVips }) => {
                             </Typography>
                         </i>
                     </Typography>
-                    <Divider sx={{ my: 2 }} />
                 </Grid>
 
                 <Grid item xs={12}>
+                    <Divider sx={{ my: 2 }} />
 
-                    {/* main word */}
-                    <Typography variant="h4" component="h1" className='overflowTypography'
-                        sx={{
-                            color: theme => theme.palette.publicWord3.main,
-                        }}
-                    >
-                        {vip.vip}
-                    </Typography>
+                    <Grid container {...Props.GCRBC}>
+                        {/* main word */}
+                        <Typography variant="h4" component="h1" className='overflowTypography'
+                            sx={{
+                                color: theme => theme.palette.publicWord3.main,
+                            }}
+                        >
+                            {vip.vip}
+                        </Typography>
+                        <IconButton
+                            size="small"
+                            sx={{ color: theme => theme.palette.publicWord3.main }}
+                            onClick={handleShare}
+                        >
+                            <ShareIcon fontSize="inherit" />
+                        </IconButton>
+                    </Grid>
 
                     {/* type2 */}
                     <Grid container {...Props.GCRSC} spacing={0.5} mt={1}>
@@ -226,7 +288,7 @@ const PublicWord = ({ vip, relatedVips: externalRelatedVips }) => {
                         }}>
 
                             <Typography variant="body2" sx={{ letterSpacing: '-0.5px' }}>
-                                {pronounce}
+                                {pronounce || '/No pronunciation/'}
                             </Typography>
 
                             {
@@ -246,48 +308,49 @@ const PublicWord = ({ vip, relatedVips: externalRelatedVips }) => {
                         </Grid>
                     </Grid>
 
-                    <Divider sx={{ my: 2 }} textAlign='right'>
-                        <Tooltip title="Subscribe to this word" arrow>
-                            <IconButton aria-label='Subscribe to this word' sx={{
-                                backgroundColor: Colors.LOGO_YELLOW,
-                                borderRadius: "12px",
-                                py: 0,
-                                "&:hover": {
-                                    backgroundColor: Colors.LOGO_YELLOW,
-                                    filter: 'brightness(80%)'
-                                },
-                                "& .MuiTouchRipple-root span": {
-                                    borderRadius: "12px",
-                                    py: 0
-                                },
-                            }} onClick={handleSubscribe}>
-                                <PlaylistAddIcon color='white' />
-                            </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Unsubscribe from this word" arrow>
-                            <IconButton aria-label='Unsubscribe from this word' sx={{
-                                backgroundColor: Colors.LOGO_BLUE,
-                                borderRadius: "12px",
-                                py: 0,
-                                ml: 1,
-                                "&:hover": {
-                                    backgroundColor: Colors.LOGO_BLUE,
-                                    filter: 'brightness(80%)'
-                                },
-                                "& .MuiTouchRipple-root span": {
-                                    borderRadius: "12px",
-                                    py: 0
-                                },
-                            }} onClick={handleUnsubscribe}>
-                                <PlaylistRemoveIcon color='white' />
-                            </IconButton>
-                        </Tooltip>
-                    </Divider>
-
                 </Grid>
 
                 {
                     !!english?.length && <Grid item xs={12}>
+
+                        <Divider sx={{ my: 2 }} textAlign='right'>
+                            <Tooltip title="Subscribe to this word" arrow>
+                                <IconButton aria-label='Subscribe to this word' sx={{
+                                    backgroundColor: Colors.LOGO_YELLOW,
+                                    borderRadius: "12px",
+                                    py: 0,
+                                    "&:hover": {
+                                        backgroundColor: Colors.LOGO_YELLOW,
+                                        filter: 'brightness(80%)'
+                                    },
+                                    "& .MuiTouchRipple-root span": {
+                                        borderRadius: "12px",
+                                        py: 0
+                                    },
+                                }} onClick={handleSubscribe}>
+                                    <PlaylistAddIcon color='white' />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Unsubscribe from this word" arrow>
+                                <IconButton aria-label='Unsubscribe from this word' sx={{
+                                    backgroundColor: Colors.LOGO_BLUE,
+                                    borderRadius: "12px",
+                                    py: 0,
+                                    ml: 1,
+                                    "&:hover": {
+                                        backgroundColor: Colors.LOGO_BLUE,
+                                        filter: 'brightness(80%)'
+                                    },
+                                    "& .MuiTouchRipple-root span": {
+                                        borderRadius: "12px",
+                                        py: 0
+                                    },
+                                }} onClick={handleUnsubscribe}>
+                                    <PlaylistRemoveIcon color='white' />
+                                </IconButton>
+                            </Tooltip>
+                        </Divider>
+
                         {
                             !_.isEmpty(photo) && (
                                 <div style={{
@@ -319,12 +382,12 @@ const PublicWord = ({ vip, relatedVips: externalRelatedVips }) => {
                                 </Typography>
                             ))
                         }
-                        <Divider sx={{ my: 2 }} />
                     </Grid>
                 }
 
                 {
                     !!vietnamese?.length && <Grid item xs={12}>
+                        <Divider sx={{ my: 2 }} />
                         {
                             vietnamese.map((item, index) => (
                                 <Typography key={`vietnamese-${index}`} variant="body1" mt={index !== 0 ? 1 : 0} sx={{
@@ -336,12 +399,12 @@ const PublicWord = ({ vip, relatedVips: externalRelatedVips }) => {
                                 </Typography>
                             ))
                         }
-                        <Divider sx={{ my: 2 }} />
                     </Grid>
                 }
 
                 {
                     !!examples?.length && <Grid item xs={12}>
+                        <Divider sx={{ my: 2 }} />
                         {
                             examples.map((item, index) => (
                                 <Typography key={`example-${index}`} variant="body1" mt={index !== 0 ? 1 : 0} ml={1} sx={{
@@ -371,12 +434,13 @@ const PublicWord = ({ vip, relatedVips: externalRelatedVips }) => {
                                 </Typography>
                             ))
                         }
-                        <Divider sx={{ my: 2 }} />
                     </Grid>
                 }
 
                 {
                     !!synonyms?.length && <Grid item xs={12}>
+                        <Divider sx={{ my: 2 }} />
+
                         <Typography variant="body1" sx={{
                             fontWeight: Fonts.FW_700,
                             fontSize: Fonts.FS_14,
@@ -401,12 +465,12 @@ const PublicWord = ({ vip, relatedVips: externalRelatedVips }) => {
                                 ))
                             }
                         </Grid>
-                        <Divider sx={{ my: 2 }} />
                     </Grid>
                 }
 
                 {
                     !!antonyms?.length && <Grid item xs={12}>
+                        <Divider sx={{ my: 2 }} />
                         <Typography variant="body1" sx={{
                             fontWeight: Fonts.FW_700,
                             fontSize: Fonts.FS_14,
@@ -431,10 +495,9 @@ const PublicWord = ({ vip, relatedVips: externalRelatedVips }) => {
                                 ))
                             }
                         </Grid>
-                        <Divider sx={{ my: 2 }} />
                     </Grid>
                 }
-
+                <Divider sx={{ my: 2, width: '100%' }} />
                 {
                     (!!actualRelatedVips.length || !!moreRelatedVips.length) && <Grid item xs={12} sx={{
                         bgcolor: `relatedPaper.main`,
@@ -528,7 +591,7 @@ const PublicWord = ({ vip, relatedVips: externalRelatedVips }) => {
                             {
                                 tags.map((item, index) => (
                                     <Grid item key={`tag-${index}`} {...Props.GIRCC}>
-                                        <Link href={`/tag/${item.id}`} passHref>
+                                        <Link href={`/tag/${item.name}`} passHref>
                                             <MuiLink underline='hover' sx={{
                                                 fontWeight: Fonts.FW_400,
                                                 fontSize: Fonts.FS_14,
@@ -541,10 +604,15 @@ const PublicWord = ({ vip, relatedVips: externalRelatedVips }) => {
                                 ))
                             }
                         </Grid>
-                        <Divider sx={{ my: 2 }} />
                     </Grid>
                 }
 
+                <Grid item xs={12}>
+                    <Divider sx={{ my: 2, width: '100%' }} />
+                    <Grid container {...Props.GCRCC}>
+                        <RandomWord />
+                    </Grid>
+                </Grid>
             </Grid>
         </Container>
     );

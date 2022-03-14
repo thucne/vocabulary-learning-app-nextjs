@@ -14,11 +14,13 @@ import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded';
 import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove';
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
+import ShareIcon from '@mui/icons-material/Share';
 
 import { Props, SXs, Fonts, Colors } from '@styles';
 import { getAudioUrl, useThisToGetSizesFromRef, getNRelatedVips } from '@utils';
 import { AUDIO_ALT, NO_PHOTO } from '@consts';
 import LoadingImage from '@components/LoadingImage';
+import RandomWord from '@components/Words/RandomWord';
 import { subscribeVip, unsubscribeVip } from "@actions";
 import * as t from '@consts';
 import { RECAPTCHA } from '@config';
@@ -30,6 +32,7 @@ import _ from 'lodash';
 const PrivateWord = ({ vip, relatedVips: externalRelatedVips }) => {
     const [audioUrl, setAudioUrl] = useState("");
     const [loadingAudio, setLoadingAudio] = useState(false);
+
     const [relatedVips, setRelatedVips] = useState([]);
     const [fetchingRelatedVips, setFetchingRelatedVips] = useState(false);
 
@@ -81,14 +84,18 @@ const PrivateWord = ({ vip, relatedVips: externalRelatedVips }) => {
             if (canRun) {
                 setLoadingAudio(true);
                 setAudioUrl("");
-                getAudioUrl(audio, (url) => {
-                    setAudioUrl(url);
-                    if (audioRef.current) {
-                        audioRef.current.pause();
-                        audioRef.current.load();
-                    }
+                if (_.isEmpty(audio)) {
                     setLoadingAudio(false);
-                });
+                } else {
+                    getAudioUrl(audio, (url) => {
+                        setAudioUrl(url);
+                        if (audioRef.current) {
+                            audioRef.current.pause();
+                            audioRef.current.load();
+                        }
+                        setLoadingAudio(false);
+                    });
+                }
             }
         }
 
@@ -104,52 +111,14 @@ const PrivateWord = ({ vip, relatedVips: externalRelatedVips }) => {
         }
     }, [externalRelatedVips, relatedVips]);
 
-    const handleSubscribe = (e) => {
-        e?.preventDefault();
-
-        if (window?.adHocFetch && recaptcha === true && window.grecaptcha) {
-            grecaptcha.ready(function () {
-                grecaptcha
-                    .execute(`${RECAPTCHA}`, { action: "vip_authentication" })
-                    .then(function (token) {
-                        adHocFetch({
-                            dispatch,
-                            action: subscribeVip(vip?.id, token),
-                            onSuccess: (data) => console.log(data),
-                            onError: (error) => console.log(error),
-                            snackbarMessageOnSuccess: "Subscribed!",
-                        });
-                    });
-            });
-        }
-    }
-
-    const handleUnsubscribe = (e) => {
-        e?.preventDefault();
-
-        if (window?.adHocFetch && recaptcha === true && window.grecaptcha) {
-            grecaptcha.ready(function () {
-                grecaptcha
-                    .execute(`${RECAPTCHA}`, { action: "vip_authentication" })
-                    .then(function (token) {
-                        adHocFetch({
-                            dispatch,
-                            action: unsubscribeVip(vip?.id, token),
-                            onSuccess: (data) => console.log(data),
-                            onError: (error) => console.log(error),
-                            snackbarMessageOnSuccess: "Unsubscribed!",
-                        });
-                    });
-            });
-        }
-    }
-
     const refreshRelatedVips = async (e) => {
         e?.preventDefault();
+
         setFetchingRelatedVips(true);
         const newRelatedVips = await getNRelatedVips(vip, 6, true);
         setFetchingRelatedVips(false);
         setRelatedVips(newRelatedVips);
+
     };
 
     return (
@@ -158,22 +127,27 @@ const PrivateWord = ({ vip, relatedVips: externalRelatedVips }) => {
                 <Grid item xs={12} mt={2}>
                     <Typography variant="caption">
                         <i>
-                            Private word. Only you can see this.
+                            You are viewing a public word.
+                            <Typography variant="caption">
+                                &nbsp;[Author: {<MuiLink href={`/user/${vip?.author?.username}`}>{vip?.author?.name}</MuiLink>}]
+                            </Typography>
                         </i>
                     </Typography>
-                    <Divider sx={{ my: 2 }} />
                 </Grid>
 
                 <Grid item xs={12}>
+                    <Divider sx={{ my: 2 }} />
 
-                    {/* main word */}
-                    <Typography variant="h4" component="h1" className='overflowTypography'
-                        sx={{
-                            color: theme => theme.palette.publicWord3.main,
-                        }}
-                    >
-                        {vip.vip}
-                    </Typography>
+                    <Grid container {...Props.GCRBC}>
+                        {/* main word */}
+                        <Typography variant="h4" component="h1" className='overflowTypography'
+                            sx={{
+                                color: theme => theme.palette.publicWord3.main,
+                            }}
+                        >
+                            {vip.vip}
+                        </Typography>
+                    </Grid>
 
                     {/* type2 */}
                     <Grid container {...Props.GCRSC} spacing={0.5} mt={1}>
@@ -223,7 +197,7 @@ const PrivateWord = ({ vip, relatedVips: externalRelatedVips }) => {
                         }}>
 
                             <Typography variant="body2" sx={{ letterSpacing: '-0.5px' }}>
-                                {pronounce}
+                                {pronounce || '/No pronunciation/'}
                             </Typography>
 
                             {
@@ -243,11 +217,13 @@ const PrivateWord = ({ vip, relatedVips: externalRelatedVips }) => {
                         </Grid>
                     </Grid>
 
-                    <Divider sx={{ my: 2 }} />
                 </Grid>
 
                 {
                     !!english?.length && <Grid item xs={12}>
+
+                        <Divider sx={{ my: 2 }} />
+
                         {
                             !_.isEmpty(photo) && (
                                 <div style={{
@@ -279,12 +255,12 @@ const PrivateWord = ({ vip, relatedVips: externalRelatedVips }) => {
                                 </Typography>
                             ))
                         }
-                        <Divider sx={{ my: 2 }} />
                     </Grid>
                 }
 
                 {
                     !!vietnamese?.length && <Grid item xs={12}>
+                        <Divider sx={{ my: 2 }} />
                         {
                             vietnamese.map((item, index) => (
                                 <Typography key={`vietnamese-${index}`} variant="body1" mt={index !== 0 ? 1 : 0} sx={{
@@ -296,12 +272,12 @@ const PrivateWord = ({ vip, relatedVips: externalRelatedVips }) => {
                                 </Typography>
                             ))
                         }
-                        <Divider sx={{ my: 2 }} />
                     </Grid>
                 }
 
                 {
                     !!examples?.length && <Grid item xs={12}>
+                        <Divider sx={{ my: 2 }} />
                         {
                             examples.map((item, index) => (
                                 <Typography key={`example-${index}`} variant="body1" mt={index !== 0 ? 1 : 0} ml={1} sx={{
@@ -331,12 +307,13 @@ const PrivateWord = ({ vip, relatedVips: externalRelatedVips }) => {
                                 </Typography>
                             ))
                         }
-                        <Divider sx={{ my: 2 }} />
                     </Grid>
                 }
 
                 {
                     !!synonyms?.length && <Grid item xs={12}>
+                        <Divider sx={{ my: 2 }} />
+
                         <Typography variant="body1" sx={{
                             fontWeight: Fonts.FW_700,
                             fontSize: Fonts.FS_14,
@@ -361,12 +338,12 @@ const PrivateWord = ({ vip, relatedVips: externalRelatedVips }) => {
                                 ))
                             }
                         </Grid>
-                        <Divider sx={{ my: 2 }} />
                     </Grid>
                 }
 
                 {
                     !!antonyms?.length && <Grid item xs={12}>
+                        <Divider sx={{ my: 2 }} />
                         <Typography variant="body1" sx={{
                             fontWeight: Fonts.FW_700,
                             fontSize: Fonts.FS_14,
@@ -391,10 +368,9 @@ const PrivateWord = ({ vip, relatedVips: externalRelatedVips }) => {
                                 ))
                             }
                         </Grid>
-                        <Divider sx={{ my: 2 }} />
                     </Grid>
                 }
-
+                <Divider sx={{ my: 2, width: '100%' }} />
                 {
                     (!!actualRelatedVips.length || !!moreRelatedVips.length) && <Grid item xs={12} sx={{
                         bgcolor: `relatedPaper.main`,
@@ -488,7 +464,7 @@ const PrivateWord = ({ vip, relatedVips: externalRelatedVips }) => {
                             {
                                 tags.map((item, index) => (
                                     <Grid item key={`tag-${index}`} {...Props.GIRCC}>
-                                        <Link href={`/tag/${item.id}`} passHref>
+                                        <Link href={`/tag/${item.name}`} passHref>
                                             <MuiLink underline='hover' sx={{
                                                 fontWeight: Fonts.FW_400,
                                                 fontSize: Fonts.FS_14,
@@ -501,10 +477,15 @@ const PrivateWord = ({ vip, relatedVips: externalRelatedVips }) => {
                                 ))
                             }
                         </Grid>
-                        <Divider sx={{ my: 2 }} />
                     </Grid>
                 }
 
+                <Grid item xs={12}>
+                    <Divider sx={{ my: 2, width: '100%' }} />
+                    <Grid container {...Props.GCRCC}>
+                        <RandomWord />
+                    </Grid>
+                </Grid>
             </Grid>
         </Container>
     );

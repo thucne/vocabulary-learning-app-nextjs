@@ -90,7 +90,8 @@ const PrivateWord = ({ router = { query: {} } }) => {
     if (loading && _.isEmpty(matchedVip)) {
         return (
             <Private>
-                <Layout tabName={"Private word"}>
+                <Layout noMeta tabName={"Private word"}>
+                    <Meta robots="noindex, follow" />
                     <LoadingOrNotFound />
                 </Layout>
             </Private>
@@ -100,7 +101,8 @@ const PrivateWord = ({ router = { query: {} } }) => {
     if (!loading && _.isEmpty(matchedVip)) {
         return (
             <Private>
-                <Layout tabName={"Private word"}>
+                <Layout noMeta tabName={"Private word"}>
+                    <Meta robots="noindex, follow" />
                     <ErrorPage
                         title="Not Found | VIP"
                         errorMessage="Word Not Found"
@@ -140,6 +142,7 @@ const MetaTag = ({ vip, params }) => {
             canonical={`/word/public/${params.id[0]}/${params.id[1]}`}
             publishedTime={vip?.createdAt}
             modifiedTime={vip?.updatedAt}
+            robots="noindex, follow"
         />
     )
 };

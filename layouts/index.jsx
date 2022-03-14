@@ -90,7 +90,7 @@ const Layout = ({ children, login = false, landing = false, noMeta = false, tabN
             }}
         >
             <ConfirmDialog
-                open={!confirmDialog?.show}
+                open={confirmDialog?.show}
                 data={confirmDialog?.data}
                 handleClose={() => dispatch({ type: t.HIDE_CONFIRM_DIALOG })}
             />

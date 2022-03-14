@@ -167,3 +167,11 @@ export const BLUE_PUBLIC_WORDS_DARK = "#6573c3";
 export const RED_PUBLIC_WORDS_DARK = "#ed4b82";
 export const YELLOW_PUBLIC_WORDS_DARK = "#ffff8d";
 export const MAIN_PUBLIC_WORDS_DARK = "#66b2ff";
+
+// dialog
+export const DIALOG_BLUE = '#0057b7';
+export const DIALOG_YELLOW = '#ffd700';
+export const DIALOG_RED = '#f50057';
+
+// word of a day
+export const WOAD_YELLOW = '#fdc702'

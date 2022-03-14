@@ -7,36 +7,68 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
-import { Colors } from '@styles';
+import { Colors, SXs } from '@styles';
+
+import _ from 'lodash';
 
 export default function FormDialog({ open, handleClose, data }) {
     return (
         <Dialog open={open} onClose={handleClose} sx={{
             '& .MuiPaper-root': {
                 borderRadius: '10px',
-                borderTop: `8px solid ${Colors.LOGO_BLUE}`,
+                borderTop: `8px solid ${getColor(data?.type || 'info')}`,
             }
-        }}>
-            <DialogTitle>Subscribe</DialogTitle>
+        }} fullWidth>
+            <DialogTitle>{data?.title}</DialogTitle>
             <DialogContent>
                 <DialogContentText>
-                    To subscribe to this website, please enter your email address here. We
-                    will send updates occasionally.
+                    {data?.message}
                 </DialogContentText>
-                <TextField
-                    autoFocus
-                    margin="dense"
-                    id="name"
-                    label="Email Address"
-                    type="email"
-                    fullWidth
-                    variant="standard"
-                />
+                {data?.children}
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleClose}>Cancel</Button>
-                <Button onClick={handleClose}>Subscribe</Button>
+                <Button
+                    sx={{
+                        ...SXs.COMMON_BUTTON_STYLES,
+                        color: theme => theme.palette.grey[600],
+                    }}
+                    onClick={() => {
+                        if (_.isFunction(data?.onClose)) {
+                            data.onClose();
+                        }
+                        handleClose();
+                    }}
+                >
+                    {data?.closeText || 'Cancel'}
+                </Button>
+                <Button
+                    sx={{
+                        ...SXs.COMMON_BUTTON_STYLES,
+                        backgroundColor: getColor(data?.type || 'info'),
+                        "&:hover": {
+                            filter: `brightness(0.95)`,
+                            backgroundColor: getColor(data?.type || 'info'),
+                        }
+                    }}
+                    onClick={() => data.onNext()}
+                    disabled={!data?.onNext || !_.isFunction(data?.onNext)}
+                    variant="contained"
+                    disableElevation
+                >
+                    {data?.nextText || 'Next'}
+                </Button>
             </DialogActions>
         </Dialog>
     );
+}
+
+const getColor = (type) => {
+    switch (type) {
+        case 'info':
+            return Colors.DIALOG_BLUE;
+        case 'warning':
+            return Colors.DIALOG_YELLOW;
+        default:
+            return Colors.DIALOG_RED;
+    }
 }
