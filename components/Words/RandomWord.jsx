@@ -4,18 +4,17 @@ import { Paper, Typography, Grid, IconButton, Tooltip } from '@mui/material';
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 
 import { Colors, Props, Fonts } from '@styles';
-import { handleDictionaryData } from '@utils';
 
 import data from "./data";
 import _ from 'lodash';
 
-const RandomWord = () => {
+const RandomWord = ({ width = 300 }) => {
     const [word, setWord] = useState(data[Math.floor(Math.random() * data.length)]);
 
     // useEffect(() => {
     //     // shuffle the data and save to file
 
-    //     const shuffledData = _.shuffle(data);
+    //     const shuffledData = _.shuffle(test);
     //     const shuffledDataString = JSON.stringify(shuffledData);
 
     //     // save to file
@@ -32,9 +31,11 @@ const RandomWord = () => {
 
     return (
         <Paper sx={{
-            width: 300,
-            height: 300,
-            borderRadius: 0,
+            width: width,
+            height: width,
+            maxWidth: 300,
+            maxHeight: 300,
+            borderRadius: '4px',
             overflow: 'hidden',
             position: 'relative',
         }}>
@@ -54,7 +55,7 @@ const RandomWord = () => {
                 </IconButton>
             </Tooltip>
             <Grid container {...Props.GCRCC}>
-                <Grid item xs={12} {...Props.GICCC} sx={{ height: 150, backgroundColor: Colors.WOAD_YELLOW }}>
+                <Grid item xs={12} {...Props.GICCC} sx={{ height: width / 2, maxHeight: 150, backgroundColor: Colors.WOAD_YELLOW, px: 2, py: 1 }}>
                     <Typography variant="caption">
                         WORD OF THE ... NOW
                     </Typography>
@@ -62,8 +63,8 @@ const RandomWord = () => {
                         {word?.word?.toLowerCase()}
                     </Typography>
                 </Grid>
-                <Grid item xs={12} {...Props.GIRCC} sx={{ height: 150, px: 2, py: 1 }} className="overflowTypography">
-                    <Typography sx={{ color: (theme) => theme.palette.mainPublicWord.main, fontSize: Fonts.FS_16 }}>
+                <Grid item xs={12} {...Props.GIRCC} sx={{ height: width / 2, maxHeight: 150, px: 2, py: 1 }} className="overflowTypography">
+                    <Typography sx={{ color: (theme) => theme.palette.mainPublicWord.main, fontSize: Fonts.FS_16 }} align="center">
                         {word?.definition?.trim()?.toLowerCase()}
                     </Typography>
                 </Grid>

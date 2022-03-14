@@ -19,13 +19,22 @@ const Index = (props) => {
     const [loading, setLoading] = useState(true);
     const [localProps, setLocalProps] = useState(defaultImg);
 
-    const { doneLoading, bgColor, ...imgProps } = props;
+    const { doneLoading, bgColor, blurDataURL, ...imgProps } = props;
 
     useEffect(() => {
         if (!_.isEqual(localProps, imgProps)) {
             setLocalProps(imgProps);
         }
     }, [imgProps, localProps]);
+
+    // useEffect(() => {
+    //     const run = async () => {
+    //         console.log('run')
+    //         const res = await encodeImageToBlurhash(defaultImg?.src);
+    //         console.log(res);
+    //     }
+    //     run();
+    // },[])
 
     return (
         <>
@@ -34,7 +43,7 @@ const Index = (props) => {
                     position: "relative",
                     width: "100%",
                     height: "100%",
-                    opacity: loading ? 0 : 1,
+                    opacity: loading ? (blurDataURL ? 1 : 0) : 1,
                     backgroundColor: bgColor || theme.palette.img_bg.main,
                 }}
             >
@@ -49,7 +58,7 @@ const Index = (props) => {
                     }}
                 />
             </div>
-            {loading && (
+            {loading && !blurDataURL && (
                 <Skeleton
                     sx={{
                         position: "absolute",
@@ -61,7 +70,7 @@ const Index = (props) => {
                     animation="wave"
                 />
             )}
-            {loading && (
+            {loading && !blurDataURL && (
                 <div
                     style={{
                         position: "absolute",

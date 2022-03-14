@@ -38,6 +38,7 @@ const PrivateWord = ({ vip, relatedVips: externalRelatedVips }) => {
 
     const audioRef = useRef(null);
     const gridRef = useRef(null);
+    const grid2Ref = useRef(null);
 
     const dispatch = useDispatch();
     const recaptcha = useSelector(state => state.recaptcha);
@@ -73,6 +74,12 @@ const PrivateWord = ({ vip, relatedVips: externalRelatedVips }) => {
     }
 
     const gridSizes = useThisToGetSizesFromRef(gridRef, {
+        revalidate: 1000,
+        terminalCondition: ({ width }) => width !== 0,
+        falseCondition: ({ width }) => width === 0,
+    });
+
+    const grid2Sizes = useThisToGetSizesFromRef(grid2Ref, {
         revalidate: 1000,
         terminalCondition: ({ width }) => width !== 0,
         falseCondition: ({ width }) => width === 0,
@@ -480,10 +487,10 @@ const PrivateWord = ({ vip, relatedVips: externalRelatedVips }) => {
                     </Grid>
                 }
 
-                <Grid item xs={12}>
+                <Grid item xs={12} ref={grid2Ref}>
                     <Divider sx={{ my: 2, width: '100%' }} />
                     <Grid container {...Props.GCRCC}>
-                        <RandomWord />
+                        <RandomWord width={grid2Sizes?.width} />
                     </Grid>
                 </Grid>
             </Grid>
