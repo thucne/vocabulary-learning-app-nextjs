@@ -11,6 +11,7 @@ import { RECAPTCHA } from '@config';
 import _ from 'lodash';
 import axios from 'axios';
 import moment from 'moment';
+import { NO_PHOTO, NO_PHOTO_SEO } from "@consts";
 
 export const isAuth = () => {
     if (typeof window !== "undefined") {
@@ -900,7 +901,8 @@ export const deepExtractObjectStrapi = (object = {}, options = {}) => {
         const {
             minify,
             minifyFields = [],
-            minifyPhoto = []
+            minifyPhoto = [],
+            allowNullPhoto = false
         } = options;
 
         // flatten strapi object
@@ -940,7 +942,7 @@ export const deepExtractObjectStrapi = (object = {}, options = {}) => {
             }).map(key => {
                 const temp = object[key]?.data?.attributes;
                 const photo = temp?.formats?.small?.url || temp?.formats?.medium?.url || temp?.formats?.large?.url || temp?.url;
-                return { [key]: photo || null }
+                return { [key]: photo || (allowNullPhoto ? null : NO_PHOTO_SEO) }
             })
 
             // convert to object

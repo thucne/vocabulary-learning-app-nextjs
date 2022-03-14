@@ -44,6 +44,8 @@ const PublicWord = ({ vip, relatedVips, params }) => {
 
 
 const MetaTag = ({ vip, params }) => {
+    
+    console.log('vip', vip);
 
     const photo = vip?.illustration;
     const firstMeaning = vip?.meanings?.english[0] || vip?.meanings?.vietnamese[0];

@@ -26,6 +26,7 @@ export const IMAGE_ALT =
     "https://res.cloudinary.com/katyperrycbt/image/upload/v1646295258/3d-flame-side-view-of-camera-polaroid-shop_2_pf95qp.webp";
 export const AVT_ALT = "https://res.cloudinary.com/katyperrycbt/image/upload/v1646312203/casual-life-3d-avatar-with-person-in-glasses-and-orange-shirt_1_lyykbz.webp";
 export const NO_PHOTO = "https://res.cloudinary.com/katyperrycbt/image/upload/v1647163656/xcgdsqqcachgrqrkoycn.svg";
+export const NO_PHOTO_SEO = "https://res.cloudinary.com/katyperrycbt/image/upload/v1647226081/dlhro6auss4rbo8eb9az.png";
 
 export const AUDIO_ALT = "https://res.cloudinary.com/katyperrycbt/video/upload/v1646213479/1646213423733-voicemaker.in-speech_sjadtl.mp3";
 
