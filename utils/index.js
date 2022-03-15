@@ -851,7 +851,8 @@ export const gruopWordByDatePeriod = wordList => {
     wordList.map((item, index) => (
         wordList[index] = {
             ...item,
-            fromNow: moment({ hours: 0 }).diff(item.createdAt, 'days')
+            fromNow: moment({ hours: 0 }).diff(item.createdAt, 'days'),
+            checked: false
         }
     ))
 
@@ -888,7 +889,7 @@ export const gruopWordByDatePeriod = wordList => {
         if (temp.length) {
             processedData.push({
                 date: item.date,
-                data: temp
+                data: [...temp]
             })
         }
     })
@@ -1075,4 +1076,16 @@ export const getNRelatedVips = async (matchedVip, n = 6, random = false) => {
         : minifiedRelatedVips.slice(0, _.isInteger(n) && n > 0 ? n : 6);
 
     return randomNRelatedVips;
+}
+
+export const isInCheckedList = (checkedList, id) => {
+    return checkedList.find(item => item.id === id && item.checked);
+}
+
+export const isCheckedAll = (data, checkedList) => {
+    return data.every(item => isInCheckedList(checkedList, item.id));
+}
+
+export const getNumberOfSelected = (data, checkedList) => {
+    return data.filter(item => isInCheckedList(checkedList, item.id)).length;
 }

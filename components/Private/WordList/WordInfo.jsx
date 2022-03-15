@@ -12,7 +12,7 @@ import { IMAGE_ALT } from "@consts";
 import { Colors, Fonts } from "@styles";
 import InfoLabel from "./InfoLabel";
 import { EditTwoTone, VisibilityTwoTone } from "@mui/icons-material";
-import { generateVipLink } from "@utils";
+import { generateVipLink, isInCheckedList } from "@utils";
 
 import Link from "next/link";
 import EditForm from "./EditForm";
@@ -22,8 +22,8 @@ import EditForm from "./EditForm";
  **/
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
-function WordInfo({ index, word, checked, handleCheckBox,setCurrentWord,setOpen }) {
-
+function WordInfo({  word, handleCheckBox,setCurrentWord,setOpen, checkList }) {
+    
   const [loading, setLoading] = useState(true);
  
   const handleOpenDialog =()=>{
@@ -43,10 +43,10 @@ function WordInfo({ index, word, checked, handleCheckBox,setCurrentWord,setOpen 
       <Box sx={{ display: "flex", alignItems: "center" }}>
         <Checkbox
           {...label}
-          checked={checked}
+          checked={isInCheckedList( checkList,word.id) ? true : false}
           icon={<CircleIcon style={{ color: Colors.GRAY_3 }} />}
           checkedIcon={<CheckCircleIcon />}
-          onChange={() => handleCheckBox(index)}
+          onChange={() => handleCheckBox(word.id)}
         />
         <div style={{ ...styles.imgBox }}>
           <LoadingImage

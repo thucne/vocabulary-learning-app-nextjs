@@ -2,9 +2,7 @@ import {
   useState,
   useEffect,
   useMemo,
-  useCallback,
   useRef,
-  useLayoutEffect,
 } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -31,10 +29,13 @@ const WordList = () => {
   const initWordList = useMemo(() => getWordList(userData), [userData]);
 
   const [wordList, setWordList] = useState(initWordList);
+
+  // represent times fecth data
   const [set, setSet] = useState(0);
   const [endOfList, setEndOfList] = useState(false);
   const [open, setOpen] = useState(false);
   const [currentWord, setCurrentWord] = useState(null);
+  const [checkList, setCheckList] = useState([]);
   const listRef = useRef(null);
 
   useEffect(() => {
@@ -48,17 +49,45 @@ const WordList = () => {
   }, [userData]);
 
   useEffect(() => {
-    setWordList(getWordList(userData));
+    const fectchWordList = getWordList(userData);
+    setWordList(fectchWordList);
+
+    setCheckList(
+      Array.from(Array(fectchWordList.length), function (_, index) {
+        return {
+          id: fectchWordList[index].id,
+          checked: false,
+        };
+      })
+    );
   }, [userData]);
 
-  const handleCloseDialog = () => {
-    setOpen(false);
-    setCurrentWord(null)
+
+  const handleUpdateCheckList = (udList, value) => {
+    let tempt = [...checkList];
+    tempt.map((element, index) => {
+      if (udList.includes(element.id)) {
+        tempt[index].checked = value ;
+      }
+    });
+    setCheckList([...tempt])
   };
 
-  const handleOpenDialog = () => {
-    setOpen(true);
+  const handleCheckSingleBox = (id) => {
+    let tempt = [...checkList];
+    tempt.map((element, index) => {
+      if (element.id === id) {
+        tempt[index].checked = !element.checked;
+      }
+    });
+    setCheckList([...tempt]);
   };
+
+  const handleCloseDialog = () => {
+      setCurrentWord(null);
+    setOpen(false);
+  };
+
 
   const handleScroll = () => {
     if (listRef.current.scrollTop === 0) {
@@ -68,6 +97,15 @@ const WordList = () => {
         return;
       }
       setWordList((state) => [...fetchList, ...state]);
+      setCheckList((state) => [
+        ...Array.from(Array(fetchList.length), function (_, index) {
+          return {
+            id: fetchList[index].id,
+            checked: false,
+          };
+        }),
+        ...state,
+      ]);
       setSet((state) => state + 1);
     }
   };
@@ -112,6 +150,9 @@ const WordList = () => {
                     dateSegment={wordsSection}
                     setCurrentWord={setCurrentWord}
                     setOpen={setOpen}
+                    checkList={checkList}
+                    handleUpdateCheckList={handleUpdateCheckList}
+                    handleCheckSingleBox={handleCheckSingleBox}
                   />
                 ))}
               </Box>

@@ -100,7 +100,9 @@ function EditForm({ open = false, setOpen, word }) {
 
   const settings = useSettings(userData);
 
+console.log("word",{word})
 
+use
   const resetWhole = () => {
     setTemptInput(initTempInputs);
     setForm(initForm(settings?.publicWords));
@@ -951,7 +953,7 @@ const SpecialLabel = ({ auto, label }) => {
   );
 };
 
-export default React.memo(EditForm);
+export default EditForm;
 const elementsInputProps = (errors, others) => ({
   examples: {
     temptField: "example",
@@ -1043,7 +1045,7 @@ const elementsListProps = (form, handleDeleteItem) => ({
 
 const initForm = (word) => ({
   vip: word?.vip || "",
-  type: word?.type1 || VOCAB_TYPES[0],
+  type: word?.type1 || VIP_TYPES[0],
   examples: word?.examples || [],
   vnMeanings: word?.vnMeanings || [],
   engMeanings: word?.engMeanings || [],
