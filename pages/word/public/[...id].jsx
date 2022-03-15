@@ -8,7 +8,8 @@ import PublicWordComponent from "@components/Words/Public";
 import ErrorPage from "@components/Error";
 
 import { API, UNSPLASH } from '@config';
-import { deepExtractObjectStrapi, getNRelatedVips } from '@utils';
+import { deepExtractObjectStrapi, getNRelatedVips, encodeImageToBlurhash, toDataURL } from '@utils';
+
 import { NO_PHOTO } from '@consts';
 
 import qs from 'qs';
@@ -84,6 +85,7 @@ export async function getStaticPaths() {
 }
 
 const RANDOM_QUERY = (word) => `https://api.unsplash.com/search/photos?query=${word}&per_page=1&client_id=${UNSPLASH}`;
+const RANDOM_PHOTO = (word) => `https://source.unsplash.com/random?${word}`;
 
 export async function getStaticProps(ctx) {
 
@@ -101,7 +103,22 @@ export async function getStaticProps(ctx) {
     const randomWord = words[Math.floor(Math.random() * words.length)];
 
     const randomPhoto = await fetch(RANDOM_QUERY(randomWord));
-    const randomPhotoData = await randomPhoto?.json().catch(err => console.log(err)) || {};
+    let randomPhotoData = await randomPhoto?.json().catch(err => console.log(err)) || {};
+
+    if (_.isEmpty(randomPhotoData?.results)) {
+
+        const url = await toDataURL(RANDOM_PHOTO(randomWord));
+        const blurData = await encodeImageToBlurhash(url);
+
+        randomPhotoData = {
+            results: [
+                {
+                    urls: { regular: url },
+                    blur_hash: blurData,
+                }
+            ]
+        }
+    }
 
     return {
         props: {

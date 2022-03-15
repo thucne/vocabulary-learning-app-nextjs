@@ -6,7 +6,7 @@ import Hero from "./Hero";
 import WordList from "./WordList";
 
 export default function DashboardPage(props) {
-
+    
     return (
         <Container maxWidth="lg">
 
