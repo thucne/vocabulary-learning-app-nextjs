@@ -7,14 +7,17 @@ import Meta from "@meta";
 import PublicWordComponent from "@components/Words/Public";
 import ErrorPage from "@components/Error";
 
-import { API } from '@config';
-import { deepExtractObjectStrapi, getNRelatedVips } from '@utils';
+import { API, UNSPLASH } from '@config';
+import { deepExtractObjectStrapi, getNRelatedVips, encodeImageToBlurhash, toDataURL } from '@utils';
+
 import { NO_PHOTO } from '@consts';
 
 import qs from 'qs';
 import _ from 'lodash';
 
-const PublicWord = ({ vip, relatedVips, params }) => {
+import words from "@components/Words/words";
+
+const PublicWord = ({ vip, relatedVips, unsplashVip, params }) => {
     const router = useRouter();
 
     if (router.isFallback || _.isEmpty(vip)) {
@@ -37,14 +40,14 @@ const PublicWord = ({ vip, relatedVips, params }) => {
     return (
         <Layout noMeta tabName={vip?.vip}>
             <MetaTag vip={vip} params={params} />
-            <PublicWordComponent vip={vip} params={params} relatedVips={relatedVips} />
+            <PublicWordComponent vip={vip} params={params} relatedVips={relatedVips} unsplashVip={unsplashVip} />
         </Layout>
     );
 };
 
 
 const MetaTag = ({ vip, params }) => {
-    
+
     const photo = vip?.illustration;
     const firstMeaning = vip?.meanings?.english[0] || vip?.meanings?.vietnamese[0];
 
@@ -81,6 +84,9 @@ export async function getStaticPaths() {
     };
 }
 
+const RANDOM_QUERY = (word) => `https://api.unsplash.com/search/photos?query=${word}&per_page=1&client_id=${UNSPLASH}`;
+const RANDOM_PHOTO = (word) => `https://source.unsplash.com/random?${word}`;
+
 export async function getStaticProps(ctx) {
 
     const { id: [vip, id] } = ctx.params;
@@ -94,10 +100,29 @@ export async function getStaticProps(ctx) {
 
     const randomSixRelatedVips = _.isObject(matchedVip) && !_.isEmpty(matchedVip) && await getNRelatedVips(matchedVip, 6);
 
+    const randomWord = words[Math.floor(Math.random() * words.length)];
+
+    const randomPhoto = await fetch(RANDOM_QUERY(randomWord));
+    let randomPhotoData = await randomPhoto?.json().catch(err => console.log(err)) || {};
+
+    if (_.isEmpty(randomPhotoData?.results)) {
+        randomPhotoData = {
+            results: [
+                {
+                    urls: { regular: RANDOM_PHOTO(randomWord) }
+                }
+            ]
+        }
+    }
+
     return {
         props: {
             vip: matchedVip,
             relatedVips: randomSixRelatedVips,
+            unsplashVip: {
+                word: randomWord,
+                photo: randomPhotoData
+            },
             params: ctx.params,
         },
         revalidate: 60

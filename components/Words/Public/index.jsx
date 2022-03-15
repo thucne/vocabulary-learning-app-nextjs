@@ -19,8 +19,11 @@ import ShareIcon from '@mui/icons-material/Share';
 import { Props, SXs, Fonts, Colors } from '@styles';
 import { getAudioUrl, useThisToGetSizesFromRef, getNRelatedVips } from '@utils';
 import { AUDIO_ALT, NO_PHOTO } from '@consts';
+
 import LoadingImage from '@components/LoadingImage';
 import RandomWord from '@components/Words/RandomWord';
+import UnsplashWord from '@components/Words/UnsplashWord';
+
 import { subscribeVip, unsubscribeVip } from "@actions";
 import * as t from '@consts';
 import { RECAPTCHA } from '@config';
@@ -29,7 +32,7 @@ import { useSelector, useDispatch } from "react-redux";
 import parser from 'html-react-parser';
 import _ from 'lodash';
 
-const PublicWord = ({ vip, relatedVips: externalRelatedVips }) => {
+const PublicWord = ({ vip, relatedVips: externalRelatedVips, unsplashVip }) => {
     const [audioUrl, setAudioUrl] = useState("");
     const [loadingAudio, setLoadingAudio] = useState(false);
 
@@ -38,6 +41,7 @@ const PublicWord = ({ vip, relatedVips: externalRelatedVips }) => {
 
     const audioRef = useRef(null);
     const gridRef = useRef(null);
+    const grid2Ref = useRef(null);
 
     const dispatch = useDispatch();
     const recaptcha = useSelector(state => state.recaptcha);
@@ -73,6 +77,12 @@ const PublicWord = ({ vip, relatedVips: externalRelatedVips }) => {
     }
 
     const gridSizes = useThisToGetSizesFromRef(gridRef, {
+        revalidate: 1000,
+        terminalCondition: ({ width }) => width !== 0,
+        falseCondition: ({ width }) => width === 0,
+    });
+
+    const grid2Sizes = useThisToGetSizesFromRef(grid2Ref, {
         revalidate: 1000,
         terminalCondition: ({ width }) => width !== 0,
         falseCondition: ({ width }) => width === 0,
@@ -607,10 +617,17 @@ const PublicWord = ({ vip, relatedVips: externalRelatedVips }) => {
                     </Grid>
                 }
 
-                <Grid item xs={12}>
+                <Grid item xs={12} sm={6} ref={grid2Ref}>
                     <Divider sx={{ my: 2, width: '100%' }} />
                     <Grid container {...Props.GCRCC}>
-                        <RandomWord />
+                        <RandomWord width={grid2Sizes?.width} />
+                    </Grid>
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
+                    <Divider sx={{ my: 2, width: '100%' }} />
+                    <Grid container {...Props.GCRCC}>
+                        <UnsplashWord width={grid2Sizes?.width} unsplashVip={unsplashVip} />
                     </Grid>
                 </Grid>
             </Grid>

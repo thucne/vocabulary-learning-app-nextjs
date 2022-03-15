@@ -14,6 +14,8 @@ import moment from 'moment';
 import { NO_PHOTO, NO_PHOTO_SEO } from "@consts";
 import qs from 'qs';
 
+import { encode } from "blurhash";
+
 export const isAuth = () => {
     if (typeof window !== "undefined") {
         if (localStorage.getItem("vip-user")) {
@@ -114,7 +116,7 @@ export const getRandomNumberInRange = (min, max) => {
 
 export const getSizeImage = async (link, callback) => {
     const data = await toDataURL(link);
-    return new Promise((resolve, reject) => {
+    return await new Promise((resolve, reject) => {
         const newImg = new window.Image();
         newImg.src = data;
         newImg.onload = function () {
@@ -1078,14 +1080,29 @@ export const getNRelatedVips = async (matchedVip, n = 6, random = false) => {
     return randomNRelatedVips;
 }
 
-export const isInCheckedList = (checkedList, id) => {
-    return checkedList.find(item => item.id === id && item.checked);
-}
 
-export const isCheckedAll = (data, checkedList) => {
-    return data.every(item => isInCheckedList(checkedList, item.id));
-}
+const loadImage = async src =>
+    new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = (...args) => reject(args);
+        img.src = src;
+        img.crossOrigin = 'anonymous';
+    });
 
-export const getNumberOfSelected = (data, checkedList) => {
-    return data.filter(item => isInCheckedList(checkedList, item.id)).length;
-}
+const getImageData = image => {
+    const canvas = document.createElement("canvas");
+    canvas.width = image.width;
+    canvas.height = image.height;
+    const context = canvas.getContext("2d");
+    context.drawImage(image, 0, 0);
+    return context.getImageData(0, 0, image.width, image.height);
+};
+
+export const encodeImageToBlurhash = async imageUrl => {
+    const image = await loadImage(imageUrl);
+    const imageData = getImageData(image);
+
+    return encode(imageData.data, imageData.width, imageData.height, 4, 4);
+};
+

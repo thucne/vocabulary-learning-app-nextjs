@@ -20,6 +20,7 @@
         "@tallis/react-dndp": "^0.0.7",
         "@tallis/react-mui-scroll-view": "^0.0.7",
         "axios": "^0.26.0",
+        "blurhash": "^1.1.5",
         "chart.js": "^3.7.1",
         "clsx": "^1.1.1",
         "framer-motion": "^6.2.6",

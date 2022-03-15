@@ -171,7 +171,7 @@ export const updateUser = (data, id) => async (dispatch) => {
 
 export const subscribeVip = (id, token) => async (dispatch) => {
     if (!getJWT()) {
-        return { error: "Empty jwt." };
+        return { error: "Login first." };
     }
     return await axios
         .put(`${API}/api/users/subscribe/${id}`, { token }, {
@@ -186,7 +186,7 @@ export const subscribeVip = (id, token) => async (dispatch) => {
 
 export const unsubscribeVip = (id, token) => async (dispatch) => {
     if (!getJWT()) {
-        return { error: "Empty jwt." };
+        return { error: "Login first." };
     }
     return await axios
         .put(`${API}/api/users/unsubscribe/${id}`, { token }, {
