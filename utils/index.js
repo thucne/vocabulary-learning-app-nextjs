@@ -1106,3 +1106,15 @@ export const encodeImageToBlurhash = async imageUrl => {
     return encode(imageData.data, imageData.width, imageData.height, 4, 4);
 };
 
+
+export const isInCheckedList = (checkedList, id) => {
+    return checkedList.find(item => item.id === id && item.checked);
+}
+
+export const isCheckedAll = (data, checkedList) => {
+    return data.every(item => isInCheckedList(checkedList, item.id));
+}
+
+export const getNumberOfSelected = (data, checkedList) => {
+    return data.filter(item => isInCheckedList(checkedList, item.id)).length;
+}
