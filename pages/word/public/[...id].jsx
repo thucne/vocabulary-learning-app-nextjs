@@ -106,15 +106,10 @@ export async function getStaticProps(ctx) {
     let randomPhotoData = await randomPhoto?.json().catch(err => console.log(err)) || {};
 
     if (_.isEmpty(randomPhotoData?.results)) {
-
-        const url = await toDataURL(RANDOM_PHOTO(randomWord));
-        const blurData = await encodeImageToBlurhash(url);
-
         randomPhotoData = {
             results: [
                 {
-                    urls: { regular: url },
-                    blur_hash: blurData,
+                    urls: { regular: RANDOM_PHOTO(randomWord) }
                 }
             ]
         }
