@@ -18,6 +18,7 @@ const ImageGallery = (props) => {
     const { illustrationsList, setCurrentImg, vips } = props;
     const [imgSizes, setImgSizes] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [bgColors, setBgColors] = useState([]);
 
     const myRef = useRef(null);
     const theme = useTheme();
@@ -44,6 +45,12 @@ const ImageGallery = (props) => {
 
         return () => clearInterval(loop);
     }, [illustrationsList, imgSizes]);
+
+    useEffect(() => { 
+        if (illustrationsList?.length !== bgColors?.length) {
+            setBgColors(illustrationsList?.map(() => getPastelColor()));
+        }
+    }, [illustrationsList, bgColors?.length]);
 
     const containerSize = useThisToGetSizesFromRef(myRef, {
         revalidate: 1000,
@@ -82,7 +89,7 @@ const ImageGallery = (props) => {
                         <ImageList variant="masonry" cols={cols} gap={8} ref={myRef}>
                             {!loading && illustrationsList.map((illustration, index) => {
                                 const photo = illustration?.formats?.small?.url || illustration?.formats?.medium?.url || illustration?.formats?.large?.url || illustration?.url;
-                                const bgColor = getPastelColor();
+                                // const bgColor = getPastelColor();
                                 return (
                                     <ImageListItem key={index}>
                                         {
@@ -95,7 +102,7 @@ const ImageGallery = (props) => {
                                                     alt={illustration?.name || 'Photo'}
                                                     onClick={() => setCurrentImg(illustration)}
                                                     quality={100}
-                                                    bgColor={bgColor}
+                                                    bgColor={bgColors[index]}
                                                     draggable={false}
                                                     className="cursorPointer"
                                                 />
