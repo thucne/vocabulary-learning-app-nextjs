@@ -486,7 +486,7 @@ const PrivateWord = ({ vip, relatedVips: externalRelatedVips, unsplashVip }) => 
                     </Grid>
                 }
 
-                <Grid item xs={12} ref={grid2Ref}>
+                <Grid item xs={12} sm={6} ref={grid2Ref}>
                     <Divider sx={{ my: 2, width: '100%' }} />
                     <Grid container {...Props.GCRCC}>
                         <RandomWord width={grid2Sizes?.width} />
