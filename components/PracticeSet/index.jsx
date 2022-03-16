@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo } from "react";
+import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
 
 import {
     Button, Dialog, DialogContent, DialogTitle,
@@ -28,6 +28,7 @@ import { IMAGE_ALT, AUDIO_ALT } from '@consts';
 
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
+import _ from 'lodash';
 
 import LoadingImage from '@components/LoadingImage';
 import SecondaryBlock from "./SecondaryBlock";
@@ -55,12 +56,13 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
     const [audioUrl, setAudioUrl] = useState("");
     const [loadingAudio, setLoadingAudio] = useState(false);
 
-    const optimizedWordList = useMemo(() => getOptimizedPraticeSet(wordList, settings), [wordList, settings]);
+    const optimizedWordList = useCallback(() => getOptimizedPraticeSet(wordList, settings), [wordList, settings]);
 
     const userData = useSelector((state) => state.userData);
     const { objectFit = "contain" } = useSettings(userData);
 
     useEffect(() => {
+
         let canset = true;
         if (canset) {
             setWordIndex(0);
@@ -71,8 +73,10 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
 
     useEffect(() => {
         let canRun = true;
+
         const run = async () => {
             if (wordIndex < optimizedWordList.length && wordIndex >= 0 && canRun) {
+                
                 setLoadingAudio(true);
                 setAudioUrl("");
                 getAudioUrl(optimizedWordList[wordIndex].audio, (url) => {
@@ -86,7 +90,7 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
             }
         }
 
-        if (canRun) {
+        if (canRun && _.isEqual) {
             run();
         }
 

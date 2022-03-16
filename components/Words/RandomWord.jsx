@@ -57,7 +57,7 @@ const RandomWord = ({ width = 300 }) => {
             <Grid container {...Props.GCRCC}>
                 <Grid item xs={12} {...Props.GICCC} sx={{ height: width / 2, maxHeight: 150, backgroundColor: Colors.WOAD_YELLOW, px: 2, py: 1 }}>
                     <Typography variant="caption">
-                        WORD OF THE ... NOW
+                        Tricky word
                     </Typography>
                     <Typography variant="h4" sx={{ color: Colors.BLUE_PUBLIC_WORDS, mt: 1 }} className="overflowTypography">
                         {word?.word?.toLowerCase()}

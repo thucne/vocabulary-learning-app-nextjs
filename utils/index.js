@@ -758,7 +758,8 @@ export const getIllustrationsList = (userData = {}) => {
 }
 
 export const getAllImageFormats = image => {
-    if (!image) return null;
+
+    if (_.isEmpty(image?.formats)) return {};
 
     let opens = {};
 

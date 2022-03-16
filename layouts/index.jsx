@@ -43,7 +43,7 @@ const StyledProgess = styled(LinearProgress)({
     },
 });
 
-const Layout = ({ children, login = false, landing = false, noMeta = false, tabName = "", noBack = false }) => {
+const Layout = ({ children, login = false, landing = false, noMeta = false, tabName = "", noBack = false}) => {
     const router = useRouter();
     const [openMessage, setOpenMessage] = useState(false);
 

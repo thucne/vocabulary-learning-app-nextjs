@@ -85,16 +85,14 @@ const Welcome = () => {
                     </Box>
                 </Grid>
             </Grid>
-            {
-                wordList?.length > 0 && (
-                    <WordCard
-                        open={openReviseWordModal}
-                        setOpen={setOpenReviseWordModal}
-                        wordList={wordList}
-                        settings={settings}
-                    />
-                )
-            }
+
+            <WordCard
+                open={openReviseWordModal}
+                setOpen={setOpenReviseWordModal}
+                wordList={wordList}
+                settings={settings}
+            />
+
         </Container>
     );
 };

@@ -10,7 +10,8 @@ import { createTheme } from "@mui/material/styles";
 import myTheme from "@styles/theme";
 
 import { store } from "@store";
-import { Provider } from "react-redux";
+import { Provider, useDispatch } from "react-redux";
+
 import "@globalCSS";
 
 // Client-side cache, shared for the whole session of the user in the browser.
@@ -83,6 +84,14 @@ export default function MyApp(props) {
         </Provider>
     );
 }
+
+// const MyAppChild = () => {
+//     const dispatch = useDispatch();
+
+//     return (
+
+//     )
+// }
 
 MyApp.propTypes = {
     Component: PropTypes.elementType.isRequired,

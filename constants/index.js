@@ -54,3 +54,5 @@ export const NO_AVT = () => {
 
     return someAvts[Math.floor(Math.random() * someAvts.length)];
 }
+
+export const SET_THEME = "SET_THEME";

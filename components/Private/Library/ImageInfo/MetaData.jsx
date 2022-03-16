@@ -36,7 +36,7 @@ const MetaData = (props) => {
 
     const buttonRef = useRef(null);
 
-    const { formatArrays, opens } = useMemo(
+    const { formatArrays = [], opens = [] } = useMemo(
         () => getAllImageFormats(illustration),
         [illustration]
     );

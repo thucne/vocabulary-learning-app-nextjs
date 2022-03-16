@@ -13,8 +13,6 @@ import { getPastelColor, getSizeImage, useThisToGetSizesFromRef, useWindowSize }
 
 import LoadingImage from "@components/LoadingImage";
 
-const bgColor = getPastelColor();
-
 const ImageGallery = (props) => {
 
     const { illustrationsList, setCurrentImg, vips } = props;
@@ -84,15 +82,16 @@ const ImageGallery = (props) => {
                         <ImageList variant="masonry" cols={cols} gap={8} ref={myRef}>
                             {!loading && illustrationsList.map((illustration, index) => {
                                 const photo = illustration?.formats?.small?.url || illustration?.formats?.medium?.url || illustration?.formats?.large?.url || illustration?.url;
+                                const bgColor = getPastelColor();
                                 return (
                                     <ImageListItem key={index}>
                                         {
-                                            !isNaN(imgSizes?.[index]?.height * 248 / imgSizes?.[index]?.width) && <label title={`Word: ${illustration.word}. Photo: ${illustration.name}` || 'Photo'}>
+                                            !isNaN(imgSizes?.[index]?.height * skeletonWidth / imgSizes?.[index]?.width) && <label title={`Word: ${illustration.word}. Photo: ${illustration.name}` || 'Photo'}>
                                                 <LoadingImage
                                                     src={`${photo}`}
                                                     loading="lazy"
-                                                    width={248}
-                                                    height={imgSizes[index]?.height * 248 / imgSizes[index]?.width}
+                                                    width={skeletonWidth}
+                                                    height={imgSizes[index]?.height * skeletonWidth / imgSizes[index]?.width}
                                                     alt={illustration?.name || 'Photo'}
                                                     onClick={() => setCurrentImg(illustration)}
                                                     quality={100}

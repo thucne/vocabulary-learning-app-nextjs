@@ -34,7 +34,7 @@ const Private = ({ children, MetaTag }) => {
             } else {
                 data = getJWT()
                     ? await axios
-                        .get(`${API}/api/type2s`, {
+                        .get(`${API}/api/check-token`, {
                             headers: {
                                 Authorization: `Bearer ${getJWT()}`,
                             },
@@ -44,6 +44,8 @@ const Private = ({ children, MetaTag }) => {
                     : {
                         error: "Require log in",
                     };
+                
+                console.log(data);
 
                 if (data?.error) {
                     logout(() =>
