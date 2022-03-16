@@ -8,24 +8,23 @@ import PrivateWordComponent from "@components/Words/Private";
 import LoadingOrNotFound from '@components/Words/LoadingOrNotFound';
 import ErrorPage from "@components/Error";
 
-import { API } from '@config';
+import { API, UNSPLASH } from '@config';
 import { deepExtractObjectStrapi, sortRelatedVips, getJWT } from '@utils';
 import Private from '@components/Auth/Private';
 import { fetcherJWT } from '@actions';
-import { Props, Fonts, Colors } from '@styles';
 import { NO_PHOTO } from '@consts';
 
 import qs from 'qs';
-
-import {
-    Skeleton, Typography, Container, Divider, Grid,
-    Link as MuiLink
-} from '@mui/material';
-
 import useSWR from 'swr';
 import _ from 'lodash';
 
+import words from "@components/Words/words";
+
 const fetcher = async (...args) => await fetcherJWT(...args);
+
+const RANDOM_QUERY = (word) => `https://api.unsplash.com/search/photos?query=${word}&per_page=1&client_id=${UNSPLASH}`;
+const RANDOM_PHOTO = (word) => `https://source.unsplash.com/random?${word}`;
+
 
 const PrivateWord = ({ router = { query: {} } }) => {
     const [loading, setLoading] = useState(true);
@@ -87,6 +86,28 @@ const PrivateWord = ({ router = { query: {} } }) => {
 
     const randomSixRelatedVips = minifiedRelatedVips.slice(0, 6);
 
+    const randomWord = words[Math.floor(Math.random() * words.length)];
+
+    const { data = {} } = useSWR(getJWT() && id
+        ? RANDOM_QUERY(randomWord)
+        : null,
+        fetcher,
+        {
+            refreshInterval: 1000,
+        });
+    let randomPhotoData = data;
+
+    if (_.isEmpty(randomPhotoData?.results)) {
+        randomPhotoData = {
+            results: [
+                {
+                    urls: { regular: RANDOM_PHOTO(randomWord) }
+                }
+            ]
+        }
+    }
+
+
     if (loading && _.isEmpty(matchedVip)) {
         return (
             <Private>
@@ -122,7 +143,15 @@ const PrivateWord = ({ router = { query: {} } }) => {
         <Private>
             <Layout noMeta tabName={matchedVip?.vip}>
                 <MetaTag vip={matchedVip} params={router?.query} />
-                <PrivateWordComponent vip={matchedVip} params={router?.query} relatedVips={randomSixRelatedVips} />
+                <PrivateWordComponent
+                    vip={matchedVip}
+                    params={router?.query}
+                    relatedVips={randomSixRelatedVips}
+                    unsplashVip={{
+                        word: randomWord,
+                        photo: randomPhotoData
+                    }}
+                />
             </Layout>
         </Private>
     );

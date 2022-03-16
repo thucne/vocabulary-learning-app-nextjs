@@ -1,26 +1,35 @@
 import React, { useEffect, useState } from 'react';
 
-import { Paper, Typography, Grid, IconButton, Tooltip, Avatar, CircularProgress } from '@mui/material';
-import { Colors, Props, Fonts } from '@styles';
-import _ from 'lodash';
-import { UNSPLASH } from '@config';
+import {
+    Paper, Typography, Grid, IconButton,
+    Tooltip, Avatar, CircularProgress, Link as MuiLink,
+    Icon
+} from '@mui/material';
+
 import LoadingImage from '@components/LoadingImage';
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
-import { UNSPLASH_LOGO_X } from '@consts';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import LaunchRoundedIcon from '@mui/icons-material/LaunchRounded';
+
+import { UNSPLASH_LOGO_X, UNSPLASH_LOADING, NO_AVT } from '@consts';
+import { encodeImageToBlurhash, toDataURL } from '@utils';
+import { Colors, Props, Fonts } from '@styles';
 import words from "@components/Words/words";
 
-import Link from 'next/link';
+import _ from 'lodash';
+import Image from 'next/image';
 
-import { encodeImageToBlurhash, toDataURL } from '@utils';
-
-const RANDOM_QUERY = (word) => `https://api.unsplash.com/search/photos?query=${word}&per_page=1`;
 const RANDOM_PHOTO = (word) => `https://source.unsplash.com/random?${word}`;
 
+const getRandomWord = () => words[Math.floor(Math.random() * words.length)];
+
 const UnsplashWord = ({ width, unsplashVip }) => {
-    console.log(unsplashVip);
 
     const [img, setImg] = useState(unsplashVip?.photo?.results?.[0]);
     const [word, setWord] = useState(unsplashVip?.word);
+    const [hoverImg, setHoverImg] = useState(false);
+    const [hoverA, setHoverA] = useState(false);
+    const [hoverB, setHoverB] = useState(false);
 
     const [loading, setLoading] = useState(false);
 
@@ -28,38 +37,53 @@ const UnsplashWord = ({ width, unsplashVip }) => {
     const src = img?.urls?.regular;
     const author = img?.user?.name;
     const authorUrl = img?.user?.links?.html;
-    const authorImg = img?.user?.profile_image?.small;
+    const authorImg = img?.user?.profile_image?.small || NO_AVT();
     const imgAlt = img?.alt_description || word;
-    const downloadUrl = img?.links?.download;
+    const downloadUrl = img?.links?.download ? `${img?.links?.download}&force=true` : '';
+    const seeOnUnsplash = img?.id ? `https://unsplash.com/photos/${img?.id}` : '';
 
     const run = async () => {
         setLoading(true);
-        const randomWord = words[Math.floor(Math.random() * words.length)];
+
+        let randomWord = getRandomWord();
+
         setWord(randomWord);
-        const res = await fetch(RANDOM_QUERY(randomWord), {
-            headers: {
-                Authorization: `Client-ID ${UNSPLASH}`
-            }
-        });
-        const data = await res.json().catch(err => console.log(err));
 
-        if (_.isEmpty(data?.photo?.results)) {
+        setImg({
+            urls: { regular: UNSPLASH_LOADING },
+            blur_hash: 'L69tP;?b004n_3xuV@Rj00IU~q?b'
+        })
 
-            const url = await toDataURL(RANDOM_PHOTO(randomWord));
-            const blurData = await encodeImageToBlurhash(url);
+        const url = await toDataURL(RANDOM_PHOTO(randomWord));
+        const blurData = await encodeImageToBlurhash(url);
 
-            setImg({
-                urls: { regular: url },
-                blur_hash: blurData,
-            })
-        } else {
-            setImg(data?.photo?.results?.[0]);
-        }
+        setImg({
+            urls: { regular: url },
+            blur_hash: blurData,
+        })
+
 
         setLoading(false);
     }
 
+    const imgClass = hoverA || hoverB || hoverImg ? 'unsplashHover' : '';
+    const buttonClass = hoverA || hoverB || hoverImg ? 'unsplashButtonHover' : '';
+    const isHover = hoverImg || hoverA || hoverB;
+
+    const hoverAll = () => {
+        setHoverA(true);
+        setHoverB(true);
+        setHoverImg(true);
+    }
+
+    const resetHoverAll = () => {
+        setHoverImg(false);
+        setHoverA(false);
+        setHoverB(false);
+    }
+
     const handleRefresh = async () => {
+        resetHoverAll();
         await run();
     }
 
@@ -71,20 +95,24 @@ const UnsplashWord = ({ width, unsplashVip }) => {
             maxHeight: 300,
             borderRadius: '4px',
             overflow: 'hidden',
-            position: 'relative',
-        }}>
-            <Tooltip title="Refresh">
+            position: 'relative'
+        }}
+            onMouseLeave={resetHoverAll}
+        >
+            <label title="Refresh">
                 <IconButton
                     onClick={handleRefresh}
                     sx={{
-                        color: Colors.BLUE_PUBLIC_WORDS,
+                        color: !isHover ? Colors.BLUE_PUBLIC_WORDS : Colors.WHITE,
                         position: 'absolute',
                         top: '0.5rem',
                         right: '0.5rem',
-                        zIndex: 1,
+                        zIndex: 101,
                     }}
                     size="small"
-                    disabled={loading}
+                    disabled={loading || !_.isEmpty(authorUrl)}
+                    onMouseEnter={hoverAll}
+                    onMouseLeave={resetHoverAll}
                 >
                     {
                         loading
@@ -92,23 +120,42 @@ const UnsplashWord = ({ width, unsplashVip }) => {
                             : <RefreshRoundedIcon sx={{ fontSize: 'inherit' }} />
                     }
                 </IconButton>
-            </Tooltip>
+            </label>
             <Grid container {...Props.GCRCC}>
                 <Grid item xs={12} {...Props.GICCC} sx={{
                     height: width / 2,
+                    width: width,
                     maxHeight: 150,
-                    backgroundColor: Colors.WOAD_YELLOW, px: 2, py: 1,
-                    position: 'relative'
-                }}>
+                    backgroundColor: Colors.WOAD_YELLOW,
+                    position: 'relative',
+                }}
+                    onMouseEnter={() => setHoverImg(true)}
+                    onMouseLeave={() => setHoverImg(false)}
+                >
+                    <div style={{
+                        height: width / 2,
+                        width: width,
+                        maxHeight: 150,
+                        display: isHover ? 'block' : 'none',
+                        opacity: '0.5',
+                        backgroundColor: Colors.BLACK,
+                        zIndex: 100
+                    }} />
                     <div style={{
                         position: 'absolute',
                         top: 0,
                         left: 0,
                         width: width,
+                        maxWidth: 300,
                         height: width / 2,
                         maxHeight: 150,
-                    }}>
-                        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                    }}
+                        className={imgClass}
+                    >
+                        <div style={{
+                            position: 'relative', width: '100%', height: '100%',
+                        }}
+                        >
                             {src && <LoadingImage
                                 src={src}
                                 alt={imgAlt}
@@ -121,23 +168,107 @@ const UnsplashWord = ({ width, unsplashVip }) => {
                             />}
                         </div>
                     </div>
-                    <div style={{ position: 'absolute', zIndex: 1000, bottom: '0.5rem', left: '0.5rem' }}>
-                        <Grid container {...Props.GCRCC}>
-                            <Link href={authorUrl || '#'} passHref>
-                                <Avatar
-                                    src={authorImg}
-                                    alt={author}
-                                    sx={{
-                                        cursor: 'pointer',
-                                        boxShadow: '0px 0px 10px rgba(255,255,255,0.5)',
-                                        width: 30,
-                                        height: 30
-                                    }}
-                                />
-                            </Link>
-                            <Grid item {...Props.GOCCC}>
-
-                            </Grid>
+                    <div style={{
+                        position: 'absolute', zIndex: 101,
+                        bottom: '0.5rem', left: '0.5rem', maxWidth: '80%',
+                        display: isHover ? 'block' : 'none'
+                    }}
+                        onMouseEnter={hoverAll}
+                        onMouseLeave={() => setHoverA(false)}
+                    >
+                        {
+                            authorUrl && <MuiLink
+                                href={authorUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                underline='none'
+                            >
+                                <Grid container {...Props.GCRCC}>
+                                    <Avatar
+                                        src={authorImg}
+                                        alt={author}
+                                        sx={{
+                                            cursor: 'pointer',
+                                            boxShadow: theme => theme.shadows[3],
+                                            width: 30,
+                                            height: 30,
+                                            mr: 1
+                                        }}
+                                    />
+                                    {/* author name */}
+                                    <Typography sx={{ color: Colors.WHITE, fontSize: Fonts.FS_15 }} className="overflowTypography">
+                                        {author}
+                                    </Typography>
+                                </Grid>
+                            </MuiLink>
+                        }
+                    </div>
+                    <div style={{
+                        position: 'absolute', zIndex: 101, bottom: '0.5rem', right: '0.5rem',
+                        display: isHover ? 'block' : 'none',
+                    }}
+                        onMouseEnter={hoverAll}
+                        onMouseLeave={() => setHoverB(false)}
+                        className={buttonClass}
+                    >
+                        <Grid container {...Props.GCCCC}>
+                            {/* see on unsplash */}
+                            {
+                                seeOnUnsplash && <label title="See on Unsplash">
+                                    <IconButton
+                                        href={seeOnUnsplash}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        sx={{
+                                            backgroundColor: Colors.WHITE,
+                                            fontSize: Fonts.FS_15,
+                                            borderRadius: '4px',
+                                            "& .MuiTouchRipple-root span": {
+                                                borderRadius: "4px",
+                                            },
+                                            ":hover": {
+                                                backgroundColor: Colors.WHITE,
+                                                borderRadius: '4px'
+                                            },
+                                            mb: 1
+                                        }}
+                                    >
+                                        <Icon sx={{ fontSize: 'inherit' }}>
+                                            <Image
+                                                src="https://res.cloudinary.com/katyperrycbt/image/upload/v1647416461/Unsplash_Symbol_sgqeja.svg"
+                                                alt="See on Unsplash"
+                                                width={30}
+                                                height={30}
+                                                quality={100}
+                                            />
+                                        </Icon>
+                                    </IconButton>
+                                </label>
+                            }
+                            {/* download button */}
+                            {
+                                downloadUrl && <label title="Download">
+                                    <IconButton
+                                        onClick={() => {
+                                            window?.open(downloadUrl);
+                                        }}
+                                        sx={{
+                                            backgroundColor: Colors.WHITE,
+                                            fontSize: Fonts.FS_15,
+                                            borderRadius: '4px',
+                                            "& .MuiTouchRipple-root span": {
+                                                borderRadius: "4px",
+                                            },
+                                            ":hover": {
+                                                backgroundColor: Colors.WHITE,
+                                                borderRadius: '4px'
+                                            },
+                                        }}
+                                    >
+                                        <ArrowDownwardIcon sx={{ fontSize: 'inherit' }} />
+                                    </IconButton>
+                                </label>
+                            }
                         </Grid>
                     </div>
                 </Grid>
@@ -161,21 +292,30 @@ const UnsplashWord = ({ width, unsplashVip }) => {
                     <Grid container {...Props.GCRCC}>
                         <Typography sx={{
                             color: (theme) => theme.palette.mainPublicWord.main,
-                            fontSize: Fonts.FS_16,
+                            fontSize: Fonts.FS_14,
                             mr: 1
                         }} align="center">
                             Powered by
                         </Typography>
-                        <div style={{ position: "relative", width: 80, height: 40 }}>
-                            <LoadingImage
-                                src={UNSPLASH_LOGO_X}
-                                alt="Unsplash"
-                                layout="fill"
-                                objectFit="contain"
-                                bgColor="transparent"
-                                draggable={false}
-                            />
-                        </div>
+                        <MuiLink href="https://unsplash.com">
+                            <div style={{
+                                position: "relative",
+                                width: 80,
+                                height: 40,
+                                cursor: 'pointer',
+                            }}
+                            >
+                                <LoadingImage
+                                    src={UNSPLASH_LOGO_X}
+                                    alt="Unsplash"
+                                    layout="fill"
+                                    objectFit="contain"
+                                    bgColor="transparent"
+                                    draggable={false}
+                                    blurDataURL="LIE{hEaK16M{.TRjNHkB_NWAM{ae"
+                                />
+                            </div>
+                        </MuiLink>
                     </Grid>
                 </Grid>
             </Grid>

@@ -20,34 +20,48 @@ const Private = ({ children, MetaTag }) => {
 
         const validate = async () => {
             // check thử xem token nếu có thì có valid hay không
+            let data;
 
-            const data = getJWT()
-                ? await axios
-                    .get(`${API}/api/type2s`, {
-                        headers: {
-                            Authorization: `Bearer ${getJWT()}`,
-                        },
-                    })
-                    .then((res) => handleCommonResponse(res))
-                    .catch((err) => handleServerError(err, true))
-                : {
-                    error: "Require log in",
-                };
+            // check if session is valid
+            const vipSession = localStorage.getItem("vip-session");
 
-            if (data?.error) {
-                logout(() =>
-                    Router.push({
-                        pathname: "/login",
-                        query: {
-                            message: "Limited access resources, please login to access.",
-                            typeMessage: "warning",
-                            url: `${pathname}`,
-                        },
-                    })
-                );
-                return;
+            // check if due date is in the future
+            if (vipSession && new Date(vipSession) > new Date()) {
+                data = 'OK';
+
+                // extend session for 5 minutes
+                localStorage.setItem("vip-session", new Date(new Date().getTime() + 1000 * 60 * 5).toString());
+            } else {
+                data = getJWT()
+                    ? await axios
+                        .get(`${API}/api/type2s`, {
+                            headers: {
+                                Authorization: `Bearer ${getJWT()}`,
+                            },
+                        })
+                        .then((res) => handleCommonResponse(res))
+                        .catch((err) => handleServerError(err, true))
+                    : {
+                        error: "Require log in",
+                    };
+
+                if (data?.error) {
+                    logout(() =>
+                        Router.push({
+                            pathname: "/login",
+                            query: {
+                                message: "Limited access resources, please login to access.",
+                                typeMessage: "warning",
+                                url: `${pathname}`,
+                            },
+                        })
+                    );
+                    return;
+                } else {
+                    // extend session for 5 minutes
+                    localStorage.setItem("vip-session", new Date(new Date().getTime() + 1000 * 60 * 5).toString());
+                }
             }
-
             setLogin(true);
         };
         validate().then(() => setValidate(true));

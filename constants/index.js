@@ -41,3 +41,16 @@ export const DONE_RECAPTCHA = "DONE_RECAPTCHA";
 export const RELOAD_RECAPTCHA = "RELOAD_RECAPTCHA";
 
 export const UNSPLASH_LOGO_X = 'https://res.cloudinary.com/katyperrycbt/image/upload/v1647276336/q7wxkdaapg6rypdqrdlo.svg';
+export const UNSPLASH_LOADING = 'https://res.cloudinary.com/katyperrycbt/image/upload/v1647408183/White_Clean_Now_Loading_Animation_Youtube_Video_pliqfe.gif';
+
+export const NO_AVT = () => {
+    const someAvts = [
+        'https://res.cloudinary.com/katyperrycbt/image/upload/v1647406463/avatar_4_hmioit.svg',
+        'https://res.cloudinary.com/katyperrycbt/image/upload/v1647406464/avatar_3_f9ouoy.svg',
+        'https://res.cloudinary.com/katyperrycbt/image/upload/v1647406464/avatar_1_cjw5h0.svg',
+        'https://res.cloudinary.com/katyperrycbt/image/upload/v1647406464/avatar_2_hagun8.svg',
+        'https://res.cloudinary.com/katyperrycbt/image/upload/v1647406464/avatar_5_rqfrv4.svg'
+    ];
+
+    return someAvts[Math.floor(Math.random() * someAvts.length)];
+}

@@ -37,26 +37,28 @@ const Index = (props) => {
     // },[])
 
     return (
-        <div style={{ position: "absolute", width: "100%", height: "100%" }}>
-            <div
-                style={{
-                    position: "relative",
-                    width: "100%",
-                    height: "100%",
-                    opacity: loading ? (blurDataURL ? 1 : 0) : 1,
-                    backgroundColor: bgColor || theme.palette.img_bg.main,
-                }}
-            >
-                <Image
-                    alt="Loading Image"
-                    {...localProps}
-                    onLoadingComplete={() => {
-                        setLoading(false);
-                        if (_.isFunction(doneLoading)) {
-                            doneLoading();
-                        }
+        <div style={{ position: "relative", width: "100%", height: "100%" }}>
+            <div style={{ position: "absolute", width: "100%", height: "100%", top: 0, left: 0 }}>
+                <div
+                    style={{
+                        position: "relative",
+                        width: "100%",
+                        height: "100%",
+                        opacity: loading ? (blurDataURL ? 1 : 0) : 1,
+                        backgroundColor: bgColor || theme.palette.img_bg.main,
                     }}
-                />
+                >
+                    <Image
+                        alt="Loading Image"
+                        {...localProps}
+                        onLoadingComplete={() => {
+                            setLoading(false);
+                            if (_.isFunction(doneLoading)) {
+                                doneLoading();
+                            }
+                        }}
+                    />
+                </div>
             </div>
             {loading && !blurDataURL && (
                 <Skeleton

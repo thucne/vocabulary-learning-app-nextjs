@@ -39,7 +39,7 @@ const RandomWord = ({ width = 300 }) => {
             overflow: 'hidden',
             position: 'relative',
         }}>
-            <Tooltip title="Refresh">
+            <label title="Refresh">
                 <IconButton
                     onClick={handleRefresh}
                     sx={{
@@ -53,7 +53,7 @@ const RandomWord = ({ width = 300 }) => {
                 >
                     <RefreshRoundedIcon fontSize="inherit" />
                 </IconButton>
-            </Tooltip>
+            </label>
             <Grid container {...Props.GCRCC}>
                 <Grid item xs={12} {...Props.GICCC} sx={{ height: width / 2, maxHeight: 150, backgroundColor: Colors.WOAD_YELLOW, px: 2, py: 1 }}>
                     <Typography variant="caption">

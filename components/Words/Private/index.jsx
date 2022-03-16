@@ -10,18 +10,17 @@ import {
 } from '@mui/material';
 
 import VolumeUpRoundedIcon from '@mui/icons-material/VolumeUpRounded';
-import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded';
-import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove';
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
-import ShareIcon from '@mui/icons-material/Share';
 
 import { Props, SXs, Fonts, Colors } from '@styles';
 import { getAudioUrl, useThisToGetSizesFromRef, getNRelatedVips } from '@utils';
 import { AUDIO_ALT, NO_PHOTO } from '@consts';
+
 import LoadingImage from '@components/LoadingImage';
 import RandomWord from '@components/Words/RandomWord';
-import { subscribeVip, unsubscribeVip } from "@actions";
+import UnsplashWord from '@components/Words/UnsplashWord';
+
 import * as t from '@consts';
 import { RECAPTCHA } from '@config';
 
@@ -29,7 +28,7 @@ import { useSelector, useDispatch } from "react-redux";
 import parser from 'html-react-parser';
 import _ from 'lodash';
 
-const PrivateWord = ({ vip, relatedVips: externalRelatedVips }) => {
+const PrivateWord = ({ vip, relatedVips: externalRelatedVips, unsplashVip }) => {
     const [audioUrl, setAudioUrl] = useState("");
     const [loadingAudio, setLoadingAudio] = useState(false);
 
@@ -491,6 +490,13 @@ const PrivateWord = ({ vip, relatedVips: externalRelatedVips }) => {
                     <Divider sx={{ my: 2, width: '100%' }} />
                     <Grid container {...Props.GCRCC}>
                         <RandomWord width={grid2Sizes?.width} />
+                    </Grid>
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
+                    <Divider sx={{ my: 2, width: '100%' }} />
+                    <Grid container {...Props.GCRCC}>
+                        <UnsplashWord width={grid2Sizes?.width} unsplashVip={unsplashVip} />
                     </Grid>
                 </Grid>
             </Grid>
