@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 
-import { Container, Grid, Typography, IconButton, Stack, Alert, Tooltip } from "@mui/material";
+import { Container, Grid, Typography, IconButton, Stack, Alert, Tooltip, TextField } from "@mui/material";
 
 import { useTheme } from "@mui/material/styles";
 
@@ -10,7 +10,7 @@ import {
     ArrowBack as ArrowBackIcon,
 } from "@mui/icons-material";
 
-import { Fonts, SXs, Colors } from "@styles";
+import { Fonts, SXs, Colors, Props } from "@styles";
 import { IMAGE_ALT, NO_PHOTO } from "@consts";
 
 import LoadingImage from "@components/LoadingImage";
@@ -23,11 +23,15 @@ import CreateNewWord from "@components/WordForm";
 import { useSettings } from "@utils";
 import _, { isEqual } from "lodash";
 
+import parser from 'html-react-parser';
+
 import Router from 'next/router';
 import Link from 'next/link';
 
 const WordListBlock = () => {
     const [sizes, setSizes] = useState({ width: 0, height: 0 });
+    const [searchTerm, setSearchTerm] = useState("");
+    const [evidences, setEvidences] = useState([]);
 
     const wordListRaw = useSelector((state) =>
         state.userData?.vips?.length > 0 ? state.userData.vips : []
@@ -37,67 +41,82 @@ const WordListBlock = () => {
         state.userData?.subscribedVips?.length > 0 ? state.userData.subscribedVips : []
     );
 
-    const wordList = useMemo(() => _.unionWith(wordListRaw, subscribedWordListRaw, _.isEqual), [wordListRaw, subscribedWordListRaw]);
+    const wordList = useMemo(() =>
+        _.filter(_.unionWith(wordListRaw, subscribedWordListRaw, _.isEqual), word => {
+            // return if any field contains the filter, deep checked
+            return _.some(word, (value, key) => {
 
-    const config = (sizes, setSizes) => ({
-        mui: {
-            Grid,
-            Container,
-            IconButton,
-            Stack,
-            ArrowBackIcon,
-            ArrowForwardIcon,
-        },
-        buttonIconStyle: {
-            // backgroundColor: theme.palette.scroll_button.main,
-            ...SXs.MUI_NAV_ICON_BUTTON,
-        },
-        iconStyle: {
-            fontSize: Fonts.FS_20,
-        },
-        getElementSizes: (data) => {
-            if (!isEqual(sizes, data)) {
-                setSizes(data);
-            }
-        },
-        elementStyle: {
-            "&:hover": { filter: "brightness(1)" }
-        },
-        containerStyle: {
-            maxWidth: "100%",
-        },
-        gridItemSize: {
-            xs: 6,
-            sm: 4,
-            md: 3,
-            lg: 2,
-        },
-        showScrollbar: true,
-        React,
-    });
+                if (!_.isEmpty(value)) {
+                    const res = _.includes(JSON.stringify(value).toLowerCase(), searchTerm.toLowerCase());
+
+                    if (res === true) {
+                        setEvidences(prev => {
+                            const temp = {
+                                id: word.id,
+                                field: key
+                            }
+                            return [...prev, temp];
+                        })
+                    }
+
+                    return res;
+                }
+                return false;
+            })
+        }), [wordListRaw, subscribedWordListRaw, searchTerm]);
+
+    // const wordList = useMemo(() => _.unionWith(wordListRaw, subscribedWordListRaw, _.isEqual), [wordListRaw, subscribedWordListRaw]);
+
+    const handleSearch = useMemo(() => _.debounce((e) => searchWord(e?.target?.value), 500), [])
+
+    const searchWord = (searchTerm) => {
+        setEvidences([]);
+        setSearchTerm(searchTerm);
+    }
 
     return (
         <Container maxWidth="lg" disableGutters>
             <Grid container direction="row" mt={[0, 1, 2, 3]}>
-                <Grid item xs={12} sx={{
-                    display: 'flex',
-                    justifyContent: 'flex-start',
-                    alignItems: 'center',
-                    gap: '10px'
-                }}>
-                    <Typography
-                        variant="h5"
-                        component="h2"
-                        sx={{ fontWeight: Fonts.FW_500 }}
-                    >
-                        Word List
-                    </Typography>
+                <Grid item xs={12}>
 
-                    <NewWord />
+                    <Grid container {...Props.GCRBC}>
+                        <Grid item {...Props.GIRSC}>
+                            <Typography
+                                variant="h5"
+                                component="h2"
+                                sx={{ fontWeight: Fonts.FW_500, mr: 1 }}
+                            >
+                                Word List
+                            </Typography>
 
+                            <NewWord />
+                        </Grid>
+                        <Grid item {...Props.GIREC}>
+                            <TextField
+                                type="text"
+                                size="small"
+                                placeholder="Word, tag, etc."
+                                label="Search"
+                                sx={{ width: [150, 'auto'] }}
+                                onChange={handleSearch}
+                            />
+                        </Grid>
+                    </Grid>
                 </Grid>
-
-                <ListWord wordList={wordList} sizes={sizes} config={config(sizes, setSizes)} />
+                <Typography variant="caption" component="p" sx={{
+                    mt: 1, px: 1,
+                    backgroundColor: Colors.MATCHED_RESULT,
+                    color: Colors.WHITE,
+                    borderRadius: '4px',
+                }}>
+                    {_.isEmpty(searchTerm) ? '' : `Matched: ${wordList?.length}`}
+                </Typography>
+                <ListWord
+                    wordList={wordList}
+                    sizes={sizes}
+                    config={config(sizes, setSizes)}
+                    evidences={_.isEmpty(searchTerm) ? [] : evidences}
+                />
 
             </Grid>
         </Container>
@@ -110,20 +129,32 @@ const NewWord = () => {
         <div>
             <CreateNewWord open={open} setOpen={setOpen} />
             <IconButton onClick={() => setOpen(true)} sx={SXs.MUI_NAV_ICON_BUTTON}>
-                <AddIcon sx={{ color: Colors.LOGO_BLUE }} />
+                <AddIcon />
             </IconButton>
         </div>
     )
 }
 
-const ListWord = ({ wordList, config, sizes }) => {
+const ListWord = ({ wordList, config, sizes, evidences }) => {
+
+    const noList = {
+        vip: "Not found",
+        pronounce: "/Not exist or empty list/",
+    }
 
     return (
         <Grid item xs={12} mt={2} sx={{ px: wordList?.length === 0 ? 0 : 2 }}>
-            {
+            {/* {
                 wordList?.length === 0 && <Alert severity="info">
                     No words in your list
                 </Alert>
+            } */}
+            {
+                wordList?.length === 0 && <EachChild
+                    word={noList}
+                    width={sizes.width}
+                    noJump
+                />
             }
             {
                 wordList?.length > 0 && <ScrollPaper {...config}>
@@ -132,6 +163,7 @@ const ListWord = ({ wordList, config, sizes }) => {
                             key={`render-word-list-${index}`}
                             word={word}
                             width={sizes.width}
+                            evidence={evidences?.find(item => item.id === word.id)}
                         />
                     ))}
                 </ScrollPaper>
@@ -140,7 +172,7 @@ const ListWord = ({ wordList, config, sizes }) => {
     )
 }
 
-const EachChild = ({ word, width }) => {
+const EachChild = ({ word, width, evidence, noJump }) => {
     const theme = useTheme();
     const [loading, setLoading] = useState(true);
 
@@ -157,7 +189,7 @@ const EachChild = ({ word, width }) => {
     }
 
     return (
-        <Link href={word?.public ? `/word/public/${word?.vip}/${word?.id}` : `/word/${word?.vip}/${word?.id}`} passHref>
+        <Link href={noJump ? '#' : word?.public ? `/word/public/${word?.vip}/${word?.id}` : `/word/${word?.vip}/${word?.id}`} passHref>
             <div
                 style={{
                     display: "flex",
@@ -206,14 +238,74 @@ const EachChild = ({ word, width }) => {
                                 fontSize: [Fonts.FS_13],
                             }}
                             className="overflowTypography"
+                            align="center"
                         >
                             {word?.pronounce}
                         </Typography>
+                    </Grid>
+                )}
+
+                {/* render evidence of search */}
+                {evidence && (
+                    <Grid item>
+                        <Tooltip title="Matched field">
+                            <Typography
+                                sx={{
+                                    fontWeight: Fonts.FW_500,
+                                    fontSize: [Fonts.FS_13],
+                                    px: 1, mt: 1,
+                                    borderRadius: "4px",
+                                    backgroundColor: Colors.LOGO_BLUE,
+                                    color: Colors.WHITE,
+                                }}
+                                className="overflowTypography"
+                            >
+                                {evidence.field}
+                            </Typography>
+                        </Tooltip>
                     </Grid>
                 )}
             </div>
         </Link>
     );
 };
+
+const config = (sizes, setSizes) => ({
+    mui: {
+        Grid,
+        Container,
+        IconButton,
+        Stack,
+        ArrowBackIcon,
+        ArrowForwardIcon,
+    },
+    buttonIconStyle: {
+        // backgroundColor: theme.palette.scroll_button.main,
+        ...SXs.MUI_NAV_ICON_BUTTON,
+    },
+    iconStyle: {
+        fontSize: Fonts.FS_20,
+    },
+    getElementSizes: (data) => {
+        if (!isEqual(sizes, data)) {
+            setSizes(data);
+        }
+    },
+    elementStyle: {
+        "&:hover": { filter: "brightness(1)" }
+    },
+    containerStyle: {
+        maxWidth: "100%",
+    },
+    gridItemSize: {
+        xs: 6,
+        sm: 4,
+        md: 3,
+        lg: 2,
+    },
+    showScrollbar: true,
+    React,
+});
+
 
 export default WordListBlock;

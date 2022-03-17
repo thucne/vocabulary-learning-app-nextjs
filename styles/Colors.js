@@ -174,4 +174,7 @@ export const DIALOG_YELLOW = '#ffd700';
 export const DIALOG_RED = '#f50057';
 
 // word of a day
-export const WOAD_YELLOW = '#fdc702'
+export const WOAD_YELLOW = '#fdc702';
+
+// matched results
+export const MATCHED_RESULT = '#357a38';
