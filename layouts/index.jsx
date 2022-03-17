@@ -100,7 +100,7 @@ const Layout = ({ children, login = false, landing = false, noMeta = false, tabN
                         position: "fixed",
                         zIndex: "1000",
                         bottom: "1rem",
-                        left: "1rem",
+                        right: "1rem",
                         ...SXs.COMMON_BUTTON_STYLES
                     }}
                     onClick={() => router.back()}
