@@ -38,10 +38,7 @@ const PrivateWord = ({ router = { query: {} } }) => {
                 $ne: id,
             }
         },
-        pagination: {
-            page: 1,
-            pageSize: 1000
-        }
+        _limit: -1
     }
 
     // get words

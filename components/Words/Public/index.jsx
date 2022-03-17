@@ -388,7 +388,19 @@ const PublicWord = ({ vip, relatedVips: externalRelatedVips, unsplashVip }) => {
                                     fontSize: Fonts.FS_18,
                                     color: (theme) => theme.palette.mainPublicWord.main,
                                 }}>
-                                    → {item}
+                                    → {item?.split(" ").map((word, index) => (
+                                        <Link
+                                            key={`english-${index}`}
+                                            href={`/word/${word
+                                                ?.toLowerCase()
+                                                ?.replace(/[^a-zA-Z ]/g, "")}`}
+                                            passHref
+                                        >
+                                            <MuiLink underline='hover'>
+                                                {word}{' '}
+                                            </MuiLink>
+                                        </Link>
+                                    ))}
                                 </Typography>
                             ))
                         }
@@ -424,21 +436,25 @@ const PublicWord = ({ vip, relatedVips: externalRelatedVips, unsplashVip }) => {
                                 }}>
                                     &bull; <i>
                                         {
-                                            parser(item
-                                                ?.split(" ")
-                                                ?.map((item) => {
-                                                    if (item?.match(regex)) {
-                                                        return `${item.replace(
-                                                            regex,
-                                                            (matched) =>
-                                                                `<span style="color: #f44336; font-weight: bold; text-decoration: underline;">${matched}</span>`
-                                                        )}`;
-                                                    } else {
-                                                        return item;
-                                                    }
-                                                })
-                                                ?.join(" ")
-                                                ?.replace(/\s\s+/g, " "))
+                                            item
+                                                ?.split(/\s+/g).map((word, index) => (
+                                                    <Link
+                                                        key={`english-${index}`}
+                                                        href={`/word/${word
+                                                            ?.toLowerCase()
+                                                            ?.replace(/[^a-zA-Z ]/g, "")}`}
+                                                        passHref
+                                                    >
+                                                        <MuiLink underline='hover' sx={{ color: 'inherit' }}>
+                                                            {parser(word.replace(
+                                                                regex,
+                                                                (matched) =>
+                                                                    `<span style="color: #f44336; font-weight: bold; text-decoration: underline;">${matched}</span>`
+                                                            ))}{' '}
+                                                        </MuiLink>
+                                                    </Link>
+                                                ))
+
                                         }
                                     </i>
                                 </Typography>
