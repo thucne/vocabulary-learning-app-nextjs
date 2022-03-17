@@ -13,7 +13,7 @@ import { Skeleton } from "@mui/material";
 
 const Private = ({ children, MetaTag }) => {
     const [validate, setValidate] = useState(false);
-    const [login, setLogin] = useState(false);
+    // const [login, setLogin] = useState(false);
 
     useEffect(() => {
         const pathname = window?.location?.pathname ? window.location.pathname : "";
@@ -44,8 +44,7 @@ const Private = ({ children, MetaTag }) => {
                     : {
                         error: "Require log in",
                     };
-                
-                console.log(data);
+
 
                 if (data?.error) {
                     logout(() =>
@@ -64,12 +63,12 @@ const Private = ({ children, MetaTag }) => {
                     localStorage.setItem("vip-session", new Date(new Date().getTime() + 1000 * 60 * 5).toString());
                 }
             }
-            setLogin(true);
         };
+
         validate().then(() => setValidate(true));
     }, []);
 
-    if (!validate || !login || !getJWT()) {
+    if (!validate || !getJWT()) {
         return (
             <>
                 <div
@@ -86,10 +85,11 @@ const Private = ({ children, MetaTag }) => {
                             position: "absolute",
                             width: "100%",
                             height: "100%",
-                            background: "linear-gradient(to right, #64b5f6 0%, #ffd54f 100%)",
+                            // background: "linear-gradient(to right, #64b5f6 0%, #ffd54f 100%)",
                         }}
                         variant="rectangular"
                         animation="wave"
+                        className="verifybg"
                     />
                     <div
                         style={{

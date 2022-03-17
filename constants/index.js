@@ -43,6 +43,8 @@ export const RELOAD_RECAPTCHA = "RELOAD_RECAPTCHA";
 export const UNSPLASH_LOGO_X = 'https://res.cloudinary.com/katyperrycbt/image/upload/v1647276336/q7wxkdaapg6rypdqrdlo.svg';
 export const UNSPLASH_LOADING = 'https://res.cloudinary.com/katyperrycbt/image/upload/v1647408183/White_Clean_Now_Loading_Animation_Youtube_Video_pliqfe.gif';
 
+export const LOADING_DUAL_BALLS = 'https://res.cloudinary.com/katyperrycbt/image/upload/v1647488137/Dual_Ball-1s-200px_2_uahymn.svg';
+
 export const NO_AVT = () => {
     const someAvts = [
         'https://res.cloudinary.com/katyperrycbt/image/upload/v1647406463/avatar_4_hmioit.svg',

@@ -94,7 +94,8 @@ const Index = (props) => {
                             }}
                         >
                             <Image
-                                src="https://res.cloudinary.com/katyperrycbt/image/upload/v1645240546/Dual_Ball-1s-200px_tbjrjw.svg"
+                                // src="https://res.cloudinary.com/katyperrycbt/image/upload/v1645240546/Dual_Ball-1s-200px_tbjrjw.svg"
+                                src="https://res.cloudinary.com/katyperrycbt/image/upload/v1647488137/Dual_Ball-1s-200px_2_uahymn.svg"
                                 alt="Loading"
                                 layout="fill"
                                 objectFit="cover"

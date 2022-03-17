@@ -39,7 +39,7 @@ const showTypes = {
     HIDE: "HIDE",
 };
 
-const WordCard = ({ open, setOpen, wordList, settings }) => {
+const WordCard = ({ open, setOpen, wordList = [], settings }) => {
 
     const windowSize = useWindowSize();
     const theme = useTheme();
@@ -56,13 +56,12 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
     const [audioUrl, setAudioUrl] = useState("");
     const [loadingAudio, setLoadingAudio] = useState(false);
 
-    const optimizedWordList = useCallback(() => getOptimizedPraticeSet(wordList, settings), [wordList, settings]);
+    const optimizedWordList = useMemo(() => getOptimizedPraticeSet(_.isEmpty(wordList) ? [] : wordList, settings), [wordList, settings]);
 
     const userData = useSelector((state) => state.userData);
     const { objectFit = "contain" } = useSettings(userData);
 
     useEffect(() => {
-
         let canset = true;
         if (canset) {
             setWordIndex(0);
@@ -73,10 +72,8 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
 
     useEffect(() => {
         let canRun = true;
-
         const run = async () => {
             if (wordIndex < optimizedWordList.length && wordIndex >= 0 && canRun) {
-                
                 setLoadingAudio(true);
                 setAudioUrl("");
                 getAudioUrl(optimizedWordList[wordIndex].audio, (url) => {
@@ -90,7 +87,7 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
             }
         }
 
-        if (canRun && _.isEqual) {
+        if (canRun) {
             run();
         }
 
@@ -262,7 +259,7 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
                                                 optimizedWordList?.[wordIndex]?.illustration?.url ||
                                                 IMAGE_ALT
                                             }
-                                            alt="something"
+                                            alt={optimizedWordList?.[wordIndex]?.vip}
                                             objectFit={objectFit}
                                             layout='fill'
                                             quality={100}
@@ -286,7 +283,7 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
                                         sx={{ fontWeight: Fonts.FW_600, mx: 3 }}
                                         className='overflowTypography'
                                     >
-                                        {optimizedWordList[wordIndex].vip}
+                                        {optimizedWordList?.[wordIndex]?.vip}
                                     </Typography>
 
                                     <IconButton onClick={handleNext}>
@@ -298,7 +295,7 @@ const WordCard = ({ open, setOpen, wordList, settings }) => {
                                 <Grid item xs={12} {...Props.GIRCC} mt={1} sx={{ position: 'relative' }} >
 
                                     <Typography sx={{ color: (theme) => theme.palette.action.main }}>
-                                        {optimizedWordList[wordIndex].pronounce}
+                                        {optimizedWordList?.[wordIndex]?.pronounce}
                                     </Typography>
 
                                     {

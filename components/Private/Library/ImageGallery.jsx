@@ -60,7 +60,7 @@ const ImageGallery = (props) => {
 
     const cols = windowSize?.width < theme.breakpoints.values.sm ? 3 : windowSize?.width < theme.breakpoints.values.md ? 4 : 5;
 
-    const skeletonWidth = Math.floor((containerSize.width / (cols + 0.1)) - 4);
+    const skeletonWidth = Math.floor((containerSize.width / (cols + 0.15)))*0.985;
 
     return (
         <>
