@@ -66,7 +66,7 @@ import { Fonts, SXs } from "@styles";
 import { API, RECAPTCHA } from "@config";
 
 import useSWR from "swr";
-import { debounce } from "lodash";
+import _, { debounce } from "lodash";
 
 import Uploader from "@tallis/react-dndp";
 
@@ -133,7 +133,9 @@ export default function CreateNewWord({ open = false, setOpen }) {
                     value: item?.attributes?.name,
                     id: item?.id,
                 }));
-            setVocabTypes(types);
+            if (!_.isEqual(types, vocabTypes)) {
+                setVocabTypes(types);
+            }
         },
     });
 

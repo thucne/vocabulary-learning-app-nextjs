@@ -18,16 +18,20 @@ const defaultImg = {
 
 const Index = (props) => {
     const theme = useTheme();
+    const { doneLoading, bgColor, blurDataURL, ...imgProps } = useMemo(() => props, [props]);
 
     const [loading, setLoading] = useState(true);
     const [localProps, setLocalProps] = useState(defaultImg);
-
-    const { doneLoading, bgColor, blurDataURL, ...imgProps } = props;
+    const memoizedProps = useMemo(() => localProps, [localProps]);
 
     useEffect(() => {
-        if (!_.isEqual(localProps, imgProps)) {
+        let isMounted = true;
+
+        if (!_.isEqual(localProps, imgProps) && isMounted) {
             setLocalProps(imgProps);
         }
+
+        return () => isMounted = false;
     }, [imgProps, localProps]);
 
     return (
@@ -48,7 +52,7 @@ const Index = (props) => {
                 >
                     {/*eslint-disable-next-line jsx-a11y/alt-text*/}
                     <Image
-                        {...localProps}
+                        {...memoizedProps}
                         onLoadingComplete={() => {
                             setLoading(false);
                             if (_.isFunction(doneLoading)) {

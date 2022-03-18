@@ -31,7 +31,6 @@ import Link from 'next/link';
 const WordListBlock = () => {
     const [sizes, setSizes] = useState({ width: 0, height: 0 });
     const [searchTerm, setSearchTerm] = useState("");
-    const [evidences, setEvidences] = useState([]);
 
     const wordListRaw = useSelector((state) =>
         state.userData?.vips?.length > 0 ? state.userData.vips : []
@@ -41,8 +40,9 @@ const WordListBlock = () => {
         state.userData?.subscribedVips?.length > 0 ? state.userData.subscribedVips : []
     );
 
-    const wordList = useMemo(() =>
-        _.filter(_.unionWith(wordListRaw, subscribedWordListRaw, _.isEqual), word => {
+    const getWordList = useMemo(() => {
+        let evidences = [];
+        const listWord = _.filter(_.unionWith(wordListRaw, subscribedWordListRaw, _.isEqual), word => {
             // return if any field contains the filter, deep checked
             return _.some(word, (value, key) => {
 
@@ -50,27 +50,31 @@ const WordListBlock = () => {
                     const res = _.includes(JSON.stringify(value).toLowerCase(), searchTerm.toLowerCase());
 
                     if (res === true) {
-                        setEvidences(prev => {
-                            const temp = {
-                                id: word.id,
-                                field: key
-                            }
-                            return [...prev, temp];
-                        })
+                        const temp = {
+                            id: word.id,
+                            field: key
+                        }
+                        evidences.push(temp);
                     }
 
                     return res;
                 }
                 return false;
             })
-        }), [wordListRaw, subscribedWordListRaw, searchTerm]);
+        });
+
+        return [listWord, evidences];
+    }, [wordListRaw, subscribedWordListRaw, searchTerm]);
+
+    const [wordList = [], evidences = []] = getWordList;
 
     // const wordList = useMemo(() => _.unionWith(wordListRaw, subscribedWordListRaw, _.isEqual), [wordListRaw, subscribedWordListRaw]);
 
-    const handleSearch = useMemo(() => _.debounce((e) => searchWord(e?.target?.value), 500), [])
+    const handleSearch = useMemo(() => _.debounce((e) => {
+        searchWord(e?.target?.value);
+    }, 500), [])
 
     const searchWord = (searchTerm) => {
-        setEvidences([]);
         setSearchTerm(searchTerm);
     }
 
@@ -111,6 +115,7 @@ const WordListBlock = () => {
                 }}>
                     {_.isEmpty(searchTerm) ? '' : `Matched: ${wordList?.length}`}
                 </Typography>
+
                 <ListWord
                     wordList={wordList}
                     sizes={sizes}
@@ -135,13 +140,7 @@ const NewWord = () => {
     )
 }
 
-const ListWord = ({ wordList, config, sizes, evidences }) => {
-
-    const noList = {
-        vip: "Not found",
-        pronounce: "/Not exist or empty list/",
-    }
-
+const ListWord = ({ wordList = [], config, sizes, evidences = [] }) => {
     return (
         <Grid item xs={12} mt={2} sx={{ px: wordList?.length === 0 ? 0 : 2 }}>
             {/* {
@@ -174,13 +173,14 @@ const ListWord = ({ wordList, config, sizes, evidences }) => {
 
 const EachChild = ({ word, width, evidence, noJump }) => {
     const theme = useTheme();
+    
     const [loading, setLoading] = useState(true);
 
     const userData = useSelector((state) => state.userData);
+
     const { objectFit = "contain" } = useSettings(userData);
 
-    const photo =
-        word?.illustration?.formats?.small?.url ||
+    const photo = word?.illustration?.formats?.small?.url ||
         word?.illustration?.url ||
         NO_PHOTO;
 
@@ -269,6 +269,11 @@ const EachChild = ({ word, width, evidence, noJump }) => {
         </Link>
     );
 };
+
+const noList = {
+    vip: "Not found",
+    pronounce: "/Not exist or empty list/",
+}
 
 const config = (sizes, setSizes) => ({
     mui: {
