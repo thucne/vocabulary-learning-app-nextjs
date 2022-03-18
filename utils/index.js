@@ -910,54 +910,58 @@ export const deepExtractObjectStrapi = (object = {}, options = {}) => {
             allowNullPhoto = false
         } = options;
 
-        // flatten strapi object
-        if (Object.keys(object).includes('data') && _.isNull(object?.data)) {
-            return null;
-        }
+        if (!_.isArray(object)) {
+            // flatten strapi object
+            if (Object.keys(object).includes('data') && _.isNull(object?.data)) {
+                return null;
+            }
 
-        if (Object.keys(object).includes('data') && _.isObject(object?.data)) {
-            object = object.data
-        }
+            if (Object.keys(object).includes('data') && _.isObject(object?.data)) {
+                object = object.data
+            }
 
-        const allKeys = Object.keys(object);
+            const allKeys = Object.keys(object);
 
-        if (_.isEqual(allKeys, ['id', 'attributes'])) {
-            return { id: object.id, ...deepExtractObjectStrapi(object.attributes, options) };
+            if (_.isEqual(allKeys, ['id', 'attributes'])) {
+                return { id: object.id, ...deepExtractObjectStrapi(object.attributes, options) };
+            } else {
+
+                // check if each key is an Strapi object - includes "data", "id" or "attributes"
+                const strapiArrays = allKeys.filter(key => {
+                    return object[key]?.data;
+                }).map(key => {
+                    const data = object[key]?.data;
+                    return {
+                        [key]: data && data.length
+                            ? data.map(i => deepExtractObjectStrapi(i, options))
+                            : deepExtractObjectStrapi(data, options)
+                    }
+                });
+
+
+                const nullData = allKeys.filter(key => {
+                    return _.isObject(object[key]?.data) && _.isEmpty(object[key]?.data);
+                }).map(key => ({ [key]: null }));
+
+                const photoData = allKeys.filter(key => {
+                    return minifyPhoto?.length ? minifyPhoto.includes(key) : false;
+                }).map(key => {
+                    const temp = object[key]?.data?.attributes;
+                    const photo = temp?.formats?.small?.url || temp?.formats?.medium?.url || temp?.formats?.large?.url || temp?.url;
+                    return { [key]: photo || (allowNullPhoto ? null : NO_PHOTO_SEO) }
+                })
+
+                // convert to object
+                const strapiObject = _.merge({}, ...strapiArrays);
+                const nullObject = _.merge({}, ...nullData);
+                const photoObject = _.merge({}, ...photoData);
+
+                const returnObject = { ...object, ...strapiObject, ...nullObject, ...photoObject };
+
+                return minify ? _.omit(returnObject, minifyFields ? minifyFields : ['createdAt', 'updatedAt']) : returnObject;
+            }
         } else {
-
-            // check if each key is an Strapi object - includes "data", "id" or "attributes"
-            const strapiArrays = allKeys.filter(key => {
-                return object[key]?.data;
-            }).map(key => {
-                const data = object[key]?.data;
-                return {
-                    [key]: data && data.length
-                        ? data.map(i => deepExtractObjectStrapi(i, options))
-                        : deepExtractObjectStrapi(data, options)
-                }
-            });
-
-
-            const nullData = allKeys.filter(key => {
-                return _.isObject(object[key]?.data) && _.isEmpty(object[key]?.data);
-            }).map(key => ({ [key]: null }));
-
-            const photoData = allKeys.filter(key => {
-                return minifyPhoto?.length ? minifyPhoto.includes(key) : false;
-            }).map(key => {
-                const temp = object[key]?.data?.attributes;
-                const photo = temp?.formats?.small?.url || temp?.formats?.medium?.url || temp?.formats?.large?.url || temp?.url;
-                return { [key]: photo || (allowNullPhoto ? null : NO_PHOTO_SEO) }
-            })
-
-            // convert to object
-            const strapiObject = _.merge({}, ...strapiArrays);
-            const nullObject = _.merge({}, ...nullData);
-            const photoObject = _.merge({}, ...photoData);
-
-            const returnObject = { ...object, ...strapiObject, ...nullObject, ...photoObject };
-
-            return minify ? _.omit(returnObject, minifyFields ? minifyFields : ['createdAt', 'updatedAt']) : returnObject;
+            return object.map(item => deepExtractObjectStrapi(item, options));
         }
     } else {
         return null;

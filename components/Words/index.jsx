@@ -1,8 +1,15 @@
 
+import { deepExtractObjectStrapi } from '@utils';
 
-const AnyWord = ({ results }) => {
+import _ from 'lodash'
 
-    console.log('s',results);
+const AnyWord = ({ results = [] }) => {
+
+    const rawVips =  results?.map(item => item.item);
+    const vips = deepExtractObjectStrapi(rawVips);
+
+    console.log(vips)
+
 
     return (
         <div>

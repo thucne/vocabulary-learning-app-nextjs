@@ -31,8 +31,6 @@ const AnyWord = () => {
 
     const results = _.isArray(data?.data) && !_.isEmpty(data?.data) ? data.data : [];
 
-    console.log(data?.meta);
-
     if (loading && _.isEmpty(results)) {
         return (
             <Layout noMeta tabName={"Private word"}>
