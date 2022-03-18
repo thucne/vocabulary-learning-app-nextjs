@@ -90,6 +90,17 @@ export const fetcherJWT = async (url) => {
         .catch((err) => handleServerError(err));
 };
 
+export const fetcherJWTIfAny = async (url) => {
+    return await axios
+        .get(url, {
+            headers: {
+                Authorization: getJWT() ? `Bearer ${getJWT()}` : undefined,
+            },
+        })
+        .then((res) => handleCommonResponse(res))
+        .catch((err) => handleServerError(err));
+};
+
 export const fetcher = async (url) => {
     return await axios
         .get(url)

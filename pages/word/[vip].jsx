@@ -4,50 +4,53 @@ import { useRouter } from 'next/router';
 
 import Layout from "@layouts";
 import Meta from "@meta";
-import PrivateWordComponent from "@components/Words/Private";
+import AnyWordComponent from '@components/Words';
 import LoadingOrNotFound from '@components/Words/LoadingOrNotFound';
-import ErrorPage from "@components/Error";
 
-import { API, UNSPLASH } from '@config';
-import { deepExtractObjectStrapi, sortRelatedVips, getJWT } from '@utils';
-import Private from '@components/Auth/Private';
-import { fetcherJWT } from '@actions';
+import { API } from '@config';
+import { fetcherJWTIfAny } from '@actions';
 import { NO_PHOTO } from '@consts';
 
 import qs from 'qs';
 import useSWR from 'swr';
 import _ from 'lodash';
 
-const fetcher = async (...args) => await fetcherJWT(...args);
+const fetcher = async (...args) => await fetcherJWTIfAny(...args);
 
 const AnyWord = () => {
     const { query: { vip } } = useRouter();
+    const [loading, setLoading] = useState(true);
 
     const queryString = qs.stringify({
-        filters: {
-            vip: {
-                $containsi: vip
-            }
-        },
-        populate: '*',
-        pagination: {
-            page: 1,
-            pageSize: 1000,
-        },
+        max: 10
     }, { encodeValuesOnly: true });
 
-    const { data } = useSWR(vip ? `${API}/api/vips?${queryString}` : null, fetcher);
+    const { data } = useSWR(vip ? `${API}/api/fuzzy-search/${vip}?${queryString}` : null, fetcher, {
+        onSuccess: () => setLoading(false),
+    });
 
-    console.log(data);
+    const results = _.isArray(data?.data) && !_.isEmpty(data?.data) ? data.data : [];
+
+    console.log(data?.meta);
+
+    if (loading && _.isEmpty(results)) {
+        return (
+            <Layout noMeta tabName={"Private word"}>
+                <MetaTag vip={vip} />
+                <LoadingOrNotFound />
+            </Layout>
+        )
+    }
 
     return (
         <Layout noMeta tabName={vip}>
             <MetaTag vip={vip} />
+            <AnyWordComponent results={results} />
         </Layout>
     )
 }
 
-const MetaTag = ({ vip }) => {
+const MetaTag = ({ vip = 'Loading...' }) => {
 
     return (
         <Meta

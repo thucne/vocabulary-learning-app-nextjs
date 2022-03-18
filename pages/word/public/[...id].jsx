@@ -68,8 +68,7 @@ export async function getStaticPaths() {
 
     const querySearchRelated = {
         pagination: {
-            page: 1,
-            pageSize: 10000
+            limit: -1
         }
     }
 

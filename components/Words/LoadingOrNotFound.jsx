@@ -17,11 +17,7 @@ const LoadingOrNotFound = () => (
             <Grid item xs={12}>
 
                 {/* main word */}
-                <Typography variant="h4" component="h1" className='overflowTypography'
-                    sx={{
-                        color: theme => theme.palette.publicWord3.main,
-                    }}
-                >
+                <Typography variant="h4" component="h1">
                     <Skeleton width="20%" />
                 </Typography>
 
@@ -40,15 +36,11 @@ const LoadingOrNotFound = () => (
 
                 {/* audio */}
                 <Grid container {...Props.GCRSC}>
-                    <Grid item xs={12} {...Props.GIRSC} mt={1} sx={{
-                        position: 'relative',
-                        color: (theme) => theme.palette.mainPublicWord.main
-                    }}>
+                    <Grid item xs={12} {...Props.GIRSC} mt={1}>
 
-                        <Typography variant="body2" sx={{ letterSpacing: '-0.5px' }}>
+                        <Typography variant="body2">
                             <Skeleton width={50} />
                         </Typography>
-
                     </Grid>
                 </Grid>
 
@@ -59,6 +51,9 @@ const LoadingOrNotFound = () => (
 
             <Grid item xs={12}>
                 <Skeleton height={100} />
+                <Typography variant="p">
+                    <Skeleton />
+                </Typography>
             </Grid>
 
         </Grid>

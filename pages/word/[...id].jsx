@@ -39,8 +39,7 @@ const PrivateWord = ({ router = { query: {} } }) => {
             }
         },
         pagination: {
-            page: 1,
-            pageSize: 10000
+            limit: -1
         }
     }
     
@@ -164,7 +163,7 @@ const MetaTag = ({ vip, params }) => {
 
     return (
         <Meta
-            title={`${vip?.vip} - VIP`}
+            title={`${vip?.vip || 'Loading...'} - VIP`}
             description={firstMeaning}
             image={photo}
             url={`/word/public/${params.id[0]}/${params.id[1]}`}
