@@ -54,12 +54,12 @@ const UnsplashWord = ({ width, unsplashVip }) => {
             blur_hash: 'L69tP;?b004n_3xuV@Rj00IU~q?b'
         })
 
-        const url = await toDataURL(RANDOM_PHOTO(randomWord));
-        const blurData = await encodeImageToBlurhash(url);
+        // const url = await toDataURL(RANDOM_PHOTO(randomWord));
+        // const blurData = await encodeImageToBlurhash(url);
 
         setImg({
-            urls: { regular: url },
-            blur_hash: blurData,
+            urls: { regular: RANDOM_PHOTO(randomWord) },
+            // blur_hash: blurData,
         })
 
 
