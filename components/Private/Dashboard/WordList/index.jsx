@@ -1,6 +1,9 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 
-import { Container, Grid, Typography, IconButton, Stack, Alert, Tooltip, TextField } from "@mui/material";
+import {
+    Container, Grid, Typography, IconButton, Stack,
+    Alert, Tooltip, TextField
+} from "@mui/material";
 
 import { useTheme } from "@mui/material/styles";
 
@@ -23,9 +26,6 @@ import CreateNewWord from "@components/WordForm";
 import { useSettings } from "@utils";
 import _, { isEqual } from "lodash";
 
-import parser from 'html-react-parser';
-
-import Router from 'next/router';
 import Link from 'next/link';
 
 const WordListBlock = () => {
@@ -52,7 +52,7 @@ const WordListBlock = () => {
                     if (res === true) {
                         const temp = {
                             id: word.id,
-                            field: key
+                            field: key !== 'vip' ? key : 'word'
                         }
                         evidences.push(temp);
                     }
@@ -173,7 +173,7 @@ const ListWord = ({ wordList = [], config, sizes, evidences = [] }) => {
 
 const EachChild = ({ word, width, evidence, noJump }) => {
     const theme = useTheme();
-    
+
     const [loading, setLoading] = useState(true);
 
     const userData = useSelector((state) => state.userData);

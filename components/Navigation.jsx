@@ -90,6 +90,8 @@ function ResponsiveDrawer(props) {
     const dispatch = useDispatch();
     const theme = useTheme();
 
+    const [refreshInterval, setRefreshInterval] = useState(1000);
+
     const [mobileOpen, setMobileOpen] = useState(false);
     const [bottom, setBottom] = useState(0);
     const [scrolled, setScrolled] = useState(false);
@@ -103,7 +105,7 @@ function ResponsiveDrawer(props) {
     const tabName = useSelector((state) => state?.tabName);
     const bgColor = useSelector((state) => state?.bgColor);
     const userData = useSelector((state) => state?.userData);
-    
+
     const [width, height] = useWindowSize(appBarRef);
 
     const trigger = useScrollTrigger({
@@ -113,16 +115,24 @@ function ResponsiveDrawer(props) {
 
     // get words
     const { data, error, isValidating } = useSWR(getJWT() ? `${API}/api/users/me` : null, fetcher, {
-        refreshInterval: 1000,
+        refreshInterval: refreshInterval,
     });
 
     useEffect(() => {
 
-        if (!error && !isValidating && data && !isEqual(userData, data)) {
+        const oldState = _.cloneDeep(userData);
+        const newState = _.cloneDeep(data);
+
+        if (!error && !isValidating && data && !isEqual(oldState, newState)) {
+            setRefreshInterval(1000);
+
             dispatch({
                 type: t.UPDATE_USER_DATA,
                 payload: data,
             });
+        } else {
+            // increase refresh interval
+            setRefreshInterval(prev => prev > 60000 ? 1000 : prev + 1000);
         }
     }, [data, error, isValidating, dispatch, userData]);
 

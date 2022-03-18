@@ -36,7 +36,7 @@ const AnyWord = () => {
         },
     }, { encodeValuesOnly: true });
 
-    const { data } = useSWR(`${API}/api/vips?${queryString}`, fetcher);
+    const { data } = useSWR(vip ? `${API}/api/vips?${queryString}` : null, fetcher);
 
     console.log(data);
 

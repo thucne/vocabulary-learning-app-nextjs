@@ -38,9 +38,12 @@ const PrivateWord = ({ router = { query: {} } }) => {
                 $ne: id,
             }
         },
-        _limit: -1
+        pagination: {
+            page: 1,
+            pageSize: 10000
+        }
     }
-
+    
     // get words
     const { data: allVips = [] } = useSWR(getJWT() && id
         ? `${API}/api/vips?${qs.stringify(querySearchRelated, { encodeValuesOnly: true })}`
