@@ -396,7 +396,7 @@ const PublicWord = ({ vip, relatedVips: externalRelatedVips, unsplashVip }) => {
                                                 ?.replace(/[^a-zA-Z ]/g, "")}`}
                                             passHref
                                         >
-                                            <MuiLink underline='hover'>
+                                            <MuiLink underline='hover' color='inherit'>
                                                 {word}{' '}
                                             </MuiLink>
                                         </Link>
@@ -445,7 +445,7 @@ const PublicWord = ({ vip, relatedVips: externalRelatedVips, unsplashVip }) => {
                                                             ?.replace(/[^a-zA-Z ]/g, "")}`}
                                                         passHref
                                                     >
-                                                        <MuiLink underline='hover' sx={{ color: 'inherit' }}>
+                                                        <MuiLink underline='hover' color='inherit'>
                                                             {parser(word.replace(
                                                                 regex,
                                                                 (matched) =>
@@ -635,14 +635,14 @@ const PublicWord = ({ vip, relatedVips: externalRelatedVips, unsplashVip }) => {
 
                 <Grid item xs={12} sm={6} ref={grid2Ref}>
                     <Divider sx={{ my: 2, width: '100%' }} />
-                    <Grid container {...Props.GCRCC}>
+                    <Grid container {...Props.GCRCC} px={[0, 1]}>
                         <RandomWord width={grid2Sizes?.width} />
                     </Grid>
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
                     <Divider sx={{ my: 2, width: '100%' }} />
-                    <Grid container {...Props.GCRCC}>
+                    <Grid container {...Props.GCRCC} px={[0, 1]}>
                         <UnsplashWord width={grid2Sizes?.width} unsplashVip={unsplashVip} />
                     </Grid>
                 </Grid>
