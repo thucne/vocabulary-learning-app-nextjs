@@ -6,7 +6,8 @@ import Link from 'next/link';
 import {
     Paper, InputBase, IconButton,
     Menu, MenuItem, Divider, Grid,
-    Link as MuiLink
+    Link as MuiLink,
+    Typography
 } from '@mui/material';
 
 import {
@@ -30,11 +31,27 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
     const [focus, setFocus] = useState(0);
 
     const paperRef = useRef(null);
+    const inputRef = useRef(null);
 
     const { bottom, left } = useThisToGetPositionFromRef(paperRef, {
         revalidate: 100,
         terminalCondition: ({ width }) => width > 0
     });
+
+    useEffect(() => {
+        document.addEventListener('keydown', function (event) {
+            if (event.ctrlKey && event.key === 'k') {
+                event?.preventDefault();
+                inputRef?.current?.focus();
+            }
+        });
+
+        return () => document.removeEventListener('keydown', function (event) {
+            if (event.ctrlKey && event.key === 'k') {
+                event?.preventDefault();
+            }
+        });
+    }, [])
 
     const handleSearch = (e) => {
         e?.preventDefault();
@@ -45,20 +62,31 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
 
     return (
         <Paper
-            sx={{ p: '2px', display: open ? 'flex' : 'none', alignItems: 'center', mx: 1, mb: mobile ? 1 : 0, borderRadius: '10px' }}
+            sx={{ px: 1, py: '2px', display: open ? 'flex' : 'none', alignItems: 'center', mx: 1, mb: mobile ? 1 : 0, borderRadius: '10px' }}
             variant="outlined"
             id="demo-customized-button"
             ref={paperRef}
         >
+            <IconButton aria-label="search" size="small" disableRipple onClick={() => inputRef?.current?.focus()}>
+                <SearchIcon />
+            </IconButton>
             <InputBase
                 sx={{ ml: 1, flex: 1 }}
                 placeholder="Search"
                 inputProps={{ 'aria-label': 'search google maps' }}
                 onChange={handleSearch}
+                inputRef={inputRef}
             />
-            <IconButton aria-label="search" size="small">
-                <SearchIcon />
-            </IconButton>
+            <Typography variant="caption" sx={{
+                px: 1,
+                borderRadius: '4px',
+                backgroundColor: Colors.GREY_400,
+                color: Colors.WHITE,
+                fontWeight: Fonts.FW_600,
+                cursor: 'pointer',
+            }} onClick={() => inputRef?.current?.focus()}>
+                Ctrl + K
+            </Typography>
             <Paper variant='outlined' sx={{
                 position: 'fixed',
                 top: bottom + 5,
