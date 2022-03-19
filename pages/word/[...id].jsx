@@ -24,7 +24,8 @@ const fetcher = async (...args) => await fetcherJWT(...args);
 
 const RANDOM_QUERY = (word) => `https://api.unsplash.com/search/photos?query=${word}&per_page=1&client_id=${UNSPLASH}`;
 const RANDOM_PHOTO = (word) => `https://source.unsplash.com/random?${word}`;
-
+const UPDATE_UNSPLASH = (word) => `${API}/api/unsplashes/update-keyword/${word}`;
+const GET_LOCAL_UNSPLASH = (word) => `${API}/api/unsplashes?word=${word}`;
 
 const PrivateWord = ({ router = { query: {} } }) => {
     const [loading, setLoading] = useState(true);

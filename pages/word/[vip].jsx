@@ -26,7 +26,7 @@ const AnyWord = () => {
     }, { encodeValuesOnly: true });
 
     const { data } = useSWR(vip ? `${API}/api/fuzzy-search/${vip}?${queryString}` : null, fetcher, {
-        onSuccess: () => setLoading(false),
+        onSuccess: () => setLoading(false)
     });
 
     const results = _.isArray(data?.data) && !_.isEmpty(data?.data) ? data.data : [];
@@ -43,7 +43,7 @@ const AnyWord = () => {
     return (
         <Layout noMeta tabName={vip}>
             <MetaTag vip={vip} />
-            <AnyWordComponent results={results} />
+            <AnyWordComponent results={results} word={vip} />
         </Layout>
     )
 }

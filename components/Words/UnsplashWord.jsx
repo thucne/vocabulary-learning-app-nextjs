@@ -12,14 +12,19 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import LaunchRoundedIcon from '@mui/icons-material/LaunchRounded';
 
 import { UNSPLASH_LOGO_X, UNSPLASH_LOADING, NO_AVT } from '@consts';
-import { encodeImageToBlurhash, toDataURL } from '@utils';
+import { encodeImageToBlurhash, toDataURL, deepExtractObjectStrapi } from '@utils';
 import { Colors, Props, Fonts } from '@styles';
 import words from "@components/Words/words";
+import { API } from '@config';
 
 import _ from 'lodash';
 import Image from 'next/image';
 
 const RANDOM_PHOTO = (word) => `https://source.unsplash.com/random?${word}`;
+const NEW_RANDOM = (word) => `https://unsplash.com/napi/search?query=${word}&per_page=20&xp=`;
+const UPDATE_UNSPLASH = (word) => `${API}/api/unsplashes/update-keyword/${word}`;
+const GET_LOCAL_UNSPLASH = (word) => `${API}/api/unsplashes?word=${word}`;
+
 
 const getRandomWord = () => words[Math.floor(Math.random() * words.length)];
 
@@ -57,11 +62,39 @@ const UnsplashWord = ({ width, unsplashVip }) => {
         // const url = await toDataURL(RANDOM_PHOTO(randomWord));
         // const blurData = await encodeImageToBlurhash(url);
 
-        setImg({
-            urls: { regular: RANDOM_PHOTO(randomWord) },
-            // blur_hash: blurData,
-        })
+        const localRes = await fetch(GET_LOCAL_UNSPLASH(randomWord));
+        const localData = await localRes.json().catch(() => ({}));
 
+        const handledData = deepExtractObjectStrapi(localData)?.[0];
+
+        if (!_.isEmpty(handledData)) {
+            // random
+            const url = handledData.urls[Math.floor(Math.random() * handledData.urls.length)];
+
+            setImg({
+                urls: { regular: url },
+            });
+        } else {
+
+            const res = await fetch(RANDOM_PHOTO(randomWord));
+
+            // get unsplash id from url
+            const url = res.url;
+
+            setImg({
+                urls: { regular: url },
+            })
+
+            // save to cms
+            await fetch(UPDATE_UNSPLASH(randomWord), {
+                method: 'PUT',
+                body: JSON.stringify({ url }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+
+        }
 
         setLoading(false);
     }

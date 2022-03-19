@@ -351,6 +351,7 @@ export const handleDictionaryData = (
     originalWord = "",
 ) => {
     const camAudio = generateAudioLink(originalWord);
+    const oxfordAudio = generateOxfordAudioLink(originalWord);
 
     const allPronounces =
         firstData?.phonetics
@@ -469,7 +470,7 @@ export const handleDictionaryData = (
     if (!autoFill) {
         return {
             pronounce: text || altPronounce,
-            audio: camAudio ? `${camAudio}<vip>${audio}` : audio,
+            audio: `${camAudio}<vip>${oxfordAudio}<vip>${audio}`,
             clasifyVocab: [...new Set(allTypes)],
             synonyms: allSynonyms,
         };
@@ -626,6 +627,32 @@ const generateAudioLink = (words) => {
         const filesLink = `${firstChar}/${firstThreeChars}/${firstFiveChars}/${words}.mp3`;
 
         return `https://dictionary.cambridge.org/vi/media/english/us_pron/${filesLink}`;
+    } else {
+        return "";
+    }
+}
+
+const generateAudioLinkOxford = (words) => {
+
+    if (words?.length) {
+        const firstChar = words[0].toLowerCase();
+        // get first 3 chars and replace the empty space with _
+        let firstThreeChars = words.toLowerCase().substring(0, 3);
+        firstThreeChars = firstThreeChars.length < 3
+            ? firstThreeChars + "_".repeat(3 - firstThreeChars.length)
+            : firstThreeChars;
+
+        // get first 5 chars and replace the empty space with _
+        let firstFiveChars = words.toLowerCase().substring(0, 5).replace(/\s/g, "_");
+        firstFiveChars = firstFiveChars.length < 5
+            ? firstFiveChars + "_".repeat(5 - firstFiveChars.length)
+            : firstFiveChars;
+
+        //get first 3 characters of words and add _ if it is not enough
+
+        const filesLink = `${firstChar}/${firstThreeChars}/${firstFiveChars}/${words}__us_1.mp3`;
+
+        return `https://www.oxfordlearnersdictionaries.com/media/english/us_pron/${filesLink}`;
     } else {
         return "";
     }
@@ -911,6 +938,7 @@ export const deepExtractObjectStrapi = (object = {}, options = {}) => {
         } = options;
 
         if (!_.isArray(object)) {
+
             // flatten strapi object
             if (Object.keys(object).includes('data') && _.isNull(object?.data)) {
                 return null;
@@ -918,6 +946,10 @@ export const deepExtractObjectStrapi = (object = {}, options = {}) => {
 
             if (Object.keys(object).includes('data') && _.isObject(object?.data)) {
                 object = object.data
+            }
+
+            if (_.isArray(object)) {
+                return object.map(item => deepExtractObjectStrapi(item, options))
             }
 
             const allKeys = Object.keys(object);

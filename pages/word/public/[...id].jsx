@@ -85,6 +85,8 @@ export async function getStaticPaths() {
 
 const RANDOM_QUERY = (word) => `https://api.unsplash.com/search/photos?query=${word}&per_page=1&client_id=${UNSPLASH}`;
 const RANDOM_PHOTO = (word) => `https://source.unsplash.com/random?${word}`;
+const UPDATE_UNSPLASH = (word) => `${API}/api/unsplashes/update-keyword/${word}`;
+const GET_LOCAL_UNSPLASH = (word) => `${API}/api/unsplashes?word=${word}`;
 
 export async function getStaticProps(ctx) {
 
@@ -105,12 +107,47 @@ export async function getStaticProps(ctx) {
     let randomPhotoData = await randomPhoto?.json().catch(err => console.log(err)) || {};
 
     if (_.isEmpty(randomPhotoData?.results)) {
-        randomPhotoData = {
-            results: [
-                {
-                    urls: { regular: RANDOM_PHOTO(randomWord) }
+
+        const localRes = await fetch(GET_LOCAL_UNSPLASH(randomWord));
+        const localData = await localRes.json().catch(() => ({}));
+
+        const handledData = deepExtractObjectStrapi(localData)?.[0];
+
+        if (!_.isEmpty(handledData)) {
+            // random
+            const url = handledData.urls[Math.floor(Math.random() * handledData.urls.length)];
+
+            randomPhotoData = {
+                results: [
+                    {
+                        urls: { regular: url }
+                    }
+                ]
+            }
+        } else {
+
+            const res = await fetch(RANDOM_PHOTO(randomWord));
+
+            // get unsplash id from url
+            const url = res.url;
+
+            randomPhotoData = {
+                results: [
+                    {
+                        urls: { regular: url }
+                    }
+                ]
+            }
+
+            // save to cms
+            await fetch(UPDATE_UNSPLASH(randomWord), {
+                method: 'PUT',
+                body: JSON.stringify({ url }),
+                headers: {
+                    'Content-Type': 'application/json'
                 }
-            ]
+            })
+
         }
     }
 
