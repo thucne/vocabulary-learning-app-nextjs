@@ -67,7 +67,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                 width: `calc(100% - ${left * 2}px)`,
                 maxWidth: 500,
                 minWidth: 300,
-                borderRadius: '10px'
+                borderRadius: '10px',
             }}>
                 <Grid container {...Props.GCRSC} py={1} spacing={1} sx={{
                     '& .MuiMenuItem-root': {
@@ -80,13 +80,22 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                     {
                         results.map((result, index) => {
                             return <Grid item xs={12} {...Props.GIRSC} key={`results-${index}-search-bar`} sx={{
-                                ':hover': {
+                                '&:hover': {
                                     color: Colors.SEARCH_RESULT
                                 }
                             }}>
 
                                 <Link href={result?.item?.link || '#'} passHref>
-                                    <MuiLink sx={{ width: '100%', mx: 1 }} underline='none'>
+                                    <MuiLink
+                                        sx={{
+                                            width: '100%', mx: 1,
+                                            color: theme => theme.palette.text.primary,
+                                            '&:hover': {
+                                                color: Colors.SEARCH_RESULT
+                                            }
+                                        }}
+                                        underline='none'
+                                    >
                                         <MenuItem
                                             aria-label={result?.item?.link}
                                             onClick={() => result?.item?.link && Router.push(result.item.link)}
@@ -94,6 +103,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                                                 width: '100%',
                                                 borderRadius: '4px',
                                                 border: `1px solid transparent`,
+                                                borderBottomColor: index !== results.length - 1 ? `${Colors.GREY_200}` : 'transparent',
                                                 ':hover': {
                                                     border: `1px solid ${Colors.SEARCH_RESULT}`,
                                                 }
