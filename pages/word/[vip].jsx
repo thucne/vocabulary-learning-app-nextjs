@@ -22,7 +22,7 @@ const AnyWord = () => {
     const [loading, setLoading] = useState(true);
 
     const queryString = qs.stringify({
-        max: 10
+        max: 10,
     }, { encodeValuesOnly: true });
 
     const { data } = useSWR(vip ? `${API}/api/fuzzy-search/${vip}?${queryString}` : null, fetcher, {

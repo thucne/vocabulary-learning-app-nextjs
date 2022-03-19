@@ -6,7 +6,7 @@ import Router from 'next/router';
 import {
     Container, Grid, Typography, Link as MuiLink,
     Divider, IconButton, Tooltip, CircularProgress,
-    Paper
+    Paper, Slider
 } from '@mui/material';
 
 import {
@@ -52,7 +52,8 @@ const AnyWord = ({ results = [], word }) => {
 const EachResult = ({ rawVip, index }) => {
 
     const vip = deepExtractObjectStrapi(rawVip?.item, {
-        minifyPhoto: ['illustration']
+        minifyPhoto: ['illustration'],
+        allowNullPhoto: true
     });
     // evidence is all but item field
     const evidence = _.omit(rawVip, 'item');
@@ -61,14 +62,14 @@ const EachResult = ({ rawVip, index }) => {
     return (
         <Grid item xs={12}>
             <Grid container {...Props.GCRSC}>
-                <ResultInfo vip={vip} score={score} index={index} />
-                <ResultEvidence evidence={evidence} vip={vip} />
+                <ResultInfo vip={vip} index={index} />
+                <ResultEvidence evidence={evidence} vip={vip} score={score} />
             </Grid>
         </Grid>
     )
 }
 
-const ResultInfo = ({ vip, score, index }) => {
+const ResultInfo = ({ vip, index }) => {
     const [loadingAudio, setLoadingAudio] = useState(false);
     const [audioUrl, setAudioUrl] = useState("");
     const audioRef = useRef(null);
@@ -315,7 +316,29 @@ const ResultInfo = ({ vip, score, index }) => {
                         </Typography>
                     }
                 </Grid>
-                <Grid item xs={12} {...Props.GIRSC} mt={1}>
+            </Grid>
+
+        </Grid>
+    )
+}
+
+const ResultEvidence = ({ evidence = {}, vip, score }) => {
+
+    const matches = evidence?.matches;
+    const matchedPercentage = _.isNumber(score) ? `${Math.floor((1 - score) * 100)}%` : '0%';
+
+    return (
+        <Grid item xs={12} mt={1}>
+            <Grid container {...Props.GCRSC} spacing={1}>
+                {
+                    !_.isEmpty(matches) && _.isArray(matches) && matches?.slice(0, 5)?.map((item, index) => (
+                        <EachEvidence key={`evidence-${index}`} evidence={item} />
+                    ))
+                }
+                <Grid item xs={12} {...Props.GIRBC}>
+                    <Typography variant="caption" sx={{ color: theme => theme.palette.publicWord1.main }}>
+                        {matchedPercentage} matched
+                    </Typography>
                     <Link
                         href={
                             vip?.public
@@ -325,35 +348,11 @@ const ResultInfo = ({ vip, score, index }) => {
                         passHref
                     >
                         <MuiLink underline='hover' sx={{ color: theme => theme.palette.publicWord3.main }}>
-                            See more
+                            <i>See more</i>
                         </MuiLink>
                     </Link>
                 </Grid>
             </Grid>
-
-        </Grid>
-    )
-}
-
-const ResultEvidence = ({ evidence = {}, vip }) => {
-
-    const matches = evidence?.matches;
-
-    return (
-        <Grid item xs={12}>
-            <Divider sx={{ my: 2 }} />
-            <Typography variant="body1" component="h2">
-                Evidence
-            </Typography>
-            <Paper variant="outlined" sx={{ p: 1, mt: 1 }}>
-                <Grid container {...Props.GCRSC} spacing={1}>
-                    {
-                        !_.isEmpty(matches) && _.isArray(matches) && matches?.map((item, index) => (
-                            <EachEvidence key={`evidence-${index}`} evidence={item} />
-                        ))
-                    }
-                </Grid>
-            </Paper>
         </Grid>
     )
 }
@@ -404,8 +403,10 @@ const EachEvidence = ({ evidence }) => {
     return (
         <Grid item xs={12}>
             <Paper variant="outlined" sx={{ p: 1 }}>
-                <Typography variant="body1" component="h2" className='overflowTypography'>
-                    [{key === 'vip' ? 'word' : key}] {parser(highlighted?.replaceAll(",", ", "))}
+                <Typography variant="body1" component="h2" className='overflowTypography'
+                 sx={{color: theme => theme.palette.mainPublicWord.main}}
+                >
+                    <b>[{key === 'vip' ? 'word' : key}]</b> {parser(highlighted?.replaceAll(",", ", "))}
                 </Typography>
             </Paper>
         </Grid>

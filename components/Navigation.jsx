@@ -31,10 +31,12 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import MuiLink from "@mui/material/Link";
 
+import SearchIcon from '@mui/icons-material/Search';
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import LogoutIcon from "@mui/icons-material/Logout";
 import LoginIcon from "@mui/icons-material/Login";
+import CloseIcon from '@mui/icons-material/Close';
 
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
@@ -56,6 +58,7 @@ import { API } from "@config";
 
 import Footer from "@components/Footer";
 import MenuNavBar from "@components/LandingPage/MenuNavBar";
+import GlobalSearch from '@components/Global/Search';
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -96,6 +99,7 @@ function ResponsiveDrawer(props) {
     const [bottom, setBottom] = useState(0);
     const [scrolled, setScrolled] = useState(false);
     const [mounted, setMounted] = useState(false);
+    const [openSearch, setOpenSearch] = useState(false);
 
     const myRef = useRef(null);
     const appBarRef = useRef(null);
@@ -321,7 +325,7 @@ function ResponsiveDrawer(props) {
                                         aria-label="open drawer"
                                         edge="start"
                                         onClick={handleDrawerToggle}
-                                        sx={{ mr: 2, display: { lg: "none" } }}
+                                        sx={{ mr: scrolled ? 2 : 0.5, display: { lg: "none" } }}
                                     >
                                         <MenuIcon />
                                     </IconButton>
@@ -345,6 +349,24 @@ function ResponsiveDrawer(props) {
                                             justifyContent="center"
                                             alignItems="center"
                                         >
+                                            <Grid item display={['none', 'flex']}>
+                                                <GlobalSearch />
+                                            </Grid>
+                                            <IconButton
+                                                sx={{
+                                                    ...SXs.MUI_NAV_ICON_BUTTON,
+                                                    color: (theme) => theme.palette[bgColor].contrastText,
+                                                    borderColor: (theme) =>
+                                                        `${theme.palette[bgColor].contrastText}5`,
+                                                    mr: 1,
+                                                    display: ['flex', 'none']
+                                                }}
+                                                onClick={() => setOpenSearch(prev => !prev)}
+                                            >
+                                                {
+                                                    !openSearch ? <SearchIcon /> : <CloseIcon />
+                                                }
+                                            </IconButton>
                                             <IconButton
                                                 sx={{
                                                     ...SXs.MUI_NAV_ICON_BUTTON,
@@ -500,6 +522,9 @@ function ResponsiveDrawer(props) {
                                 </Grid>
                             </Grid>
                         </Toolbar>
+                        <Grid item display={['block', 'none']}>
+                            <GlobalSearch open={openSearch} mobile />
+                        </Grid>
                     </Container>
                 </AppBar>
                 <Box
@@ -568,7 +593,7 @@ function ResponsiveDrawer(props) {
                         sx={{
                             alignItems: "center",
                             justifyContent: "center",
-                            display: "flex",
+                            display: "flex"
                         }}
                         maxWidth={false}
                         ref={myRef}

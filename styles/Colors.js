@@ -178,3 +178,4 @@ export const WOAD_YELLOW = '#fdc702';
 
 // matched results
 export const MATCHED_RESULT = '#357a38';
+export const SEARCH_RESULT = '#0072e5';
