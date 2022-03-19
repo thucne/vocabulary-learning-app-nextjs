@@ -102,7 +102,9 @@ function EditForm({ open = false, setOpen, word }) {
 
 console.log("word",{word})
 
-use
+    useEffect(()=>{
+        setForm(initForm(word));
+    },[word])
   const resetWhole = () => {
     setTemptInput(initTempInputs);
     setForm(initForm(settings?.publicWords));
