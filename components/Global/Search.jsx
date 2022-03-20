@@ -8,7 +8,7 @@ import {
     Paper, InputBase, IconButton,
     Menu, MenuItem, Divider, Grid,
     Link as MuiLink,
-    Typography, MenuList, Icon
+    Typography, MenuList, Icon, CircularProgress
 } from '@mui/material';
 
 import {
@@ -23,13 +23,16 @@ import {
     Article as ArticleIcon,
     ToggleOff as ToggleOffIcon,
     ArrowForwardIos as ArrowForwardIosIcon,
+    FindInPage as FindInPageIcon,
 } from '@mui/icons-material';
 
 import { Props, SXs, Fonts, Colors } from '@styles';
+
 import {
     useThisToGetPositionFromRef, useOutsideAlerter,
     useInsideAlerter, handleFuzzyResults, fuzzyWordToSearchData, deepExtractObjectStrapi
 } from '@utils';
+
 import { fetcherJWTIfAny } from '@actions';
 import { API } from '@config';
 
@@ -50,16 +53,17 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
 
     const inputRef = useRef(null);
     const resultsRef = useRef(null);
-    const eachResultRef = useRef([]);
     const dispatch = useDispatch();
     const searchBarRef = useRef(null);
     const bottomRef = useRef(null);
+    const wordFirstResultRef = useRef(null);
+    const directoryFirstResultRef = useRef(null);
 
     const queryString = qs.stringify({
         max: 10,
     }, { encodeValuesOnly: true });
 
-    const { data } = useSWR(searchString ? `${API}/api/fuzzy-search/${searchString}?${queryString}` : null, fetcher, {
+    const { data, isValidating } = useSWR(searchString ? `${API}/api/fuzzy-search/${searchString}?${queryString}` : null, fetcher, {
         onSuccess: () => setLoading(false)
     });
 
@@ -67,8 +71,6 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
         handleFuzzyResults(_.isArray(data?.data) && !_.isEmpty(data?.data) ? data.data : [])
             ?.slice(0, 5),
         [data]);
-
-    useEffect(() => eachResultRef.current = eachResultRef.current.slice(0, results.length), [results.length]);
 
     useEffect(() => {
         if (!forcedClose && !!searchString?.trim()?.length) {
@@ -79,9 +81,12 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
     }, [forcedClose, searchString, dispatch]);
 
     useEffect(() => {
-        let currentInput = inputRef?.current;
 
         const handler = (event) => {
+            let currentInput = inputRef?.current;
+            let wordFirstResult = wordFirstResultRef?.current;
+            let directoryFirstResult = directoryFirstResultRef?.current;
+
             if ((event.ctrlKey && event.key === 'k') || (event.ctrlKey && event.key === 'f') || event.key === 'f') {
                 event?.preventDefault();
                 setForcedClose(false);
@@ -89,6 +94,16 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
             }
             if (event.key === 'Escape') {
                 setForcedClose(true);
+            }
+            if (event.key === 'Enter') {
+                console.log('enterd')
+                if (wordFirstResult && directoryFirstResult) {
+                    wordFirstResult.click();
+                } else if (wordFirstResult) {
+                    wordFirstResult.click();
+                } else {
+                    directoryFirstResult?.click();
+                }
             }
         }
 
@@ -200,7 +215,8 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                 display: !forcedClose ? 'flex' : 'none',
                 zIndex: 2,
                 flexDirection: 'column',
-                bgcolor: 'paper_grey2.main'
+                bgcolor: 'paper_grey2.main',
+                paddingBottom: '0px !important'
             }} ref={resultsRef} className='searchBar'>
 
                 <Grid ref={searchBarRef} container {...Props.GCRSC} p={2} sx={{
@@ -266,8 +282,22 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                             </Typography>
                         }
                         {
+                            isValidating && <Grid item xs={12} {...Props.GICCC} py={4} sx={{
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                                filter: 'brightness(0.5)',
+                            }}>
+                                <FindInPageIcon sx={{ fontSize: Fonts.FS_60 }} />
+                                <Typography variant="h6">
+                                    Searching for &quot;{searchString}&quot;...
+                                </Typography>
+                            </Grid>
+                        }
+                        {
                             !!wordResults?.length && <Typography variant="caption" sx={{ pt: 1, px: 1.5 }}>
-                                Word
+                                Word [Start with &quot;w:&quot; for words only]
                             </Typography>
                         }
                         <MenuList sx={{ width: '100%', px: 1, display: !!wordResults?.length ? 'block' : 'none' }}>
@@ -297,6 +327,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                                             },
                                             p: 0
                                         }}
+                                        ref={index === 0 ? wordFirstResultRef : null}
                                     >
                                         <Link href={displayData?.link || '/'} passHref>
                                             <MuiLink underline="none" sx={{
@@ -340,7 +371,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
 
                         {
                             !!results?.length && <Typography variant="caption" sx={{ pt: 1, px: 1.5 }}>
-                                Directory
+                                Directory [Start with &quot;d:&quot; for directory only]
                             </Typography>
                         }
                         <MenuList sx={{ width: '100%', px: 1, display: !!results?.length ? 'block' : 'none' }}>
@@ -367,6 +398,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                                             },
                                             p: 0
                                         }}
+                                        ref={index === 0 ? directoryFirstResultRef : null}
                                     >
                                         <Link href={result?.item?.link || '/'} passHref>
                                             <MuiLink underline="none" sx={{
@@ -393,7 +425,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                     </Grid>
                 </div>
 
-                <Grid ref={bottomRef} container {...Props.GCREC} py={1} px={2} sx={{
+                <Grid ref={bottomRef} container {...Props.GCRBC} py={1} px={2} sx={{
                     position: 'absolute',
                     bottom: 0,
                     left: 0,
@@ -402,7 +434,13 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                     <Typography variant="caption" sx={{
                         display: 'flex',
                         alignItems: 'center',
-                    }}>
+                    }} className='overflowTypography'>
+
+                    </Typography>
+                    <Typography variant="caption" sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                    }} className='overflowTypography'>
                         Search by&nbsp;
                         <Link href="https://www.trantrongthuc.com" passHref>
                             <MuiLink underline='none'>
