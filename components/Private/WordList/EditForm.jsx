@@ -53,7 +53,7 @@ import ListArrayInputs from "@components/WordForm/FormComponents/ListArrayInputs
 import ListInputs from "@components/WordForm/FormComponents/ListInputs";
 
 import { IMAGE_ALT, VIP_TYPES, SHOW_SNACKBAR, VOCAB_TYPES } from "@consts";
-import { fetcherJWT, createVIP } from "@actions";
+import { fetcherJWT, createVIP, updateVIP } from "@actions";
 import {
   useWindowSize,
   useThisToGetSizesFromRef,
@@ -72,7 +72,7 @@ import Uploader from "@tallis/react-dndp";
 
 const fetcher = async (...args) => await fetcherJWT(...args);
 
-function EditForm({ open = false, setOpen, word }) {
+function EditForm({ open = false, setOpen, word,setCurrentWord }) {
   // console.log("word", word)
   const theme = useTheme();
   const windowSize = useWindowSize();
@@ -99,12 +99,14 @@ function EditForm({ open = false, setOpen, word }) {
   const userData = useSelector((state) => state.userData);
 
   const settings = useSettings(userData);
+//     console.log("word", word)
+//   console.log("photo", photo?.get("photo"))
+//   console.log("form", form)
 
-console.log("word",{word})
+  useEffect(() => {
+    setForm(initForm(word));
+  }, [word]);
 
-    useEffect(()=>{
-        setForm(initForm(word));
-    },[word])
   const resetWhole = () => {
     setTemptInput(initTempInputs);
     setForm(initForm(settings?.publicWords));
@@ -119,8 +121,9 @@ console.log("word",{word})
   const handleClose = () => {
     // reset all
     resetWhole();
-
+    
     setOpen(false);
+    setCurrentWord(null)
   };
 
   // get types
@@ -139,15 +142,26 @@ console.log("word",{word})
 
   useEffect(() => {
     const loop = setInterval(() => {
-      if (!photo && window) {
+      if (!photo ) {
         setPhoto(new FormData());
         clearInterval(loop);
       }
- 
+    }, 100);
+    return () => clearInterval(loop);
+  }, [photo]);
+
+  useEffect(() => {
+    const loop = setInterval(() => {
+      if (word?.illustration && !photo?.get("photo")) {
+        if (photo) {
+          photo?.set("photo", word?.illustration?.url);
+          clearInterval(loop);
+        }
+      }
     }, 100);
 
     return () => clearInterval(loop);
-  }, [photo]);
+  }, [word, photo]);
 
   // useDebounce(form.vip, () => handleFetchPronouce(), 2000);
 
@@ -162,7 +176,6 @@ console.log("word",{word})
 
     let formData = new FormData();
 
-    // prepare object
     const data = {
       vip: form.vip,
       type1: form.type,
@@ -183,7 +196,7 @@ console.log("word",{word})
       audio: form.audio,
     };
 
-    formData.append("files.illustration", photo?.get("illustration"));
+    formData.append("files.illustration", photo?.get("photo"));
 
     if (window?.adHocFetch && recaptcha === true && window.grecaptcha) {
       grecaptcha.ready(function () {
@@ -195,12 +208,12 @@ console.log("word",{word})
 
             adHocFetch({
               dispatch,
-              action: createVIP(formData),
+              action: updateVIP(formData, word?.id),
               onSuccess: (data) => resetWhole(),
               onError: (error) => console.log(error),
               onStarting: () => setLoading(true),
               onFinally: () => setLoading(false),
-              snackbarMessageOnSuccess: "Added!",
+              snackbarMessageOnSuccess: "Updated!",
             });
           });
       });
@@ -296,6 +309,7 @@ console.log("word",{word})
       }));
     }
   };
+
 
   const canSubmit = () =>
     Boolean(
@@ -1049,8 +1063,8 @@ const initForm = (word) => ({
   vip: word?.vip || "",
   type: word?.type1 || VIP_TYPES[0],
   examples: word?.examples || [],
-  vnMeanings: word?.vnMeanings || [],
-  engMeanings: word?.engMeanings || [],
+  vnMeanings: word?.meanings?.vietnamese || [],
+  engMeanings: word?.meanings?.english || [],
   pronounce: word?.pronounce || "",
   synonyms:
     typeof word?.synonyms === "string"

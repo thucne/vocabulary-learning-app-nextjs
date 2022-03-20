@@ -9,7 +9,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
-import { Colors } from "@styles";
+import { Colors, Fonts } from "@styles";
 import { getNumberOfSelected, isCheckedAll } from "@utils";
 
 /**
@@ -56,12 +56,14 @@ function DateLabesSection({
           sx={{
             border: `1px solid ${Colors.GRAY_4}`,
             color: Colors.BLACK,
-            padding: "5px 15px",
+            padding: ["5px 10px","5px 10px","5px 15px"],
             borderRadius: "20px",
             display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
           }}
         >
-          <Typography>{dateSegment.date}</Typography>
+          <Typography sx={{fontSize:[Fonts.FS_10, Fonts.FS_11, Fonts.FS_14]}}>{dateSegment.date}</Typography>
           <ArrowDropDownIcon />
         </Box>
       </Divider>
@@ -75,7 +77,7 @@ function DateLabesSection({
         <IconButton>
           <DeleteOutlineIcon></DeleteOutlineIcon>
         </IconButton>
-        <Typography sx={{ ml: 3 }}>Selected item: {numsOfSelected} </Typography>
+        <Typography sx={{ ml: 3, fontSize:[Fonts.FS_13, Fonts.FS_13, Fonts.FS_16] }}>Selected item: {numsOfSelected} </Typography>
       </Box>
 
       {dateSegment.data.map((word, index) => (
