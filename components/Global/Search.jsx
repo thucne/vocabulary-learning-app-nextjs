@@ -63,9 +63,14 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
         max: 10,
     }, { encodeValuesOnly: true });
 
-    const { data, isValidating } = useSWR(searchString ? `${API}/api/fuzzy-search/${searchString}?${queryString}` : null, fetcher, {
-        onSuccess: () => setLoading(false)
-    });
+    const { data, isValidating } = useSWR(searchString
+        ? `${API}/api/fuzzy-search/${searchString
+            ?.replace(/(w:)/, "")?.replace(/(d:)/, "")}?${queryString}`
+        : null,
+        fetcher,
+        {
+            onSuccess: () => setLoading(false)
+        });
 
     const wordResults = useMemo(() =>
         handleFuzzyResults(_.isArray(data?.data) && !_.isEmpty(data?.data) ? data.data : [])
@@ -204,8 +209,8 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
 
             <Paper variant='outlined' sx={{
                 position: 'fixed',
-                top: '50%',
-                left: '50%',
+                top: '50% !important',
+                left: '50% !important',
                 transform: 'translate(-50%, -50%)',
                 width: [`90%`],
                 maxWidth: 700,
@@ -216,7 +221,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                 zIndex: 2,
                 flexDirection: 'column',
                 bgcolor: 'paper_grey2.main',
-                paddingBottom: '0px !important'
+                padding: '0px !important'
             }} ref={resultsRef} className='searchBar'>
 
                 <Grid ref={searchBarRef} container {...Props.GCRSC} p={2} sx={{
@@ -227,7 +232,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                     </IconButton>
                     <InputBase
                         sx={{ ml: 1, flex: 1 }}
-                        placeholder="Search"
+                        placeholder="Search..."
                         inputProps={{ 'aria-label': 'search google maps' }}
                         onChange={handleSearch}
                         inputRef={inputRef}
@@ -251,7 +256,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                 <div style={{
                     width: '100%',
                     maxWidth: 700,
-                    maxHeight: 600 - height - bottomHeight,
+                    maxHeight: 600,
                     overflowY: 'auto',
                     overflowX: 'hidden',
                     paddingBottom: '0px !important'
@@ -273,7 +278,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                         }
                         {
                             !!!wordResults.length && !!!results.length && !!searchString?.trim()?.length && <Typography variant="caption" sx={{ p: 1.5 }}>
-                                No results found for &quot;{searchString}&quot;
+                                No results found for &quot;{searchString?.replace(/(w:)/, "")?.replace(/(d:)/, "")}&quot;
                             </Typography>
                         }
                         {
@@ -283,19 +288,25 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                                 left: '50%',
                                 transform: 'translate(-50%, -50%)',
                                 filter: 'brightness(0.5)',
+                                zIndex: 2,
                             }}>
                                 <FindInPageIcon sx={{ fontSize: Fonts.FS_60 }} />
                                 <Typography variant="h6">
-                                    Searching for &quot;{searchString}&quot;...
+                                    Searching for &quot;{searchString?.replace(/(w:)/, "")?.replace(/(d:)/, "")}&quot;...
                                 </Typography>
                             </Grid>
                         }
                         {
-                            !!wordResults?.length && <Typography variant="caption" sx={{ pt: 1, px: 1.5 }}>
-                                Word [Start with &quot;w:&quot; for words only]
-                            </Typography>
+                            (!!wordResults?.length && !searchString.startsWith("d:")) && <Grid item xs={12} {...Props.GIRBC} sx={{ pt: 1, px: 1.5 }}>
+                                <Typography variant="h6">
+                                    Word
+                                </Typography>
+                                <Typography variant="caption" sx={{ backgroundColor: Colors.LOGO_BLUE, color: Colors.WHITE, px: 1, borderRadius: '4px' }}>
+                                    Start with &quot;w:&quot; for words only
+                                </Typography>
+                            </Grid>
                         }
-                        <MenuList sx={{ width: '100%', px: 1, display: !!wordResults?.length ? 'block' : 'none' }}>
+                        <MenuList sx={{ width: '100%', px: 1, display: (!!wordResults?.length && !searchString.startsWith("d:")) ? 'block' : 'none' }}>
                             {
                                 wordResults?.map((result, index) => {
                                     const handledData = deepExtractObjectStrapi(result?.item, { minifyPhoto: ['illustration'] });
@@ -309,9 +320,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                                             width: '100%',
                                             borderRadius: '4px',
                                             border: `1px solid transparent`,
-                                            borderBottomColor: theme => index !== results.length - 1
-                                                ? theme.palette.borderSearch.main
-                                                : 'transparent',
+                                            borderBottomColor: theme => theme.palette.borderSearch.main,
                                             ':hover': {
                                                 border: `1px solid ${Colors.SEARCH_RESULT}`,
                                                 color: Colors.SEARCH_RESULT
@@ -365,11 +374,16 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                         </MenuList>
 
                         {
-                            !!results?.length && <Typography variant="caption" sx={{ pt: 1, px: 1.5 }}>
-                                Directory [Start with &quot;d:&quot; for directory only]
-                            </Typography>
+                            (!!results?.length && !searchString.startsWith("w:")) && <Grid item xs={12} {...Props.GIRBC} sx={{ pt: 1, px: 1.5 }}>
+                                <Typography variant="h6">
+                                    Directory
+                                </Typography>
+                                <Typography variant="caption" sx={{ backgroundColor: Colors.LOGO_BLUE, color: Colors.WHITE, px: 1, borderRadius: '4px' }}>
+                                    Start with &quot;d:&quot; for directory only
+                                </Typography>
+                            </Grid>
                         }
-                        <MenuList sx={{ width: '100%', px: 1, display: !!results?.length ? 'block' : 'none' }}>
+                        <MenuList sx={{ width: '100%', px: 1, display: (!!results?.length && !searchString.startsWith("w:")) ? 'block' : 'none' }}>
                             {
                                 results?.map((result, index) => {
                                     return <MenuItem
@@ -380,9 +394,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                                             width: '100%',
                                             borderRadius: '4px',
                                             border: `1px solid transparent`,
-                                            borderBottomColor: theme => index !== results.length - 1
-                                                ? theme.palette.borderSearch.main
-                                                : 'transparent',
+                                            borderBottomColor: theme => theme.palette.borderSearch.main,
                                             ':hover': {
                                                 border: `1px solid ${Colors.SEARCH_RESULT}`,
                                                 color: Colors.SEARCH_RESULT
@@ -671,5 +683,5 @@ const searchDefault = (value) => {
         keys: searchKeys
     })
 
-    return fuse.search(value);
+    return fuse.search(value?.replace(/(w:)/, "")?.replace(/(d:)/, ""));
 }
