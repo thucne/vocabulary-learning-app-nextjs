@@ -220,9 +220,6 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
             }} ref={resultsRef} className='searchBar'>
 
                 <Grid ref={searchBarRef} container {...Props.GCRSC} p={2} sx={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
                     borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
                 }}>
                     <IconButton aria-label="search" size="small" disableRipple onClick={() => inputRef?.current?.focus()}>
@@ -255,8 +252,6 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                     width: '100%',
                     maxWidth: 700,
                     maxHeight: 600 - height - bottomHeight,
-                    marginTop: height,
-                    marginBottom: bottomHeight,
                     overflowY: 'auto',
                     overflowX: 'hidden',
                     paddingBottom: '0px !important'
@@ -426,9 +421,6 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                 </div>
 
                 <Grid ref={bottomRef} container {...Props.GCRBC} py={1} px={2} sx={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
                     borderTop: '1px solid rgba(0, 0, 0, 0.12)',
                 }}>
                     <Typography variant="caption" sx={{
