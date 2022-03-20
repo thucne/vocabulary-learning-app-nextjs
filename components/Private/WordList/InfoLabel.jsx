@@ -1,4 +1,5 @@
 import { Tooltip, Typography } from "@mui/material";
+import { Box } from "@mui/system";
 import { Colors, Fonts } from "@styles";
 import React from "react";
 
@@ -12,6 +13,7 @@ import React from "react";
 function InfoLabel({ content, bgColor,label }) {
   return (
     <React.Fragment>
+      <Box className="tooltip">
       <Tooltip title={label} arrow>
         <Typography
           sx={styles(bgColor).toolTip}
@@ -19,6 +21,7 @@ function InfoLabel({ content, bgColor,label }) {
           {content}
         </Typography>
       </Tooltip>
+      </Box>
     </React.Fragment>
   );
 }
@@ -31,7 +34,7 @@ const styles=(bgColor) =>({
     fontSize: Fonts.FS_12,
     fontWeight: Fonts.FW_600,
     cursor: "pointer",
-    mr: 3,
+    mr: [1,1,3],
     backgroundColor: bgColor,
   }
 });

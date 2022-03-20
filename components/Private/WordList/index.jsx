@@ -1,9 +1,4 @@
-import {
-  useState,
-  useEffect,
-  useMemo,
-  useRef,
-} from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -62,15 +57,14 @@ const WordList = () => {
     );
   }, [userData]);
 
-
   const handleUpdateCheckList = (udList, value) => {
     let tempt = [...checkList];
     tempt.map((element, index) => {
       if (udList.includes(element.id)) {
-        tempt[index].checked = value ;
+        tempt[index].checked = value;
       }
     });
-    setCheckList([...tempt])
+    setCheckList([...tempt]);
   };
 
   const handleCheckSingleBox = (id) => {
@@ -84,10 +78,9 @@ const WordList = () => {
   };
 
   const handleCloseDialog = () => {
-      setCurrentWord(null);
+    setCurrentWord(null);
     setOpen(false);
   };
-
 
   const handleScroll = () => {
     if (listRef.current.scrollTop === 0) {
@@ -111,9 +104,9 @@ const WordList = () => {
   };
 
   return (
-    <Container maxWidth="md">
+    <Container maxWidth="md" sx={{ p: ["0px"] }}>
       <Grid container {...Props.GCRCS}>
-        <Grid item xs={12} mt={[5, 5, 3]}>
+        <Grid item xs={12} mt={[5, 5, 3]} className="pasdasdasd">
           <Typography
             variant="h1"
             align="center"
@@ -131,7 +124,7 @@ const WordList = () => {
           </Typography>
         </Grid>
 
-        <Grid item xs={12} mt={[5, 5, 3]}>
+        <Grid item xs={12} mt={[5, 5, 3]} sx={{ width: "100%" }}>
           <Grid container {...Props.GCRCC}>
             <Grid
               item
@@ -166,6 +159,7 @@ const WordList = () => {
           open={open}
           handleClose={handleCloseDialog}
           word={currentWord}
+          setCurrentWord={setCurrentWord}
           setOpen={setOpen}
         />
       )}
