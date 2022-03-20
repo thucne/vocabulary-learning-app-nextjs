@@ -33,6 +33,9 @@ const MyTheme = (mode) => ({
     paper_grey: {
         main: mode === "light" ? "#fff" : Colors.PAPER_GREY_DARK,
     },
+    paper_grey2: {
+        main: mode === "light" ? "#fff" : Colors.SEARCH_DARK_GREY,
+    },
     drawer: {
         main: mode === "light" ? Colors.GRAY_5 : Colors.WHITE,
     },

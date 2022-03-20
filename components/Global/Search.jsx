@@ -199,6 +199,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                 display: !forcedClose ? 'flex' : 'none',
                 zIndex: 2,
                 flexDirection: 'column',
+                bgcolor: 'paper_grey2.main'
             }} ref={resultsRef} className='searchBar'>
 
                 <Grid ref={searchBarRef} container {...Props.GCRSC} p={2} sx={{
@@ -349,7 +350,6 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                                             width: '100%',
                                             borderRadius: '4px',
                                             border: `1px solid transparent`,
-                                            color: Colors.GREY_700,
                                             borderBottomColor: index !== results.length - 1 ? `${Colors.GREY_200}` : 'transparent',
                                             ':hover': {
                                                 border: `1px solid ${Colors.SEARCH_RESULT}`,
