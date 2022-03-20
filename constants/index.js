@@ -58,3 +58,6 @@ export const NO_AVT = () => {
 }
 
 export const SET_THEME = "SET_THEME";
+
+export const BLUR_SCREEN = "BLUR_SCREEN";
+export const UNBLUR_SCREEN = "UNBLUR_SCREEN";

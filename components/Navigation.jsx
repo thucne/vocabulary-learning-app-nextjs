@@ -109,6 +109,7 @@ function ResponsiveDrawer(props) {
     const tabName = useSelector((state) => state?.tabName);
     const bgColor = useSelector((state) => state?.bgColor);
     const userData = useSelector((state) => state?.userData);
+    const blurScreen = useSelector((state) => state?.blurScreen);
 
     const [width, height] = useWindowSize(appBarRef);
 
@@ -578,6 +579,9 @@ function ResponsiveDrawer(props) {
                             "& .MuiDrawer-paper": {
                                 boxSizing: "border-box",
                                 width: drawerWidth,
+                            },
+                            "& .MuiPaper-root": {
+                                zIndex: 1,
                             },
                         }}
                         open

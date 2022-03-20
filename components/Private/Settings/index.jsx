@@ -39,8 +39,6 @@ export default function SwitchListSecondary() {
 
     const checked = useSettings(userData, true);
 
-    console.log(checked);
-
     const handledChecked = useSettings(userData);
 
     const [syncing, setSyncing] = useState(false);

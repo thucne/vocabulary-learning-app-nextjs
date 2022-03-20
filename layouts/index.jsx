@@ -51,6 +51,7 @@ const Layout = ({ children, login = false, landing = false, noMeta = false, tabN
     const linear = useSelector((state) => state.linear);
     const backdrop = useSelector((state) => state.backdrop);
     const confirmDialog = useSelector((state) => state?.confirmDialog);
+    const blurScreen = useSelector((state) => state?.blurScreen);
 
     useEffect(() => {
         const handleRouteChange = (url, { shallow }) => {

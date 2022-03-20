@@ -34,6 +34,8 @@ import Fuse from 'fuse.js';
 import qs from 'qs';
 import useSWR from 'swr';
 import parser from 'html-react-parser';
+import { useDispatch } from 'react-redux';
+import * as t from '@consts';
 
 const fetcher = async (...args) => await fetcherJWTIfAny(...args);
 
@@ -46,6 +48,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
     const inputRef = useRef(null);
     const resultsRef = useRef(null);
     const eachResultRef = useRef([]);
+    const dispatch = useDispatch();
 
     const queryString = qs.stringify({
         max: 10,
@@ -55,15 +58,20 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
         onSuccess: () => setLoading(false)
     });
 
-    const wordResults = useMemo(() => handleFuzzyResults(_.isArray(data?.data) && !_.isEmpty(data?.data) ? data.data : []), [data]);
-
-    const { bottom, left } = useThisToGetPositionFromRef(paperRef, {
-        revalidate: 100,
-        terminalCondition: ({ width }) => width > 0,
-        falseCondition: ({ width }) => width === 0,
-    });
+    const wordResults = useMemo(() =>
+        handleFuzzyResults(_.isArray(data?.data) && !_.isEmpty(data?.data) ? data.data : [])
+            ?.slice(0, 5),
+        [data]);
 
     useEffect(() => eachResultRef.current = eachResultRef.current.slice(0, results.length), [results.length]);
+
+    useEffect(() => {
+        if (!forcedClose && !!searchString?.trim()?.length) {
+            dispatch({ type: t.BLUR_SCREEN });
+        } else {
+            dispatch({ type: t.UNBLUR_SCREEN });
+        }
+    }, [forcedClose, searchString, dispatch]);
 
     useEffect(() => {
         let currentInput = inputRef?.current;
@@ -71,8 +79,11 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
         const handler = (event) => {
             if (event.ctrlKey && event.key === 'k') {
                 event?.preventDefault();
-                currentInput?.focus();
                 setForcedClose(false);
+                currentInput?.focus();
+            }
+            if (event.key === 'Escape') {
+                setForcedClose(true);
             }
         }
 
@@ -100,20 +111,32 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
 
     return (
         <Paper
-            sx={{ px: 1, py: '2px', display: open ? 'flex' : 'none', alignItems: 'center', mx: 1, mb: mobile ? 1 : 0, borderRadius: '10px' }}
+            sx={{
+                px: 1, py: '2px',
+                display: open ? 'flex' : 'none',
+                alignItems: 'center',
+                mx: 1, mb: mobile ? 1 : 0,
+                borderRadius: '10px',
+                position: 'relative',
+            }}
             variant="outlined"
             id="demo-customized-button"
-            ref={paperRef}
         >
-            <IconButton aria-label="search" size="small" disableRipple onClick={() => inputRef?.current?.focus()}>
+            <IconButton aria-label="search" size="small" disableRipple onClick={() => {
+                setForcedClose(false);
+                inputRef?.current?.focus()
+            }}>
                 <SearchIcon />
             </IconButton>
             <InputBase
                 sx={{ ml: 1, flex: 1 }}
                 placeholder="Search"
-                inputProps={{ 'aria-label': 'search google maps' }}
-                onChange={handleSearch}
-                inputRef={inputRef}
+                inputProps={{ 'aria-label': 'Search' }}
+                value={searchString}
+                onClick={() => {
+                    setForcedClose(false);
+                    inputRef?.current?.focus()
+                }}
             />
             <Typography variant="caption" sx={{
                 px: 1,
@@ -123,22 +146,68 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                 fontWeight: Fonts.FW_600,
                 cursor: 'pointer',
                 display: mobile ? 'none' : 'flex',
-            }} onClick={() => inputRef?.current?.focus()}>
+            }} onClick={() => {
+                setForcedClose(false);
+                inputRef?.current?.focus()
+            }}>
                 Ctrl + K
             </Typography>
+
+            <div style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                display: !forcedClose ? 'flex' : 'none',
+                backgroundColor: 'rgba(111, 126, 140, 0.2)',
+                zIndex: 1,
+                backdropFilter: 'blur(4px)',
+                transition: 'opacity 100ms ease 0s',
+            }} />
+
             <Paper variant='outlined' sx={{
                 position: 'fixed',
-                top: bottom + 5,
-                left: left,
-                display: !!results.length && !forcedClose ? 'flex' : 'none',
-                width: `calc(100% - ${left * 2}px)`,
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: `90%`,
                 maxWidth: 500,
                 minWidth: 300,
                 borderRadius: '10px',
-                maxHeight: `calc(100vh - ${bottom + 35}px)`,
+                maxHeight: `calc(100vh - ${40}px)`,
                 overflowY: 'auto',
                 overflowX: 'hidden',
+                display: !forcedClose ? 'flex' : 'none',
+                zIndex: 2,
+                flexDirection: 'column',
             }} ref={resultsRef}>
+                <Grid container {...Props.GCRSC} p={1}>
+                    <IconButton aria-label="search" size="small" disableRipple onClick={() => inputRef?.current?.focus()}>
+                        <SearchIcon />
+                    </IconButton>
+                    <InputBase
+                        sx={{ ml: 1, flex: 1 }}
+                        placeholder="Search"
+                        inputProps={{ 'aria-label': 'search google maps' }}
+                        onChange={handleSearch}
+                        inputRef={inputRef}
+                    />
+                    <Typography variant="caption" sx={{
+                        px: 1,
+                        borderRadius: '4px',
+                        backgroundColor: Colors.GREY_400,
+                        color: Colors.WHITE,
+                        fontWeight: Fonts.FW_600,
+                        cursor: 'pointer',
+                        display: mobile ? 'none' : 'flex',
+                    }} onClick={() => {
+                        setForcedClose(false);
+                        inputRef?.current?.focus()
+                    }}>
+                        ESC
+                    </Typography>
+                </Grid>
                 <Grid container {...Props.GCRSC} sx={{
                     '& .MuiMenuItem-root': {
                         '& .MuiSvgIcon-root': {
@@ -153,13 +222,18 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                 }}>
 
                     {
+                        !!!wordResults.length && !!!results.length && !!searchString?.trim()?.length && <Typography variant="caption" sx={{ p: 1.5 }}>
+                            No results found for &quot;{searchString}&quot;
+                        </Typography>
+                    }
+                    {
                         !!wordResults?.length && <Typography variant="caption" sx={{ pt: 1, px: 1.5 }}>
                             Word
                         </Typography>
                     }
-                    <MenuList sx={{ width: '100%', px: 1 }}>
+                    <MenuList sx={{ width: '100%', px: 1, display: !!wordResults?.length ? 'block' : 'none' }}>
                         {
-                            wordResults?.slice(0, 5)?.map((result, index) => {
+                            wordResults?.map((result, index) => {
                                 const handledData = deepExtractObjectStrapi(result?.item, { minifyPhoto: ['illustration'] });
                                 const displayData = fuzzyWordToSearchData({ ...handledData, hightlight: result?.highlight });
 
@@ -228,7 +302,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                             Directory
                         </Typography>
                     }
-                    <MenuList sx={{ width: '100%', px: 1 }}>
+                    <MenuList sx={{ width: '100%', px: 1, display: !!results?.length ? 'block' : 'none' }}>
                         {
                             results?.map((result, index) => {
                                 return <MenuItem
