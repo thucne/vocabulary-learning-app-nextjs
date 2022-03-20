@@ -263,8 +263,8 @@ const allLinks = [
     {
         title: "Resources",
         links: [
-            { title: "Document", href: "/document" },
-            { title: "How to get started", href: "/how-to-get-started" },
+            { title: "Documentation", href: "/documentation" },
+            { title: "Getting started", href: "/getting-started" },
         ],
     },
     {
