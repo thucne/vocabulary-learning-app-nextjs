@@ -6,10 +6,10 @@ import Image from 'next/image';
 
 import {
     Paper, InputBase, IconButton,
-    Menu, MenuItem, Divider, Grid,
+    MenuItem, Grid,
     Link as MuiLink,
-    Typography, MenuList, Icon, CircularProgress,
-    Dialog, DialogActions, DialogContent, DialogTitle
+    Typography, MenuList,
+    Dialog,
 } from '@mui/material';
 
 import {
@@ -275,24 +275,6 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                             </Typography>
                         }
                         {
-                            isValidating && <div style={{
-                                position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                opacity: 0.2,
-                                zIndex: 2,
-                                display: 'flex',
-                                alignItems: 'center',   
-                                flexDirection: 'column',
-                            }}>
-                                <FindInPageIcon sx={{ fontSize: Fonts.FS_60 }} />
-                                <Typography variant="h6" className='overflowTypography'>
-                                    Searching...
-                                </Typography>
-                            </div>
-                        }
-                        {
                             (!!wordResults?.length && !searchString.startsWith("d:")) && <Grid item xs={12} {...Props.GIRBC} sx={{ pt: 1, px: 1.5 }}>
                                 <Typography variant="h6">
                                     Word
@@ -434,9 +416,11 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                     <Typography variant="caption" sx={{
                         display: 'flex',
                         alignItems: 'center',
+                        opacity: isValidating ? 1 : 0
                     }} className='overflowTypography'>
-
+                        Searching...
                     </Typography>
+
                     <Typography variant="caption" sx={{
                         display: 'flex',
                         alignItems: 'center',
