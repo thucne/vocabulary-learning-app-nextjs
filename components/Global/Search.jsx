@@ -53,7 +53,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
     const [forcedClose, setForcedClose] = useState(true);
 
     const inputRef = useRef(null);
-    const resultsRef = useRef(null);
+    // const resultsRef = useRef(null);
     const dispatch = useDispatch();
     const searchBarRef = useRef(null);
     const bottomRef = useRef(null);
@@ -217,265 +217,6 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                     }
                 }}
             >
-                    <Grid ref={searchBarRef} container {...Props.GCRSC} p={2} sx={{
-                        borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
-                    }}>
-                        <IconButton aria-label="search" size="small" disableRipple onClick={() => inputRef?.current?.focus()}>
-                            <SearchIcon />
-                        </IconButton>
-                        <InputBase
-                            sx={{ ml: 1, flex: 1 }}
-                            placeholder="Search..."
-                            inputProps={{ 'aria-label': 'search google maps' }}
-                            onChange={handleSearch}
-                            inputRef={inputRef}
-                        />
-                        <Typography variant="caption" sx={{
-                            px: 1,
-                            borderRadius: '4px',
-                            backgroundColor: Colors.GREY_400,
-                            color: Colors.WHITE,
-                            fontWeight: Fonts.FW_600,
-                            cursor: 'pointer',
-                            display: mobile ? 'none' : 'flex',
-                        }} onClick={() => {
-                            setForcedClose(false);
-                            inputRef?.current?.focus()
-                        }}>
-                            ESC
-                        </Typography>
-                    </Grid>
-
-                    <div style={{
-                        width: '100%',
-                        maxWidth: 700,
-                        maxHeight: 600,
-                        overflowY: 'auto',
-                        overflowX: 'hidden',
-                        paddingBottom: '0px !important'
-                    }}>
-                        <Grid container {...Props.GCRSC} sx={{
-                            '& .MuiMenuItem-root': {
-                                '& .MuiSvgIcon-root': {
-                                    fontSize: 18,
-                                    marginRight: theme => theme.spacing(1.5),
-                                },
-                                '& .MuiIcon-root': {
-                                    fontSize: 18,
-                                    marginRight: theme => theme.spacing(1.5),
-                                },
-                            },
-                        }}>
-                            {
-                                !!!searchString?.trim()?.length && <NoSearchString />
-                            }
-                            {
-                                !!!wordResults.length && !!!results.length && !!searchString?.trim()?.length && <Typography variant="caption" sx={{ p: 1.5 }}>
-                                    No results found for &quot;{searchString?.replace(/(w:)/, "")?.replace(/(d:)/, "")}&quot;
-                                </Typography>
-                            }
-                            {
-                                isValidating && <Grid item xs={12} {...Props.GICCC} py={4} sx={{
-                                    position: 'absolute',
-                                    top: '50%',
-                                    left: '50%',
-                                    transform: 'translate(-50%, -50%)',
-                                    filter: 'brightness(0.5)',
-                                    zIndex: 2,
-                                }}>
-                                    <FindInPageIcon sx={{ fontSize: Fonts.FS_60 }} />
-                                    <Typography variant="h6">
-                                        Searching for &quot;{searchString?.replace(/(w:)/, "")?.replace(/(d:)/, "")}&quot;...
-                                    </Typography>
-                                </Grid>
-                            }
-                            {
-                                (!!wordResults?.length && !searchString.startsWith("d:")) && <Grid item xs={12} {...Props.GIRBC} sx={{ pt: 1, px: 1.5 }}>
-                                    <Typography variant="h6">
-                                        Word
-                                    </Typography>
-                                    <Typography variant="caption" sx={{ backgroundColor: Colors.LOGO_BLUE, color: Colors.WHITE, px: 1, borderRadius: '4px' }}>
-                                        Start with &quot;w:&quot; for words only
-                                    </Typography>
-                                </Grid>
-                            }
-                            <MenuList sx={{ width: '100%', px: 1, display: (!!wordResults?.length && !searchString.startsWith("d:")) ? 'block' : 'none' }}>
-                                {
-                                    wordResults?.map((result, index) => {
-                                        const handledData = deepExtractObjectStrapi(result?.item, { minifyPhoto: ['illustration'] });
-                                        const displayData = fuzzyWordToSearchData({ ...handledData, hightlight: result?.highlight });
-
-                                        return <MenuItem
-                                            key={`-word-results-${index}-search-bar`}
-                                            aria-label={displayData?.link}
-                                            onClick={() => displayData?.link && Router.push(displayData.link)}
-                                            sx={{
-                                                width: '100%',
-                                                borderRadius: '4px',
-                                                border: `1px solid transparent`,
-                                                borderBottomColor: theme => theme.palette.borderSearch.main,
-                                                ':hover': {
-                                                    border: `1px solid ${Colors.SEARCH_RESULT}`,
-                                                    color: Colors.SEARCH_RESULT
-                                                },
-                                                ':focus, :active': {
-                                                    border: `1px solid ${Colors.SEARCH_RESULT}`,
-                                                    color: Colors.SEARCH_RESULT
-                                                },
-                                                p: 0
-                                            }}
-                                            ref={index === 0 ? wordFirstResultRef : null}
-                                        >
-                                            <Link href={displayData?.link || '/'} passHref>
-                                                <MuiLink underline="none" sx={{
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    color: 'inherit',
-                                                    width: '100%',
-                                                    p: '6px 16px',
-                                                    ':hover, :active, :focus': {
-                                                        outline: `none`,
-                                                        borderRadius: '4px',
-                                                        color: Colors.SEARCH_RESULT,
-                                                    }
-                                                }}>
-                                                    {displayData?.icon}
-                                                    <Grid container {...Props.GCCXS} sx={{
-                                                        position: 'relative',
-                                                        maxWidth: '100%',
-                                                        overflow: 'hidden',
-                                                    }}>
-                                                        <Grid item xs={12}>
-                                                            <Typography className='overflowTypography'>
-                                                                {parser(displayData?.title?.replace(new RegExp(`(${searchString})`, 'gi'), `<u>$1</u>`))}
-                                                            </Typography>
-                                                        </Grid>
-                                                        <Grid item xs={12}>
-                                                            <Typography
-                                                                variant="caption"
-                                                                className='overflowTypography'
-                                                            >
-                                                                {parser(displayData?.description)}
-                                                            </Typography>
-                                                        </Grid>
-                                                    </Grid>
-                                                </MuiLink>
-                                            </Link>
-                                        </MenuItem>
-                                    })
-                                }
-                            </MenuList>
-
-                            {
-                                (!!results?.length && !searchString.startsWith("w:")) && <Grid item xs={12} {...Props.GIRBC} sx={{ pt: 1, px: 1.5 }}>
-                                    <Typography variant="h6">
-                                        Directory
-                                    </Typography>
-                                    <Typography variant="caption" sx={{ backgroundColor: Colors.LOGO_BLUE, color: Colors.WHITE, px: 1, borderRadius: '4px' }}>
-                                        Start with &quot;d:&quot; for directory only
-                                    </Typography>
-                                </Grid>
-                            }
-                            <MenuList sx={{ width: '100%', px: 1, display: (!!results?.length && !searchString.startsWith("w:")) ? 'block' : 'none' }}>
-                                {
-                                    results?.map((result, index) => {
-                                        return <MenuItem
-                                            key={`results-${index}-search-bar`}
-                                            aria-label={result?.item?.link}
-                                            onClick={() => result?.item?.link && Router.push(result.item.link)}
-                                            sx={{
-                                                width: '100%',
-                                                borderRadius: '4px',
-                                                border: `1px solid transparent`,
-                                                borderBottomColor: theme => theme.palette.borderSearch.main,
-                                                ':hover': {
-                                                    border: `1px solid ${Colors.SEARCH_RESULT}`,
-                                                    color: Colors.SEARCH_RESULT
-                                                },
-                                                ':focus, :active': {
-                                                    border: `1px solid ${Colors.SEARCH_RESULT}`,
-                                                    color: Colors.SEARCH_RESULT
-                                                },
-                                                p: 0
-                                            }}
-                                            ref={index === 0 ? directoryFirstResultRef : null}
-                                        >
-                                            <Link href={result?.item?.link || '/'} passHref>
-                                                <MuiLink underline="none" sx={{
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    color: 'inherit',
-                                                    width: '100%',
-                                                    height: '100%',
-                                                    p: '6px 16px',
-                                                    ':hover, :active, :focus': {
-                                                        outline: `none`,
-                                                        borderRadius: '4px',
-                                                        color: Colors.SEARCH_RESULT,
-                                                    }
-                                                }}>
-                                                    {result?.item?.icon}
-                                                    {result?.item?.title}
-                                                </MuiLink>
-                                            </Link>
-                                        </MenuItem>
-                                    })
-                                }
-                            </MenuList>
-                        </Grid>
-                    </div>
-
-                    <Grid ref={bottomRef} container {...Props.GCRBC} py={1} px={2} sx={{
-                        borderTop: '1px solid rgba(0, 0, 0, 0.12)',
-                    }}>
-                        <Typography variant="caption" sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                        }} className='overflowTypography'>
-
-                        </Typography>
-                        <Typography variant="caption" sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                        }} className='overflowTypography'>
-                            Search by&nbsp;
-                            <Link href="https://www.trantrongthuc.com" passHref>
-                                <MuiLink underline='none'>
-                                    <Image
-                                        src={
-                                            typeof window !== "undefined" &&
-                                                (localStorage?.getItem("colorMode") || "light") === "dark" ?
-                                                'https://res.cloudinary.com/katyperrycbt/image/upload/v1647778049/Add_a_heading_2_1_qvwh9n.png' :
-                                                'https://res.cloudinary.com/katyperrycbt/image/upload/v1647777566/Add_a_heading_1_1_rdhdny.png'}
-                                        width={105}
-                                        height={30}
-                                        alt='Tallis'
-                                        objectFit='contain'
-                                        quality={100}
-                                    />
-                                </MuiLink>
-                            </Link>
-                        </Typography>
-                    </Grid>
-            </Dialog>
-
-            {/* <Paper variant='outlined' sx={{
-                position: 'fixed',
-                top: '50% !important',
-                left: '50% !important',
-                transform: 'translate(-50%, -50%)',
-                width: [`90%`],
-                maxWidth: 700,
-                borderRadius: '10px',
-                maxHeight: 600,
-                overflow: 'hidden',
-                display: !forcedClose ? 'flex' : 'none',
-                zIndex: 2,
-                flexDirection: 'column',
-                bgcolor: 'paper_grey2.main',
-                padding: '0px !important'
-            }} ref={resultsRef} className='searchBar'>
-
                 <Grid ref={searchBarRef} container {...Props.GCRSC} p={2} sx={{
                     borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
                 }}>
@@ -534,19 +275,22 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                             </Typography>
                         }
                         {
-                            isValidating && <Grid item xs={12} {...Props.GICCC} py={4} sx={{
+                            isValidating && <div style={{
                                 position: 'absolute',
                                 top: '50%',
                                 left: '50%',
                                 transform: 'translate(-50%, -50%)',
-                                filter: 'brightness(0.5)',
+                                opacity: 0.2,
                                 zIndex: 2,
+                                display: 'flex',
+                                alignItems: 'center',   
+                                flexDirection: 'column',
                             }}>
                                 <FindInPageIcon sx={{ fontSize: Fonts.FS_60 }} />
-                                <Typography variant="h6">
-                                    Searching for &quot;{searchString?.replace(/(w:)/, "")?.replace(/(d:)/, "")}&quot;...
+                                <Typography variant="h6" className='overflowTypography'>
+                                    Searching...
                                 </Typography>
-                            </Grid>
+                            </div>
                         }
                         {
                             (!!wordResults?.length && !searchString.startsWith("d:")) && <Grid item xs={12} {...Props.GIRBC} sx={{ pt: 1, px: 1.5 }}>
@@ -716,7 +460,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                         </Link>
                     </Typography>
                 </Grid>
-            </Paper> */}
+            </Dialog>
         </Paper >
     );
 }
