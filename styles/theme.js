@@ -53,6 +53,9 @@ const MyTheme = (mode) => ({
     },
     mainPublicWord: {
         main: mode === "light" ? Colors.BLUE_PUBLIC_WORDS : Colors.MAIN_PUBLIC_WORDS_DARK,
+    },
+    borderSearch: {
+        main: mode === "light" ? Colors.GREY_200 : Colors.GREY_700,
     }
 });
 

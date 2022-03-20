@@ -147,6 +147,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                 mx: 1, mb: mobile ? 1 : 0,
                 borderRadius: '10px',
                 position: 'relative',
+                bgcolor: theme => theme.palette.mode === 'dark' && 'transparent'
             }}
             variant="outlined"
             id="demo-customized-button"
@@ -242,6 +243,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                     marginBottom: bottomHeight,
                     overflowY: 'auto',
                     overflowX: 'hidden',
+                    paddingBottom: '0px !important'
                 }}>
                     <Grid container {...Props.GCRSC} sx={{
                         '& .MuiMenuItem-root': {
@@ -282,7 +284,9 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                                             width: '100%',
                                             borderRadius: '4px',
                                             border: `1px solid transparent`,
-                                            borderBottomColor: index !== wordResults.length - 1 ? `${Colors.GREY_200}` : 'transparent',
+                                            borderBottomColor: theme => index !== results.length - 1
+                                                ? theme.palette.borderSearch.main
+                                                : 'transparent',
                                             ':hover': {
                                                 border: `1px solid ${Colors.SEARCH_RESULT}`,
                                                 color: Colors.SEARCH_RESULT
@@ -350,7 +354,9 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                                             width: '100%',
                                             borderRadius: '4px',
                                             border: `1px solid transparent`,
-                                            borderBottomColor: index !== results.length - 1 ? `${Colors.GREY_200}` : 'transparent',
+                                            borderBottomColor: theme => index !== results.length - 1
+                                                ? theme.palette.borderSearch.main
+                                                : 'transparent',
                                             ':hover': {
                                                 border: `1px solid ${Colors.SEARCH_RESULT}`,
                                                 color: Colors.SEARCH_RESULT
