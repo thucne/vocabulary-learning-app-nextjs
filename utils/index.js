@@ -4,6 +4,7 @@ import {
     useLayoutEffect,
     useState,
     useRef,
+    useMemo
 } from "react";
 import Router from "next/router";
 import { logout, updateSettings } from "@actions";
@@ -13,8 +14,11 @@ import _ from 'lodash';
 import moment from 'moment';
 import { NO_PHOTO, NO_PHOTO_SEO } from "@consts";
 import qs from 'qs';
-
+import { Colors } from '@styles';
 import { encode } from "blurhash";
+
+import { Icon } from '@mui/material';
+import Image from 'next/image';
 
 export const isAuth = () => {
     if (typeof window !== "undefined") {
@@ -1154,4 +1158,123 @@ export const isCheckedAll = (data, checkedList) => {
 
 export const getNumberOfSelected = (data, checkedList) => {
     return data.filter(item => isInCheckedList(checkedList, item.id)).length;
+}
+
+export const useOutsideAlerter = (ref, callback) => {
+    useEffect(() => {
+        /**
+         * Alert if clicked on outside of element
+         */
+        function handleClickOutside(event) {
+            if (ref.current && !ref.current.contains(event.target)) {
+                if (_.isFunction(callback)) {
+                    callback();
+                }
+            }
+        }
+        // Bind the event listener
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            // Unbind the event listener on clean up
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [ref, callback]);
+}
+
+export const useInsideAlerter = (ref, callback) => {
+    useEffect(() => {
+        /**
+         * Alert if clicked on outside of element
+         */
+        function handleClickOutside(event) {
+            if (ref.current && ref.current.contains(event.target)) {
+                if (_.isFunction(callback)) {
+                    callback();
+                }
+            }
+        }
+        // Bind the event listener
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            // Unbind the event listener on clean up
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [ref, callback]);
+}
+
+export const handleFuzzyResults = (rawData = []) => {
+    let res = [];
+
+    if (rawData?.length > 0) {
+        res = rawData.map(item => {
+            const evidence = _.omit(item, 'item');
+            const firstEvidence = evidence?.matches?.[0];
+            return {
+                item: item?.item,
+                highlight: hightlightEvidence(firstEvidence)
+            }
+        })
+    }
+
+    return res;
+}
+
+const underlineEvidence = (value, indices) => {
+    const underlined = indices
+        .map(index => value.slice(index[0], index[1] + 1))
+        .filter(item => !_.isEmpty(item));
+
+    // replace value with highlighted text
+    return underlined.reduce((acc, curr, index) => {
+        return acc.replace(curr, `<u>${curr}</u>`)
+    }, value);
+}
+
+const hightlightEvidence = (evidence) => {
+    const key = evidence?.key?.replace("attributes.", "")?.split(".")?.[0];
+    const indices = evidence?.indices;
+    const value = evidence?.value;
+    const rawHighlighted = underlineEvidence(value, indices);
+
+    // split out by <u> tags
+    const regex = new RegExp(/<u>(.*?)<\/u>/g);
+
+    // split and get <u> tags
+    const highlightedTags = rawHighlighted?.match(regex);
+
+    // unhiglighted text
+    const regex2 = new RegExp(highlightedTags?.join('|'), 'g');
+    const unHighlighted = rawHighlighted?.split(regex2);
+
+    // transform to <span> tags with underline, color red
+    const highlightedText = highlightedTags?.map((item, index) => {
+        // remove <u> tags
+        const text = item?.replace(/<\/?u>/g, '');
+
+        return `<span style="text-decoration: underline; color: ${Colors.RED}">${text}</span>`
+    });
+
+    // join back together one by one
+    const highlighted = unHighlighted?.reduce((acc, curr, index) => {
+        return (acc || '') + (curr || '') + (highlightedText?.[index] || '');
+    }, '');
+
+    return highlighted;
+}
+
+export const fuzzyWordToSearchData = (word) => {
+    return {
+        icon: <Icon>
+            <Image 
+                src="/logo.icon.svg"
+                width={20}
+                height={20}
+                alt='word'
+                draggable={false}
+            />
+        </Icon>,
+        link: word?.public ? `/word/public/${word.vip}/${word.id}` : `/word/${word.vip}/${word.id}`,
+        title: word?.vip,
+        description: word?.hightlight,
+    }
 }

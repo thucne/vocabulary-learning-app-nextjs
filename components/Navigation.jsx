@@ -494,6 +494,22 @@ function ResponsiveDrawer(props) {
                                 </Grid>
                                 <Grid item>
                                     <Stack direction="row">
+                                        <Grid item display={['none', 'flex']}>
+                                            <GlobalSearch />
+                                        </Grid>
+                                        <IconButton
+                                            sx={{
+                                                ...SXs.MUI_NAV_ICON_BUTTON,
+                                                mr: 1,
+                                                display: ['flex', 'none'],
+                                            }}
+                                            color="mui_button_inner"
+                                            onClick={() => setOpenSearch(prev => !prev)}
+                                        >
+                                            {
+                                                !openSearch ? <SearchIcon /> : <CloseIcon />
+                                            }
+                                        </IconButton>
                                         <IconButton
                                             sx={{
                                                 ...SXs.MUI_NAV_ICON_BUTTON,

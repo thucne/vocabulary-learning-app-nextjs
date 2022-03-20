@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 
-import Head from "next/head";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import Script from "next/script";
@@ -43,7 +42,7 @@ const StyledProgess = styled(LinearProgress)({
     },
 });
 
-const Layout = ({ children, login = false, landing = false, noMeta = false, tabName = "", noBack = false}) => {
+const Layout = ({ children, login = false, landing = false, noMeta = false, tabName = "", noBack = false }) => {
     const router = useRouter();
     const [openMessage, setOpenMessage] = useState(false);
 
@@ -52,6 +51,23 @@ const Layout = ({ children, login = false, landing = false, noMeta = false, tabN
     const linear = useSelector((state) => state.linear);
     const backdrop = useSelector((state) => state.backdrop);
     const confirmDialog = useSelector((state) => state?.confirmDialog);
+
+    useEffect(() => {
+        const handleRouteChange = (url, { shallow }) => {
+            console.log(
+                `App is changing to ${url} ${shallow ? 'with' : 'without'
+                } shallow routing`
+            )
+        }
+
+        router.events.on('routeChangeStart', handleRouteChange)
+
+        // If the component is unmounted, unsubscribe
+        // from the event with the `off` method:
+        return () => {
+            router.events.off('routeChangeStart', handleRouteChange)
+        }
+    }, [router.events])
 
     useEffect(() => {
         if (router?.query?.message) {

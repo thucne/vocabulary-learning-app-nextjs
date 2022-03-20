@@ -89,20 +89,20 @@ a {
 }
 
 .overflowTypography {
-	overflow-wrap: break-word;
-	word-wrap: break-word;
+	overflow-wrap: break-word !important;
+	word-wrap: break-word !important;
 
-	-ms-word-break: break-all;
+	-ms-word-break: break-all !important;
 	/* This is the dangerous one in WebKit, as it breaks things wherever */
-	word-break: break-all;
+	word-break: break-all !important;
 	/* Instead use this non-standard one: */
-	word-break: break-word;
+	word-break: break-word !important;
 
 	/* Adds a hyphen where the word breaks, if supported (No Blink) */
-	-ms-hyphens: auto;
-	-moz-hyphens: auto;
-	-webkit-hyphens: auto;
-	hyphens: auto;
+	-ms-hyphens: auto !important;
+	-moz-hyphens: auto !important;
+	-webkit-hyphens: auto !important;
+	hyphens: auto !important;
 }
 
 .grecaptcha-badge {
