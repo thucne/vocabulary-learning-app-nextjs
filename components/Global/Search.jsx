@@ -401,7 +401,11 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                         <Link href="https://www.trantrongthuc.com" passHref>
                             <MuiLink underline='none'>
                                 <Image
-                                    src='https://res.cloudinary.com/katyperrycbt/image/upload/v1647777566/Add_a_heading_1_1_rdhdny.png'
+                                    src={
+                                        typeof window !== "undefined" &&
+                                            (localStorage?.getItem("colorMode") || "light") === "dark" ?
+                                            'https://res.cloudinary.com/katyperrycbt/image/upload/v1647778049/Add_a_heading_2_1_qvwh9n.png' :
+                                            'https://res.cloudinary.com/katyperrycbt/image/upload/v1647777566/Add_a_heading_1_1_rdhdny.png'}
                                     width={105}
                                     height={30}
                                     alt='Tallis'
@@ -427,7 +431,7 @@ const NoSearchString = () => {
                     </Grid>
                     <Grid item {...Props.GICCS}>
                         <Typography>
-                            Getting Started
+                            Getting started
                         </Typography>
                         {
                             links.gettingStarted.map((link, index) => (
@@ -550,7 +554,7 @@ const NoSearchString = () => {
                     </Grid>
                     <Grid item {...Props.GICCS}>
                         <Typography>
-                            And More
+                            And more
                         </Typography>
                         {
                             links.more.map((link, index) => (
