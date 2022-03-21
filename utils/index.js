@@ -355,7 +355,7 @@ export const handleDictionaryData = (
     originalWord = "",
 ) => {
     const camAudio = generateAudioLink(originalWord);
-    const oxfordAudio = generateOxfordAudioLink(originalWord);
+    const oxfordAudio = generateAudioLinkOxford(originalWord);
 
     const allPronounces =
         firstData?.phonetics
