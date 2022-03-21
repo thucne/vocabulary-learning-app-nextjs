@@ -178,11 +178,13 @@ const EachChild = ({ word, width, evidence, noJump }) => {
 
     const userData = useSelector((state) => state.userData);
 
-    const { objectFit = "contain" } = useSettings(userData);
+    const raw = useSettings(userData);
 
-    const photo = word?.illustration?.formats?.small?.url ||
+    const { objectFit = "contain" } = useMemo(() => raw, [raw]);
+
+    const photo = useMemo(() => word?.illustration?.formats?.small?.url ||
         word?.illustration?.url ||
-        NO_PHOTO;
+        NO_PHOTO, [word?.illustration]);
 
     if (_.isEmpty(word)) {
         return <div />;

@@ -50,7 +50,7 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import { Container, Grid, Stack, Avatar, Button } from "@mui/material";
 
 import { Fonts, SXs } from "@styles";
-import { isAuth, getJWT } from "@utils";
+import { isAuth, getJWT, useWindowSize as useGeneralWindowSize } from "@utils";
 import { logout, fetcherJWT } from "@actions";
 import { ColorModeContext } from "@pages/_app";
 import * as t from "@consts";
@@ -92,6 +92,7 @@ function ResponsiveDrawer(props) {
     const { window, children, landing } = props;
     const dispatch = useDispatch();
     const theme = useTheme();
+    const windowSize = useGeneralWindowSize();
 
     const [refreshInterval, setRefreshInterval] = useState(1000);
 
@@ -350,9 +351,11 @@ function ResponsiveDrawer(props) {
                                             justifyContent="center"
                                             alignItems="center"
                                         >
-                                            <Grid item display={['none', 'flex']}>
-                                                <GlobalSearch />
-                                            </Grid>
+                                            {
+                                                !landing && windowSize?.width >= theme.breakpoints.values.sm && <Grid item display={['none', 'flex']}>
+                                                    <GlobalSearch />
+                                                </Grid>
+                                            }
                                             <IconButton
                                                 sx={{
                                                     ...SXs.MUI_NAV_ICON_BUTTON,
@@ -495,9 +498,11 @@ function ResponsiveDrawer(props) {
                                 </Grid>
                                 <Grid item>
                                     <Stack direction="row">
-                                        <Grid item display={['none', 'flex']}>
-                                            <GlobalSearch />
-                                        </Grid>
+                                        {
+                                            landing && windowSize?.width >= theme.breakpoints.values.sm && <Grid item display={['none', 'flex']}>
+                                                <GlobalSearch />
+                                            </Grid>
+                                        }
                                         <IconButton
                                             sx={{
                                                 ...SXs.MUI_NAV_ICON_BUTTON,
@@ -539,9 +544,11 @@ function ResponsiveDrawer(props) {
                                 </Grid>
                             </Grid>
                         </Toolbar>
-                        <Grid item display={['block', 'none']}>
-                            <GlobalSearch open={openSearch} mobile />
-                        </Grid>
+                        {
+                            windowSize?.width < theme.breakpoints.values.sm && <Grid item display={['block', 'none']}>
+                                <GlobalSearch open={openSearch} mobile />
+                            </Grid>
+                        }
                     </Container>
                 </AppBar>
                 <Box

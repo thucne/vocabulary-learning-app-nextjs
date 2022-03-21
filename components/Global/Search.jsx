@@ -25,7 +25,9 @@ import {
     ToggleOff as ToggleOffIcon,
     ArrowForwardIos as ArrowForwardIosIcon,
     FindInPage as FindInPageIcon,
+    SearchOffRounded as SearchOffRoundedIcon,
 } from '@mui/icons-material';
+
 
 import { Props, SXs, Fonts, Colors } from '@styles';
 
@@ -66,7 +68,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
 
     const { data, isValidating } = useSWR(searchString
         ? `${API}/api/fuzzy-search/${searchString
-            ?.replace(/(w:)/, "")?.replace(/(d:)/, "")}?${queryString}`
+            ?.replace(/(w:|W:)/, "")?.replace(/(d:)/, "")}?${queryString}`
         : null,
         fetcher,
         {
@@ -216,6 +218,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                         borderRadius: '10px',
                     }
                 }}
+                fullWidth
             >
                 <Grid ref={searchBarRef} container {...Props.GCRSC} p={2} sx={{
                     borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
@@ -270,21 +273,26 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                             !!!searchString?.trim()?.length && <NoSearchString />
                         }
                         {
-                            !!!wordResults.length && !!!results.length && !!searchString?.trim()?.length && <Typography variant="caption" sx={{ p: 1.5 }}>
-                                No results found for &quot;{searchString?.replace(/(w:)/, "")?.replace(/(d:)/, "")}&quot;
-                            </Typography>
-                        }
-                        {
-                            (!!wordResults?.length && !searchString.startsWith("d:")) && <Grid item xs={12} {...Props.GIRBC} sx={{ pt: 1, px: 1.5 }}>
-                                <Typography variant="h6">
-                                    Word
-                                </Typography>
-                                <Typography variant="caption" sx={{ backgroundColor: Colors.LOGO_BLUE, color: Colors.WHITE, px: 1, borderRadius: '4px' }}>
-                                    Start with &quot;w:&quot; for words only
+                            !!!wordResults.length && !!!results.length && !!searchString?.trim()?.length && <Grid item xs={12} {...Props.GICCC} py={2} px={5}>
+                                <SearchOffRoundedIcon sx={{ fontSize: Fonts.FS_60 }} />
+                                <Typography variant="body1" sx={{ p: 1.5 }} className='overflowTypography' align='center'>
+                                    No results for &quot;{searchString?.replace(/(w:|W:)/, "")?.replace(/(d:|D:)/, "")}&quot;
                                 </Typography>
                             </Grid>
                         }
-                        <MenuList sx={{ width: '100%', px: 1, display: (!!wordResults?.length && !searchString.startsWith("d:")) ? 'block' : 'none' }}>
+                        {
+                            (!!wordResults?.length && !/^(d:|D:)/.test(searchString)) && <Grid item xs={12} {...Props.GIRBC} sx={{ pt: 1, px: 1.5 }}>
+                                <Typography variant="h6">
+                                    Word
+                                </Typography>
+                                {
+                                    !/^(w:|W:)/.test(searchString) && <Typography variant="caption" sx={{ backgroundColor: Colors.LOGO_BLUE, color: Colors.WHITE, px: 1, borderRadius: '4px' }}>
+                                        Start with &quot;w:&quot; for words only
+                                    </Typography>
+                                }
+                            </Grid>
+                        }
+                        <MenuList sx={{ width: '100%', px: 1, display: (!!wordResults?.length && !/^(d:|D:)/.test(searchString)) ? 'block' : 'none' }}>
                             {
                                 wordResults?.map((result, index) => {
                                     const handledData = deepExtractObjectStrapi(result?.item, { minifyPhoto: ['illustration'] });
@@ -352,16 +360,18 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                         </MenuList>
 
                         {
-                            (!!results?.length && !searchString.startsWith("w:")) && <Grid item xs={12} {...Props.GIRBC} sx={{ pt: 1, px: 1.5 }}>
+                            (!!results?.length && !/^(w:|W:)/.test(searchString)) && <Grid item xs={12} {...Props.GIRBC} sx={{ pt: 1, px: 1.5 }}>
                                 <Typography variant="h6">
                                     Directory
                                 </Typography>
-                                <Typography variant="caption" sx={{ backgroundColor: Colors.LOGO_BLUE, color: Colors.WHITE, px: 1, borderRadius: '4px' }}>
-                                    Start with &quot;d:&quot; for directory only
-                                </Typography>
+                                {
+                                    !/^(d:|D:)/.test(searchString) && <Typography variant="caption" sx={{ backgroundColor: Colors.LOGO_BLUE, color: Colors.WHITE, px: 1, borderRadius: '4px' }}>
+                                        Start with &quot;d:&quot; for directory only
+                                    </Typography>
+                                }
                             </Grid>
                         }
-                        <MenuList sx={{ width: '100%', px: 1, display: (!!results?.length && !searchString.startsWith("w:")) ? 'block' : 'none' }}>
+                        <MenuList sx={{ width: '100%', px: 1, display: (!!results?.length && !/^(w:|W:)/.test(searchString)) ? 'block' : 'none' }}>
                             {
                                 results?.map((result, index) => {
                                     return <MenuItem
@@ -663,7 +673,7 @@ const searchDefault = (value) => {
         keys: searchKeys
     })
 
-    return fuse.search(value?.replace(/(w:)/, "")?.replace(/(d:)/, ""));
+    return fuse.search(value?.replace(/(w:|W:)/, "")?.replace(/(d:|D:)/, ""));
 }
 
 
@@ -738,7 +748,7 @@ const searchDefault = (value) => {
             }
             {
                 !!!wordResults.length && !!!results.length && !!searchString?.trim()?.length && <Typography variant="caption" sx={{ p: 1.5 }}>
-                    No results found for &quot;{searchString?.replace(/(w:)/, "")?.replace(/(d:)/, "")}&quot;
+                    No results found for &quot;{searchString?.replace(/(w:|W:)/, "")?.replace(/(d:)/, "")}&quot;
                 </Typography>
             }
             {
@@ -752,12 +762,12 @@ const searchDefault = (value) => {
                 }}>
                     <FindInPageIcon sx={{ fontSize: Fonts.FS_60 }} />
                     <Typography variant="h6">
-                        Searching for &quot;{searchString?.replace(/(w:)/, "")?.replace(/(d:)/, "")}&quot;...
+                        Searching for &quot;{searchString?.replace(/(w:|W:)/, "")?.replace(/(d:)/, "")}&quot;...
                     </Typography>
                 </Grid>
             }
             {
-                (!!wordResults?.length && !searchString.startsWith("d:")) && <Grid item xs={12} {...Props.GIRBC} sx={{ pt: 1, px: 1.5 }}>
+                (!!wordResults?.length && !/^(d:|D:)/.test(searchString) && <Grid item xs={12} {...Props.GIRBC} sx={{ pt: 1, px: 1.5 }}>
                     <Typography variant="h6">
                         Word
                     </Typography>
@@ -766,7 +776,7 @@ const searchDefault = (value) => {
                     </Typography>
                 </Grid>
             }
-            <MenuList sx={{ width: '100%', px: 1, display: (!!wordResults?.length && !searchString.startsWith("d:")) ? 'block' : 'none' }}>
+            <MenuList sx={{ width: '100%', px: 1, display: (!!wordResults?.length && !/^(d:|D:)/.test(searchString) ? 'block' : 'none' }}>
                 {
                     wordResults?.map((result, index) => {
                         const handledData = deepExtractObjectStrapi(result?.item, { minifyPhoto: ['illustration'] });
@@ -834,7 +844,7 @@ const searchDefault = (value) => {
             </MenuList>
 
             {
-                (!!results?.length && !searchString.startsWith("w:")) && <Grid item xs={12} {...Props.GIRBC} sx={{ pt: 1, px: 1.5 }}>
+                (!!results?.length && !/^(w:|W:)/.test(searchString) && <Grid item xs={12} {...Props.GIRBC} sx={{ pt: 1, px: 1.5 }}>
                     <Typography variant="h6">
                         Directory
                     </Typography>
@@ -843,7 +853,7 @@ const searchDefault = (value) => {
                     </Typography>
                 </Grid>
             }
-            <MenuList sx={{ width: '100%', px: 1, display: (!!results?.length && !searchString.startsWith("w:")) ? 'block' : 'none' }}>
+            <MenuList sx={{ width: '100%', px: 1, display: (!!results?.length && !/^(w:|W:)/.test(searchString) ? 'block' : 'none' }}>
                 {
                     results?.map((result, index) => {
                         return <MenuItem
