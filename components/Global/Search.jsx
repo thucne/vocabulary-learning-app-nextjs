@@ -66,9 +66,9 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
         max: 10,
     }, { encodeValuesOnly: true });
 
-    const { data, isValidating } = useSWR(searchString
+    const { data, isValidating } = useSWR(!!searchString?.replace(/(w:|W:)/, "")?.replace(/(d:|D:)/, "")?.trim()?.length
         ? `${API}/api/fuzzy-search/${searchString
-            ?.replace(/(w:|W:)/, "")?.replace(/(d:)/, "")}?${queryString}`
+            ?.replace(/(w:|W:)/, "")?.replace(/(d:|D:)/, "")}?${queryString}`
         : null,
         fetcher,
         {
@@ -270,10 +270,10 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                         },
                     }}>
                         {
-                            !!!searchString?.trim()?.length && <NoSearchString />
+                            !!!searchString?.replace(/(w:|W:)/, "")?.replace(/(d:|D:)/, "")?.trim()?.length && <NoSearchString />
                         }
                         {
-                            !!!wordResults.length && !!!results.length && !!searchString?.trim()?.length && <Grid item xs={12} {...Props.GICCC} py={2} px={5}>
+                            !!!wordResults.length && !!!results.length && !!searchString?.replace(/(w:|W:)/, "")?.replace(/(d:|D:)/, "")?.trim()?.length && <Grid item xs={12} {...Props.GICCC} py={2} px={5}>
                                 <SearchOffRoundedIcon sx={{ fontSize: Fonts.FS_60 }} />
                                 <Typography variant="body1" sx={{ p: 1.5 }} className='overflowTypography' align='center'>
                                     No results for &quot;{searchString?.replace(/(w:|W:)/, "")?.replace(/(d:|D:)/, "")}&quot;
@@ -297,6 +297,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                                 wordResults?.map((result, index) => {
                                     const handledData = deepExtractObjectStrapi(result?.item, { minifyPhoto: ['illustration'] });
                                     const displayData = fuzzyWordToSearchData({ ...handledData, hightlight: result?.highlight });
+                                    const matchedPercentage = result?.matchedPercentage;
 
                                     return <MenuItem
                                         key={`-word-results-${index}-search-bar`}
@@ -340,7 +341,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                                                 }}>
                                                     <Grid item xs={12}>
                                                         <Typography className='overflowTypography'>
-                                                            {parser(displayData?.title?.replace(new RegExp(`(${searchString})`, 'gi'), `<u>$1</u>`))}
+                                                            {parser(displayData?.title?.replace(new RegExp(`(${searchString?.replace(/(w:|W:)/, "")?.replace(/(d:|D:)/, "")})`, 'gi'), `<u style="color: ${Colors.SEARCH_RESULT}">$1</u>`))} {matchedPercentage}
                                                         </Typography>
                                                     </Grid>
                                                     <Grid item xs={12}>

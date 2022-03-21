@@ -1209,9 +1209,14 @@ export const handleFuzzyResults = (rawData = []) => {
         res = rawData.map(item => {
             const evidence = _.omit(item, 'item');
             const firstEvidence = evidence?.matches?.[0];
+            const score = evidence?.score;
+            const matchedPercentage = _.isNumber(score) ? `${Math.floor((1 - score) * 100)}%` : '0%';
+
             return {
                 item: item?.item,
-                highlight: hightlightEvidence(firstEvidence)
+                highlight: hightlightEvidence(firstEvidence),
+                score,
+                matchedPercentage
             }
         })
     }
