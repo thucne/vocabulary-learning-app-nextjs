@@ -211,6 +211,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                 open={!forcedClose}
                 onClose={() => setForcedClose(true)}
                 scroll='paper'
+                fullWidth
                 sx={{
                     '& .MuiPaper-root': {
                         borderRadius: '10px',
