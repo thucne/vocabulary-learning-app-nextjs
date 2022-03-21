@@ -26,8 +26,9 @@ import {
     ArrowForwardIos as ArrowForwardIosIcon,
     FindInPage as FindInPageIcon,
     SearchOffRounded as SearchOffRoundedIcon,
+    DirectionsRounded as DirectionsRoundedIcon,
+    KeyboardReturnRounded as KeyboardReturnRoundedIcon,
 } from '@mui/icons-material';
-
 
 import { Props, SXs, Fonts, Colors } from '@styles';
 
@@ -53,6 +54,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
     const [results, setResults] = useState([]);
     const [searchString, setSearchString] = useState('');
     const [forcedClose, setForcedClose] = useState(true);
+    const [hoveredItem, setHoveredItem] = useState(null);
 
     const inputRef = useRef(null);
     // const resultsRef = useRef(null);
@@ -104,7 +106,9 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                 setForcedClose(true);
             }
             if (event.key === 'Enter') {
-                if (wordFirstResult && directoryFirstResult) {
+                if (hoveredItem) {
+                    Router.push(hoveredItem);
+                } else if (wordFirstResult && directoryFirstResult) {
                     wordFirstResult.click();
                 } else if (wordFirstResult) {
                     wordFirstResult.click();
@@ -117,7 +121,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
         document.addEventListener('keydown', handler);
 
         return () => document.removeEventListener('keydown', handler);
-    }, []);
+    }, [hoveredItem]);
 
     useEffect(() => {
         if (mobile === true && open) {
@@ -316,10 +320,24 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                                                 border: `1px solid ${Colors.SEARCH_RESULT}`,
                                                 color: Colors.SEARCH_RESULT
                                             },
-                                            p: 0
+                                            p: 1
                                         }}
+                                        onMouseOver={() => setHoveredItem(displayData?.link)}
+                                        onMouseLeave={() => setHoveredItem(null)}
                                         ref={index === 0 ? wordFirstResultRef : null}
                                     >
+                                        {
+                                            hoveredItem === displayData?.link && <KeyboardReturnRoundedIcon
+                                                sx={{
+                                                    position: 'absolute',
+                                                    top: '50%',
+                                                    right: '16px',
+                                                    transform: 'translateY(-50%)',
+                                                    width: 22,
+                                                    height: 22,
+                                                }}
+                                            />
+                                        }
                                         <Link href={displayData?.link || '/'} passHref>
                                             <MuiLink underline="none" sx={{
                                                 display: 'flex',
@@ -339,9 +357,12 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                                                     maxWidth: '100%',
                                                     overflow: 'hidden',
                                                 }}>
-                                                    <Grid item xs={12}>
+                                                    <Grid item xs={12} {...Props.GIRBC}>
                                                         <Typography className='overflowTypography'>
-                                                            {parser(displayData?.title?.replace(new RegExp(`(${searchString?.replace(/(w:|W:)/, "")?.replace(/(d:|D:)/, "")})`, 'gi'), `<u style="color: ${Colors.SEARCH_RESULT}">$1</u>`))} {matchedPercentage}
+                                                            {parser(displayData?.title?.replace(new RegExp(`(${searchString?.replace(/(w:|W:)/, "")?.replace(/(d:|D:)/, "")})`, 'gi'), `<u style="color: ${Colors.SEARCH_RESULT}">$1</u>`))}
+                                                        </Typography>
+                                                        <Typography variant='caption' className='overflowTypography'>
+                                                            [{matchedPercentage} matched]
                                                         </Typography>
                                                     </Grid>
                                                     <Grid item xs={12}>
@@ -392,10 +413,24 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                                                 border: `1px solid ${Colors.SEARCH_RESULT}`,
                                                 color: Colors.SEARCH_RESULT
                                             },
-                                            p: 0
+                                            py: 1
                                         }}
+                                        onMouseOver={() => setHoveredItem(result?.item?.link)}
+                                        onMouseLeave={() => setHoveredItem(null)}
                                         ref={index === 0 ? directoryFirstResultRef : null}
                                     >
+                                        {
+                                            hoveredItem === result?.item?.link && <KeyboardReturnRoundedIcon
+                                                sx={{
+                                                    position: 'absolute',
+                                                    top: '50%',
+                                                    right: '16px',
+                                                    transform: 'translateY(-50%)',
+                                                    width: 22,
+                                                    height: 22,
+                                                }}
+                                            />
+                                        }
                                         <Link href={result?.item?.link || '/'} passHref>
                                             <MuiLink underline="none" sx={{
                                                 display: 'flex',
