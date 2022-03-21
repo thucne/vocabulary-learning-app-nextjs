@@ -93,7 +93,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
             let wordFirstResult = wordFirstResultRef?.current;
             let directoryFirstResult = directoryFirstResultRef?.current;
 
-            if ((event.ctrlKey && event.key === 'k') || (event.ctrlKey && event.key === 'f') || event.key === 'f') {
+            if (event.ctrlKey && event.key === 'k') {
                 event?.preventDefault();
                 setForcedClose(false);
                 currentInput?.focus();
@@ -102,7 +102,6 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                 setForcedClose(true);
             }
             if (event.key === 'Enter') {
-                console.log('enterd')
                 if (wordFirstResult && directoryFirstResult) {
                     wordFirstResult.click();
                 } else if (wordFirstResult) {
