@@ -931,6 +931,66 @@ export const gruopWordByDatePeriod = wordList => {
     return processedData
 }
 
+export const groupByDate = (wordList = []) => {
+    let raw = [];
+    let res = [];
+    // sort by date
+    raw = wordList.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+
+    // calculate days from now
+    raw = raw.map((item, index) => (
+        raw[index] = {
+            ...item,
+            fromNow: moment({ hours: 0 }).diff(item.createdAt, 'days'),
+            checked: false
+        }
+    ));
+
+    // possible suffixes
+    const dateLabels = [
+        {
+            date: 'N years',
+            range: [366, Infinity]
+        },
+        {
+            date: 'Last year',
+            range: [31, 365]
+        },
+        {
+            date: "Last month",
+            range: [8, 30]
+        },
+        {
+            date: "Last week",
+            range: [2, 8]
+        },
+        {
+            date: "Yesterday",
+            range: [1, 2]
+        },
+        {
+            date: "Today",
+            range: [0, 1],
+        },
+    ]
+
+    // group word by date dateLabels
+    dateLabels.map((item, index) => {
+        let temp = raw.filter(word => {
+            if(word.fromNow > 365) return ``
+            return word.fromNow < item.range[1] && word.fromNow >= item.range[0]
+        })
+        if (temp.length) {
+            res.push({
+                date: item.date,
+                data: [...temp]
+            })
+        }
+    })
+
+    return res;
+}
+
 export const deepExtractObjectStrapi = (object = {}, options = {}) => {
 
     if (_.isObject(object) && !_.isEmpty(object)) {
@@ -1270,7 +1330,7 @@ const hightlightEvidence = (evidence) => {
 export const fuzzyWordToSearchData = (word) => {
     return {
         icon: <Icon>
-            <Image 
+            <Image
                 src="/logo.icon.svg"
                 width={20}
                 height={20}

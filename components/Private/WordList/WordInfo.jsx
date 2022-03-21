@@ -31,9 +31,6 @@ function WordInfo({
 }) {
   const [loading, setLoading] = useState(true);
 
-  console.log("word",word)
-
-
   const handleOpenDialog = () => {
     setOpen(true);
     setCurrentWord(word);
