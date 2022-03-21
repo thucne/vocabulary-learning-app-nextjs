@@ -358,7 +358,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                                                 <Grid item xs={12} {...Props.GIRBC}>
                                                     <Typography className='overflowTypography'>
                                                         No exact match for &quot;{actualSearchString}&quot;.
-                                                        Go to page of this word instead?
+                                                        Go to page of this word instead? 
                                                     </Typography>
                                                 </Grid>
                                             </Grid>
