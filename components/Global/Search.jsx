@@ -228,7 +228,6 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                         borderRadius: '10px',
                     }
                 }}
-                fullWidth
             >
                 <Grid ref={searchBarRef} container {...Props.GCRSC} p={2} sx={{
                     borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
