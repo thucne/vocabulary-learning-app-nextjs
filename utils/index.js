@@ -847,7 +847,7 @@ export function formatBytes(bytes, decimals = 2) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
-export const getWordList = (userData, set = 0, limit = 8,) => {
+export const getWordList = (userData, set = 0, limit = 8) => {
     if (!userData?.vips?.length) return [];
 
     let tempt = [...userData.vips]
@@ -856,7 +856,7 @@ export const getWordList = (userData, set = 0, limit = 8,) => {
     let sliced = tempt.slice(skip, skip + limit)
 
     // modify createdAt for more flexible
-    mockCreatedAt(sliced)
+    // mockCreatedAt(sliced)
 
     return sliced
 }
@@ -989,6 +989,17 @@ export const groupByDate = (wordList = []) => {
     })
 
     return res;
+}
+
+export const getInfiniteVips = (wordList = [], page = 0, limit = 8) => {
+
+    // sort by createdAt first
+    const local = wordList.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+
+    let skip = page * limit;
+    let sliced = local.slice(skip, skip + limit)
+
+    return sliced;
 }
 
 export const deepExtractObjectStrapi = (object = {}, options = {}) => {

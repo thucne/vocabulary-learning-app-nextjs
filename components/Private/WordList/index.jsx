@@ -13,7 +13,7 @@ import {
 import { Box } from "@mui/system";
 
 import { Fonts, Colors, Props, SXs } from "@styles";
-import { groupByDate, getWordList, gruopWordByDatePeriod, deepExtractObjectStrapi } from "@utils";
+import { groupByDate, getWordList, gruopWordByDatePeriod, deepExtractObjectStrapi, getInfiniteVips } from "@utils";
 
 import DateLabesSection from "./DateLabelsSection";
 import EditForm from "./EditForm";
@@ -34,13 +34,29 @@ const WordList = () => {
     const [checkList, setCheckList] = useState([]);
     const listRef = useRef(null);
 
+    const [page, setPage] = useState(0);
+    const [pageSize, setPageSize] = useState(4);
+    const [numOfPages, setNumOfPages] = useState(0);
+
     const vips = deepExtractObjectStrapi(userData?.vips, {
         minifyPhoto: ['illustration']
     });
 
-    const groupedVips = groupByDate(_.isArray(vips) && !_.isEmpty(vips) ? vips : []);  
+    let pages = [];
 
-    console.log(groupedVips);
+    for (let i = 0; i < numOfPages; i++) {
+        const inifiniteVips = getInfiniteVips(_.isArray(vips) && !_.isEmpty(vips) ? vips : [], i, pageSize);
+        const groupedVips = groupByDate(_.isArray(inifiniteVips) && !_.isEmpty(inifiniteVips) ? inifiniteVips : []);
+
+        pages.push(<EachPage
+            vips={groupedVips}
+            setCurrentWord={setCurrentWord}
+            setOpen={setOpen}
+            checkList={checkList}
+            handleUpdateCheckList={handleUpdateCheckList}
+            handleCheckSingleBox={handleCheckSingleBox}
+        />)
+    }
 
     useEffect(() => {
         //scroll to bottom
@@ -113,7 +129,7 @@ const WordList = () => {
     };
 
     return (
-        <Container maxWidth="md" sx={{ p: ["0px"] }}>
+        <Container maxWidth="md" disableGutters>
             <Grid container {...Props.GCRCS}>
                 <Grid item xs={12} mt={[5, 5, 3]} className="pasdasdasd">
                     <Typography
@@ -133,33 +149,34 @@ const WordList = () => {
                     </Typography>
                 </Grid>
 
-                <Grid item xs={12} mt={[5, 5, 3]} sx={{ width: "100%" }}>
-                    <Grid container {...Props.GCRCC}>
-                        <Grid
-                            item
-                            xs={12}
-                            {...Props.GIRSC}
-                            sx={{ width: "100%", height: "500px" }}
-                        >
-                            <Box
-                                ref={listRef}
-                                onScroll={handleScroll}
-                                sx={{ width: "100%", height: "100%", overflowY: "auto" }}
-                            >
-                                {groupedVips.map((wordsSection, index) => (
-                                    <DateLabesSection
-                                        key={index}
-                                        dateSegment={wordsSection}
-                                        setCurrentWord={setCurrentWord}
-                                        setOpen={setOpen}
-                                        checkList={checkList}
-                                        handleUpdateCheckList={handleUpdateCheckList}
-                                        handleCheckSingleBox={handleCheckSingleBox}
-                                    />
-                                ))}
-                            </Box>
+                <Grid item xs={12} mt={[5, 5, 3]}>
+                    <Paper variant='outlined'>
+                        <Grid container {...Props.GCRCC}>
+                            <Grid item xs={12} {...Props.GIRSC} sx={{ height: "500px" }}>
+                                <Box
+                                    ref={listRef}
+                                    onScroll={handleScroll}
+                                    sx={{ width: "100%", height: "100%", overflowY: "auto" }}
+                                >
+                                    {/* {groupedVips.map((wordsSection, index) => (
+                                        <DateLabesSection
+                                            key={index}
+                                            dateSegment={wordsSection}
+                                            setCurrentWord={setCurrentWord}
+                                            setOpen={setOpen}
+                                            checkList={checkList}
+                                            handleUpdateCheckList={handleUpdateCheckList}
+                                            handleCheckSingleBox={handleCheckSingleBox}
+                                        />
+                                    ))} */}
+                                    {pages}
+                                </Box>
+                            </Grid>
                         </Grid>
-                    </Grid>
+                    </Paper>
+                    <Button onClick={() => setNumOfPages(prev => prev + 1)}>
+                        Load more
+                    </Button>
                 </Grid>
             </Grid>
 
@@ -175,5 +192,19 @@ const WordList = () => {
         </Container>
     );
 };
+
+const EachPage = ({ vips, setCurrentWord, setOpen, checkList, handleUpdateCheckList, handleCheckSingleBox }) => {
+    return <>
+        {vips.map((vip, index) => <DateLabesSection
+            key={index}
+            dateSegment={vip}
+            setCurrentWord={setCurrentWord}
+            setOpen={setOpen}
+            checkList={checkList}
+            handleUpdateCheckList={handleUpdateCheckList}
+            handleCheckSingleBox={handleCheckSingleBox}
+        />)}
+    </>
+}
 
 export default WordList;
