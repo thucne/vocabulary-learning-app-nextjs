@@ -42,10 +42,22 @@ const WordList = () => {
     const [existingVips, setExistingVips] = useState([]);
     const [hasNext, setHasNext] = useState(0);
     const [minimizedGroups, setMinimizedGroups] = useState([]);
+    const [checkedAllGroups, setCheckedAllGroups] = useState([]);
+    const [indeterminateGroups, setIndeterminateGroups] = useState({});
+    const [sumUpGroups, setSumUpGroups] = useState([]);
 
     const vips = deepExtractObjectStrapi(userData?.vips, {
         minifyPhoto: ['illustration']
     });
+
+    const pageProps = {
+        existingVips, setExistingVips,
+        hasNext, setHasNext,
+        minimizedGroups, setMinimizedGroups,
+        checkedAllGroups, setCheckedAllGroups,
+        indeterminateGroups, setIndeterminateGroups,
+        sumUpGroups, setSumUpGroups,
+    }
 
     let pages = [];
 
@@ -54,12 +66,7 @@ const WordList = () => {
             key={`eachpage-${i}`}
             vips={vips}
             pageNumber={i}
-            setExistingVips={setExistingVips}
-            existingVips={existingVips}
-            hasNext={hasNext}
-            setHasNext={setHasNext}
-            minimizedGroups={minimizedGroups}
-            setMinimizedGroups={setMinimizedGroups}
+            {...pageProps}
         />)
     }
 
