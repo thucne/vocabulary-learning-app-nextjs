@@ -931,7 +931,35 @@ export const gruopWordByDatePeriod = wordList => {
     return processedData
 }
 
-export const groupByDate = (wordList = []) => {
+// possible suffixes
+const dateLabels = [
+    {
+        date: "Today",
+        range: [0, 1],
+    },
+    {
+        date: "Yesterday",
+        range: [1, 2]
+    },
+    {
+        date: "Last week",
+        range: [2, 8]
+    },
+    {
+        date: "Last month",
+        range: [8, 30]
+    },
+    {
+        date: 'Last year',
+        range: [31, 365]
+    },
+    {
+        date: (days) => `${Math.floor(days / 365)} year${Math.floor(days / 365) > 1 ? 's' : ''} ago`,
+        range: [366, Infinity]
+    },
+]
+
+export const groupByDate = (wordList = [], previousData = [], setNewPreviousData, pageNumber) => {
     let raw = [];
     let res = [];
     // sort by date
@@ -946,47 +974,35 @@ export const groupByDate = (wordList = []) => {
         }
     ));
 
-    // possible suffixes
-    const dateLabels = [
-        {
-            date: 'N years',
-            range: [366, Infinity]
-        },
-        {
-            date: 'Last year',
-            range: [31, 365]
-        },
-        {
-            date: "Last month",
-            range: [8, 30]
-        },
-        {
-            date: "Last week",
-            range: [2, 8]
-        },
-        {
-            date: "Yesterday",
-            range: [1, 2]
-        },
-        {
-            date: "Today",
-            range: [0, 1],
-        },
-    ]
-
     // group word by date dateLabels
     dateLabels.map((item, index) => {
         let temp = raw.filter(word => {
-            if(word.fromNow > 365) return ``
             return word.fromNow < item.range[1] && word.fromNow >= item.range[0]
         })
         if (temp.length) {
+
+            const isDateExist = previousData.find(i => i.date === item.date);
+
+            let isDisplay = true;
+
+            if (isDateExist) {
+                if (isDateExist.page !== pageNumber) {
+                    isDisplay = false;
+                }
+            } else {
+                previousData.push({ date: item.date, page: pageNumber })
+                setNewPreviousData(previousData)
+            }
+
             res.push({
-                date: item.date,
-                data: [...temp]
+                date: _.isFunction(item.date) ? item.date(Math.max(raw.map(item => item.fromNow))) : item.date,
+                data: [...temp],
+                isDisplay
             })
         }
     })
+
+
 
     return res;
 }
@@ -999,7 +1015,13 @@ export const getInfiniteVips = (wordList = [], page = 0, limit = 8) => {
     let skip = page * limit;
     let sliced = local.slice(skip, skip + limit)
 
-    return sliced;
+    // check if there can be next page
+    let nextSkip = skip + limit;
+    let nextSliced = local.slice(nextSkip, nextSkip + limit)
+
+    let hasNext = nextSliced.length > 0 ? page + 1 : -1;
+
+    return [sliced, hasNext];
 }
 
 export const deepExtractObjectStrapi = (object = {}, options = {}) => {
