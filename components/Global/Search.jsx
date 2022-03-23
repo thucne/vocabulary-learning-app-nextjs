@@ -58,12 +58,10 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
     const [hoveredItem, setHoveredItem] = useState(null);
 
     const inputRef = useRef(null);
-    // const resultsRef = useRef(null);
     const dispatch = useDispatch();
-    const searchBarRef = useRef(null);
-    const bottomRef = useRef(null);
     const wordFirstResultRef = useRef(null);
     const directoryFirstResultRef = useRef(null);
+    const noExactMatchRef= useRef(null);
 
     const actualSearchString = searchString?.replace(/(w:|W:)/, "")?.replace(/(d:|D:)/, "");
     const isDirectorySearch = /^(d:|D:)/.test(searchString);
@@ -97,14 +95,14 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
     useEffect(() => {
 
         const handler = (event) => {
-            let currentInput = inputRef?.current;
             let wordFirstResult = wordFirstResultRef?.current;
             let directoryFirstResult = directoryFirstResultRef?.current;
+            let noExactMatch = noExactMatchRef?.current;
 
             if (event.ctrlKey && event.key === 'k') {
                 event?.preventDefault();
                 setForcedClose(false);
-                currentInput?.focus();
+                inputRef?.current?.focus()
             }
             if (event.key === 'Escape') {
                 setForcedClose(true);
@@ -112,6 +110,8 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
             if (event.key === 'Enter') {
                 if (hoveredItem) {
                     Router.push(hoveredItem);
+                } else if (noExactMatch) {
+                    noExactMatch.click();
                 } else if (wordFirstResult && directoryFirstResult) {
                     wordFirstResult.click();
                 } else if (wordFirstResult) {
@@ -133,14 +133,6 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
         }
     }, [mobile, open]);
 
-    // useOutsideAlerter(resultsRef, () => {
-    //     setForcedClose(true);
-    // });
-
-    // useInsideAlerter(inputRef, () => {
-    //     setForcedClose(false);
-    // });
-
     const debounceSearch = useMemo(() => _.debounce((e) => setSearchString(e.target.value), 500), []);
 
     const handleSearch = (e) => {
@@ -155,18 +147,6 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
         setForcedClose(false);
         setTimeout(() => inputRef?.current?.focus(), 100);
     }
-
-    const { height = 0 } = useThisToGetPositionFromRef(searchBarRef, {
-        revalidate: 100,
-        falseCondition: ({ width }) => width === 0,
-        terminalCondition: ({ width }) => width > 0,
-    });
-
-    const { height: bottomHeight = 0 } = useThisToGetPositionFromRef(bottomRef, {
-        revalidate: 100,
-        falseCondition: ({ width }) => width === 0,
-        terminalCondition: ({ width }) => width > 0,
-    });
 
     const isThereExactMatch = useMemo(() => wordResults?.map(item => deepExtractObjectStrapi(item.item)).findIndex(item => item.vip === actualSearchString) > -1, [wordResults, actualSearchString]);
 
@@ -229,7 +209,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                     }
                 }}
             >
-                <Grid ref={searchBarRef} container {...Props.GCRSC} p={2} sx={{
+                <Grid container {...Props.GCRSC} p={2} sx={{
                     borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
                 }}>
                     <IconButton aria-label="search" size="small" disableRipple onClick={() => inputRef?.current?.focus()}>
@@ -323,6 +303,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                                     }}
                                     onMouseOver={() => setHoveredItem(`/word/${actualSearchString}`)}
                                     onMouseLeave={() => setHoveredItem(null)}
+                                    ref={noExactMatchRef}
                                 >
                                     {
                                         hoveredItem === `/word/${actualSearchString}` && <KeyboardReturnRoundedIcon
@@ -525,7 +506,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                     </Grid>
                 </div>
 
-                <Grid ref={bottomRef} container {...Props.GCRBC} py={1} px={2} sx={{
+                <Grid container {...Props.GCRBC} py={1} px={2} sx={{
                     borderTop: '1px solid rgba(0, 0, 0, 0.12)',
                 }}>
                     <Typography variant="caption" sx={{
