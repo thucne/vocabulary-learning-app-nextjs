@@ -23,22 +23,21 @@ const EachPage = ({
     checkedAllGroups, setCheckedAllGroups,
     indeterminateGroups, setIndeterminateGroups,
     sumUpGroups, setSumUpGroups,
+    currentWord, setCurrentWord,
     isLastPage
 }) => {
 
     const [groupedVips, setGroupedVips] = useState([]);
 
     useEffect(() => {
-        if (hasNext >= pageNumber || pageNumber === 0) {
-            const [inifiniteVips, hasNextPage] = getInfiniteVips(_.isArray(vips) && !_.isEmpty(vips) ? vips : [], pageNumber, PAGE_SIZE);
-            const localGroupedVips = groupByDate(_.isArray(inifiniteVips) && !_.isEmpty(inifiniteVips) ? inifiniteVips : [],
-                existingVips,
-                setExistingVips,
-                pageNumber
-            );
-            if (isLastPage) setHasNext(hasNextPage);
-            setGroupedVips(localGroupedVips);
-        }
+        const [inifiniteVips, hasNextPage] = getInfiniteVips(_.isArray(vips) && !_.isEmpty(vips) ? vips : [], pageNumber, PAGE_SIZE);
+        const localGroupedVips = groupByDate(_.isArray(inifiniteVips) && !_.isEmpty(inifiniteVips) ? inifiniteVips : [],
+            existingVips,
+            setExistingVips,
+            pageNumber
+        );
+        if (isLastPage) setHasNext(hasNextPage);
+        setGroupedVips(localGroupedVips);
     }, [existingVips, pageNumber, vips, setExistingVips, hasNext, setHasNext, isLastPage]);
 
     useEffect(() => {
@@ -70,6 +69,7 @@ const EachPage = ({
         checkedAllGroups, setCheckedAllGroups,
         indeterminateGroups, setIndeterminateGroups,
         sumUpGroups, setSumUpGroups,
+        currentWord, setCurrentWord
     }
 
     return <Grid container {...Props.GCRSC}>

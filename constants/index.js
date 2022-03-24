@@ -61,3 +61,6 @@ export const SET_THEME = "SET_THEME";
 
 export const BLUR_SCREEN = "BLUR_SCREEN";
 export const UNBLUR_SCREEN = "UNBLUR_SCREEN";
+
+export const FORCE_RELOAD = "FORCE_RELOAD";
+export const DONE_RELOAD = "DONE_RELOAD";

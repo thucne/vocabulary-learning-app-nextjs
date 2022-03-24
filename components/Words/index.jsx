@@ -15,6 +15,8 @@ import {
     LaunchRounded as LaunchRoundedIcon
 } from '@mui/icons-material';
 
+import VolumeOffIcon from '@mui/icons-material/VolumeOff';
+
 import { Props, SXs, Fonts, Colors } from '@styles';
 import { deepExtractObjectStrapi, getAudioUrl } from '@utils';
 import { AUDIO_ALT } from '@consts';
@@ -81,6 +83,8 @@ const ResultInfo = ({ vip, index }) => {
     const photo = vip?.illustration;
     const english = vip?.meanings?.english;
     const vietnamese = vip?.meanings?.vietnamese;
+    const illustrationExist = !vip?.illustrationIsDefault;
+    const noAudio = !audio || (!loadingAudio && !audioUrl);
 
 
     const author = vip?.author?.name;
@@ -232,13 +236,22 @@ const ResultInfo = ({ vip, index }) => {
                             </Typography>
 
                             {
-                                !loadingAudio ? <IconButton
+                                noAudio && <VolumeOffIcon
+                                    sx={{
+                                        fontSize: Fonts.FS_16, ml: 0.5,
+                                        color: (theme) => theme.palette.mainPublicWord.main
+                                    }}
+                                />
+                            }
+
+                            {
+                                !noAudio && (!loadingAudio ? <IconButton
                                     disabled={!audio}
                                     onClick={() => audioRef.current.play()}
                                     sx={{ fontSize: Fonts.FS_16, height: '25px', width: '25px', ml: 0.5 }}
                                 >
                                     <VolumeUpRoundedIcon fontSize='inherit' sx={{ color: (theme) => theme.palette.mainPublicWord.main }} />
-                                </IconButton> : <CircularProgress size={16} sx={{ ml: 0.5 }} />
+                                </IconButton> : <CircularProgress size={16} sx={{ ml: 0.5 }} />)
                             }
 
                             <audio ref={audioRef}>
@@ -251,7 +264,7 @@ const ResultInfo = ({ vip, index }) => {
 
                 <Grid item {...Props.GIRCC}>
                     {
-                        !_.isEmpty(photo) && (
+                        !_.isEmpty(photo) && illustrationExist && (
                             <div style={{
                                 position: "relative",
                                 width: 96,
@@ -404,7 +417,7 @@ const EachEvidence = ({ evidence }) => {
         <Grid item xs={12}>
             <Paper variant="outlined" sx={{ p: 1 }}>
                 <Typography variant="body1" component="h2" className='overflowTypography'
-                 sx={{color: theme => theme.palette.mainPublicWord.main}}
+                    sx={{ color: theme => theme.palette.mainPublicWord.main }}
                 >
                     <b>[{key === 'vip' ? 'word' : key}]</b> {parser(highlighted?.replaceAll(",", ", "))}
                 </Typography>

@@ -10,6 +10,7 @@ import recaptcha from "./recaptcha";
 import confirmDialog from "./confirmDialog";
 import theme from "./theme";
 import blurScreen from "./blurScreen";
+import reload from "./reload";
 
 const rootReducer = combineReducers({
     user,
@@ -22,7 +23,8 @@ const rootReducer = combineReducers({
     recaptcha,
     confirmDialog,
     theme,
-    blurScreen
+    blurScreen,
+    reload
 });
 
 export default rootReducer;

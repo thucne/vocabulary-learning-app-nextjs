@@ -1,25 +1,41 @@
 import React, { useState, useEffect } from 'react';
 
+import Router from 'next/router';
+
 import {
     Checkbox, Grid, Typography, IconButton,
-    Paper, Avatar, MenuItem, ListItem, ListItemButton,
-    Divider,
+    Paper, ListItem, ListItemButton,
+    Divider, Tooltip, ClickAwayListener,
+    Menu, MenuItem
 } from '@mui/material';
 
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
 import CheckBoxRoundedIcon from '@mui/icons-material/CheckBoxRounded';
 import CheckBoxOutlineBlankRoundedIcon from '@mui/icons-material/CheckBoxOutlineBlankRounded';
+import EditIcon from '@mui/icons-material/Edit';
+import LaunchRoundedIcon from '@mui/icons-material/LaunchRounded';
+
+import { styled, alpha } from '@mui/material/styles';
 
 import { Props, SXs, Colors, Fonts } from '@styles';
 import { getAudioUrl } from '@utils';
 
 import LoadingImage from '@components/LoadingImage';
+import WordSnippet from "./WordSnippet";
 
 import _ from 'lodash';
 
-const EachWord = ({ vip, selectedVips, setSelectedVips }) => {
+const EachWord = ({ vip, selectedVips, setSelectedVips, setCurrentWord }) => {
     const [expand, setExpand] = useState(false);
     const [audioUrl, setAudioUrl] = useState("");
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+
+
+    const [tooltips, setTooltips] = useState({
+        examples: false,
+        meanings: false
+    });
 
     const meaningsCount = (vip?.meanings?.english?.length || 0) + (vip?.meanings?.vietnamese?.length || 0);
     const examplesCount = vip?.examples?.length || 0;
@@ -35,6 +51,9 @@ const EachWord = ({ vip, selectedVips, setSelectedVips }) => {
     const tagsCount = vip?.tags?.length;
 
     const audio = vip?.audio;
+
+    const type1 = vip?.type1;
+    const type2 = vip?.type2;
 
     useEffect(() => {
         const run = async () => {
@@ -57,8 +76,34 @@ const EachWord = ({ vip, selectedVips, setSelectedVips }) => {
         setSelectedVips(vip.id)
     }
 
+    const handleTooltipClose = (isMeaning) => {
+        setTooltips({
+            ...tooltips,
+            [isMeaning ? "meanings" : "examples"]: false
+        })
+    };
+
+    const handleTooltipOpen = (isMeaning) => {
+        setTooltips({
+            ...tooltips,
+            [isMeaning ? "meanings" : "examples"]: true
+        })
+    };
+
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
     return (
-        <Paper variant='outlined' sx={{ mx: 1, my: 0.5, overflow: 'hidden' }}>
+        <Paper variant='outlined' sx={{
+            mx: 1, my: 0.5, overflow: 'hidden',
+            borderColor: theme => expand ? Colors.DIALOG_BLUE : theme.palette.divider,
+            borderWidth: expand ? 2 : 1
+        }}>
             <ListItem sx={{ borderRadius: '4px' }} disablePadding>
                 <ListItemButton sx={{ p: 1, pl: 0, borderRadius: '4px' }} onClick={handleClickExpand}>
                     <Grid container {...Props.GCRSC}>
@@ -71,7 +116,7 @@ const EachWord = ({ vip, selectedVips, setSelectedVips }) => {
                         </Grid>
                         <Grid item xs {...Props.GIRCC}>
                             <Grid container {...Props.GCRBC}>
-                                <Grid item xs={5}>
+                                <Grid item xs={5} sm={7}>
                                     <Typography className='overflow Typography' sx={{
                                         fontWeight: Fonts.FW_500,
                                         color: theme => theme.palette.publicWord3.main
@@ -90,22 +135,62 @@ const EachWord = ({ vip, selectedVips, setSelectedVips }) => {
                                         draggable={false}
                                     />
                                 </Grid>
+                                <ClickAwayListener onClickAway={(e) => handleTooltipClose(true)}>
+                                    <Grid item sx={{ px: 0.5 }}>
+                                        <Tooltip
+                                            PopperProps={{
+                                                disablePortal: true,
+                                            }}
+                                            onClose={() => handleTooltipClose(true)}
+                                            onClick={(e) => e.stopPropagation()}
+                                            open={tooltips.meanings}
+                                            disableFocusListener
+                                            disableHoverListener
+                                            disableTouchListener
+                                            title="Number of meanings"
+                                        >
+                                            <Paper sx={styles.meaningsCount} elevation={0} onClick={() => handleTooltipOpen(true)}>
+                                                <Typography className='overflowTypography'>
+                                                    {meaningsCount}
+                                                </Typography>
+                                            </Paper>
+                                        </Tooltip>
+                                    </Grid>
+                                </ClickAwayListener>
+                                <ClickAwayListener onClickAway={(e) => handleTooltipClose()}>
+                                    <Grid item sx={{ px: 0.5 }}>
+                                        <Tooltip
+                                            PopperProps={{
+                                                disablePortal: true,
+                                            }}
+                                            onClose={() => handleTooltipClose()}
+                                            onClick={(e) => e.stopPropagation()}
+                                            open={tooltips.examples}
+                                            disableFocusListener
+                                            disableHoverListener
+                                            disableTouchListener
+                                            title="Number of examples"
+                                        >
+                                            <Paper sx={styles.examplesCount} elevation={0} onClick={() => handleTooltipOpen()}>
+                                                <Typography className='overflowTypography'>
+                                                    {examplesCount}
+                                                </Typography>
+                                            </Paper>
+                                        </Tooltip>
+                                    </Grid>
+                                </ClickAwayListener>
                                 <Grid item sx={{ px: 0.5 }}>
-                                    <Paper sx={styles.meaningsCount} elevation={0}>
-                                        <Typography className='overflowTypography'>
-                                            {meaningsCount}
-                                        </Typography>
-                                    </Paper>
-                                </Grid>
-                                <Grid item sx={{ px: 0.5 }}>
-                                    <Paper sx={styles.examplesCount} elevation={0}>
-                                        <Typography className='overflowTypography'>
-                                            {examplesCount}
-                                        </Typography>
-                                    </Paper>
-                                </Grid>
-                                <Grid item sx={{ px: 0.5 }}>
-                                    <IconButton aria-label='more' onClick={e => e.stopPropagation()}>
+                                    <IconButton
+                                        aria-label='more'
+                                        onClick={e => {
+                                            e.stopPropagation();
+                                            handleClick(e);
+                                        }}
+                                        id={`demo-customized-button-${vip.id}`}
+                                        aria-controls={open ? `demo-customized-menu-${vip.id}` : undefined}
+                                        aria-haspopup="true"
+                                        aria-expanded={open ? 'true' : undefined}
+                                    >
                                         <MoreVertRoundedIcon />
                                     </IconButton>
                                 </Grid>
@@ -114,6 +199,30 @@ const EachWord = ({ vip, selectedVips, setSelectedVips }) => {
                     </Grid>
                 </ListItemButton>
             </ListItem>
+            <StyledMenu
+                id={`demo-customized-menu-${vip.id}`}
+                MenuListProps={{
+                    'aria-labelledby': `demo-customized-button-${vip.id}`,
+                }}
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+            >
+                <MenuItem onClick={() => {
+                    handleClose();
+                    setCurrentWord(vip);
+                }}>
+                    <EditIcon />
+                    Edit
+                </MenuItem>
+                <MenuItem onClick={() => {
+                    handleClose();
+                    Router.push(vip?.public ? `/word/public/${vip?.vip}/${vip?.id}` : `/word/${vip?.vip}/${vip?.id}`)
+                }}>
+                    <LaunchRoundedIcon />
+                    Open
+                </MenuItem>
+            </StyledMenu>
             {
                 expand && <Grid container {...Props.GCRSC} sx={{
                     p: 1,
@@ -264,11 +373,56 @@ const EachWord = ({ vip, selectedVips, setSelectedVips }) => {
                             </Grid>
                         </Grid>
                     </Grid>
+
+                    <Grid item xs={12} p={1}>
+                        <WordSnippet vip={vip} />
+                    </Grid>
                 </Grid>
             }
         </Paper>
     );
 }
+
+const StyledMenu = styled((props) => (
+    <Menu
+        elevation={0}
+        anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right',
+        }}
+        transformOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+        }}
+        {...props}
+    />
+))(({ theme }) => ({
+    '& .MuiPaper-root': {
+        borderRadius: 6,
+        marginTop: theme.spacing(1),
+        // minWidth: 180,
+        color:
+            theme.palette.mode === 'light' ? 'rgb(55, 65, 81)' : theme.palette.grey[300],
+        boxShadow:
+            'rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px',
+        '& .MuiMenu-list': {
+            padding: '4px 0',
+        },
+        '& .MuiMenuItem-root': {
+            '& .MuiSvgIcon-root': {
+                fontSize: 18,
+                color: theme.palette.text.secondary,
+                marginRight: theme.spacing(1.5),
+            },
+            '&:active': {
+                backgroundColor: alpha(
+                    theme.palette.primary.main,
+                    theme.palette.action.selectedOpacity,
+                ),
+            },
+        },
+    },
+}));
 
 const styles = {
     examplesCount: {

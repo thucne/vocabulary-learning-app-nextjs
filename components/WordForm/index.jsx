@@ -52,7 +52,7 @@ import LoadingImage from "@components/LoadingImage";
 import ListArrayInputs from "./FormComponents/ListArrayInputs";
 import ListInputs from "./FormComponents/ListInputs";
 
-import { IMAGE_ALT, VIP_TYPES, SHOW_SNACKBAR } from "@consts";
+import { IMAGE_ALT, VIP_TYPES, SHOW_SNACKBAR, FORCE_RELOAD } from "@consts";
 import { fetcherJWT, createVIP } from "@actions";
 import {
     useWindowSize,
@@ -154,7 +154,7 @@ export default function CreateNewWord({ open = false, setOpen }) {
 
     const photoSizes = useThisToGetSizesFromRef(photoRef, {
         revalidate: 1000,
-        terminalCondition: ({ width }) => width !== 0,
+        // terminalCondition: ({ width }) => width !== 0,
         falseCondition: ({ width }) => width === 0,
     });
 
@@ -197,7 +197,10 @@ export default function CreateNewWord({ open = false, setOpen }) {
                         adHocFetch({
                             dispatch,
                             action: createVIP(formData),
-                            onSuccess: (data) => resetWhole(),
+                            onSuccess: (data) => {
+                                resetWhole();
+                                dispatch({ type: FORCE_RELOAD });
+                            },
                             onError: (error) => console.log(error),
                             onStarting: () => setLoading(true),
                             onFinally: () => setLoading(false),
@@ -216,32 +219,34 @@ export default function CreateNewWord({ open = false, setOpen }) {
                 return;
             }
             try {
-                setFetchingAPI(true);
-                const res = await fetch(
-                    `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(
-                        value.toString().toLowerCase()
-                    )}`
-                );
-                const data = await res.json();
-
-                setFetchingAPI(false);
-
-                const firstData = data?.[0];
-
-                if (
-                    !data.message &&
-                    firstData?.word === value.toString().toLowerCase()
-                ) {
-                    const processedData = handleDictionaryData(
-                        firstData,
-                        vocabTypes,
-                        settings,
-                        value.toString().toLowerCase()
+                if (!fetchingAPI) {
+                    setFetchingAPI(true);
+                    const res = await fetch(
+                        `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(
+                            value.toString().toLowerCase()
+                        )}`
                     );
+                    const data = await res.json();
 
-                    setForm((form) => ({ ...form, ...processedData, auto: true }));
-                } else {
-                    setForm((form) => ({ ...form, ...resetSome }));
+                    setFetchingAPI(false);
+
+                    const firstData = data?.[0];
+
+                    if (
+                        !data.message &&
+                        firstData?.word === value.toString().toLowerCase()
+                    ) {
+                        const processedData = handleDictionaryData(
+                            firstData,
+                            vocabTypes,
+                            settings,
+                            value.toString().toLowerCase()
+                        );
+
+                        setForm((form) => ({ ...form, ...processedData, auto: true }));
+                    } else {
+                        setForm((form) => ({ ...form, ...resetSome }));
+                    }
                 }
             } catch (e) {
                 console.log(e);
@@ -249,15 +254,15 @@ export default function CreateNewWord({ open = false, setOpen }) {
                 setFetchingAPI(false);
             }
         },
-        [vocabTypes, settings]
+        [vocabTypes, settings, fetchingAPI]
     );
 
     const debounceFunction = useMemo(
         () =>
-            debounce((e) => {
+            debounce(async (e) => {
                 handleChangeValue(e, "vip");
                 checkInputCriteria(e, "vip");
-                handleFetchPronouce(e.target.value);
+                await handleFetchPronouce(e.target.value);
             }, 1000),
         [handleFetchPronouce, checkInputCriteria]
     );

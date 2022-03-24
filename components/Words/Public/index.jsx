@@ -15,6 +15,7 @@ import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded';
 import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove';
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 import ShareIcon from '@mui/icons-material/Share';
+import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 
 import { Props, SXs, Fonts, Colors } from '@styles';
 import { getAudioUrl, useThisToGetSizesFromRef, getNRelatedVips } from '@utils';
@@ -62,6 +63,8 @@ const PublicWord = ({ vip, relatedVips: externalRelatedVips, unsplashVip }) => {
     const tags = vip?.tags;
 
     const photo = vip?.illustration;
+    const illustrationExist = !vip?.illustrationIsDefault;
+    const noAudio = !audio || (!loadingAudio && !audioUrl);
 
     const splitWord = vip?.vip?.split(" ");
     const regex = new RegExp(splitWord?.join("|"), "gi");
@@ -302,13 +305,22 @@ const PublicWord = ({ vip, relatedVips: externalRelatedVips, unsplashVip }) => {
                             </Typography>
 
                             {
-                                !loadingAudio ? <IconButton
+                                noAudio && <VolumeOffIcon
+                                    sx={{
+                                        fontSize: Fonts.FS_16, ml: 0.5,
+                                        color: (theme) => theme.palette.mainPublicWord.main
+                                    }}
+                                />
+                            }
+
+                            {
+                                !noAudio && (!loadingAudio ? <IconButton
                                     disabled={!audio}
                                     onClick={() => audioRef.current.play()}
                                     sx={{ fontSize: Fonts.FS_16, height: '25px', width: '25px', ml: 0.5 }}
                                 >
                                     <VolumeUpRoundedIcon fontSize='inherit' sx={{ color: (theme) => theme.palette.mainPublicWord.main }} />
-                                </IconButton> : <CircularProgress size={16} sx={{ ml: 0.5 }} />
+                                </IconButton> : <CircularProgress size={16} sx={{ ml: 0.5 }} />)
                             }
 
                             <audio ref={audioRef}>
@@ -362,7 +374,7 @@ const PublicWord = ({ vip, relatedVips: externalRelatedVips, unsplashVip }) => {
                         </Divider>
 
                         {
-                            !_.isEmpty(photo) && (
+                            !_.isEmpty(photo) && illustrationExist && (
                                 <div style={{
                                     position: "relative",
                                     width: 192,

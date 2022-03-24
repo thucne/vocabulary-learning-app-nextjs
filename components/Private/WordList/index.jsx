@@ -4,47 +4,33 @@ import { useDispatch, useSelector } from "react-redux";
 import {
     Container,
     Grid,
-    Button,
-    IconButton,
     Typography,
-    Paper,
-    TextField,
 } from "@mui/material";
-import { Box } from "@mui/system";
 
 import { Fonts, Colors, Props, SXs } from "@styles";
-import { groupByDate, getWordList, gruopWordByDatePeriod, deepExtractObjectStrapi, useThisToGetPositionFromRef } from "@utils";
+import { deepExtractObjectStrapi } from "@utils";
 
-import DateLabesSection from "./DateLabelsSection";
 import EditForm from "./EditForm";
-import EachWord from "./EachWord";
 import Page from "./EachPage";
 
 import _ from "lodash";
 
 const WordList = () => {
-    const userData = useSelector((state) => state.userData);
-
-    const initWordList = useMemo(() => getWordList(userData), [userData]);
-
-    const [wordList, setWordList] = useState(initWordList);
-
-    // represent times fecth data
-    const [set, setSet] = useState(0);
-    const [endOfList, setEndOfList] = useState(false);
-    const [open, setOpen] = useState(false);
-    const [currentWord, setCurrentWord] = useState(null);
-    const [checkList, setCheckList] = useState([]);
     const listRef = useRef(null);
 
-    const [numOfPages, setNumOfPages] = useState(1);
+    const userData = useSelector((state) => state.userData);
 
+    const [currentWord, setCurrentWord] = useState(null);
+    const open = Boolean(currentWord);
+
+    const [numOfPages, setNumOfPages] = useState(1);
     const [existingVips, setExistingVips] = useState([]);
     const [hasNext, setHasNext] = useState(0);
     const [minimizedGroups, setMinimizedGroups] = useState([]);
     const [checkedAllGroups, setCheckedAllGroups] = useState([]);
     const [indeterminateGroups, setIndeterminateGroups] = useState({});
     const [sumUpGroups, setSumUpGroups] = useState([]);
+    const [changed, setChanged] = useState(false);
 
     const vips = deepExtractObjectStrapi(userData?.vips, {
         minifyPhoto: ['illustration']
@@ -57,6 +43,7 @@ const WordList = () => {
         checkedAllGroups, setCheckedAllGroups,
         indeterminateGroups, setIndeterminateGroups,
         sumUpGroups, setSumUpGroups,
+        currentWord, setCurrentWord
     }
 
     let pages = [];
@@ -70,6 +57,14 @@ const WordList = () => {
             {...pageProps}
         />)
     }
+
+    useEffect(() => { 
+        if (!changed) {
+            setNumOfPages(1);
+            setHasNext(0);
+            setChanged(true);
+        }
+    }, [vips, changed]);
 
     useEffect(() => {
 
@@ -92,30 +87,6 @@ const WordList = () => {
         setCurrentWord(null);
         setOpen(false);
     };
-
-    // const handleScroll = (e) => {
-    //     console.log('scrolling', listRef.current.scrollBottom);
-
-    //     if (listRef.current.scrollBottom === 0) {
-    //         console.log('scroll bottom');
-    //         let fetchList = getWordList(userData, set + 1);
-    //         if (fetchList.length === 0) {
-    //             setEndOfList(true);
-    //             return;
-    //         }
-    //         setWordList((state) => [...fetchList, ...state]);
-    //         setCheckList((state) => [
-    //             ...Array.from(Array(fetchList.length), function (_, index) {
-    //                 return {
-    //                     id: fetchList[index].id,
-    //                     checked: false,
-    //                 };
-    //             }),
-    //             ...state,
-    //         ]);
-    //         setSet((state) => state + 1);
-    //     }
-    // };
 
     return (
         <Container maxWidth="md" disableGutters>
@@ -155,7 +126,6 @@ const WordList = () => {
                     handleClose={handleCloseDialog}
                     word={currentWord}
                     setCurrentWord={setCurrentWord}
-                    setOpen={setOpen}
                 />
             )}
         </Container>

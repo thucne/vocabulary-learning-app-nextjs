@@ -30,6 +30,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import MuiLink from "@mui/material/Link";
+import CircularProgress from '@mui/material/CircularProgress';
 
 import SearchIcon from '@mui/icons-material/Search';
 import Brightness4Icon from "@mui/icons-material/Brightness4";
@@ -101,6 +102,7 @@ function ResponsiveDrawer(props) {
     const [scrolled, setScrolled] = useState(false);
     const [mounted, setMounted] = useState(false);
     const [openSearch, setOpenSearch] = useState(false);
+    const [forcingReload, setForcingReload] = useState(false);
 
     const myRef = useRef(null);
     const appBarRef = useRef(null);
@@ -111,6 +113,7 @@ function ResponsiveDrawer(props) {
     const bgColor = useSelector((state) => state?.bgColor);
     const userData = useSelector((state) => state?.userData);
     const blurScreen = useSelector((state) => state?.blurScreen);
+    const reload = useSelector((state) => state?.reload);
 
     const [width, height] = useWindowSize(appBarRef);
 
@@ -122,6 +125,13 @@ function ResponsiveDrawer(props) {
     // get words
     const { data, error, isValidating } = useSWR(getJWT() ? `${API}/api/users/me` : null, fetcher, {
         refreshInterval: refreshInterval,
+        onSuccess: () => {
+            if (reload) {
+                dispatch({ type: t.DONE_RELOAD });
+                dispatch({ type: t.HIDE_BACKDROP });
+                setForcingReload(false);
+            }
+        }
     });
 
     useEffect(() => {
@@ -138,9 +148,17 @@ function ResponsiveDrawer(props) {
             });
         } else {
             // increase refresh interval
-            setRefreshInterval(prev => prev > 60000 ? 1000 : prev + 1000);
+            setRefreshInterval(prev => prev > 10000 ? 1000 : prev + 1000);
         }
     }, [data, error, isValidating, dispatch, userData]);
+
+    useEffect(() => {
+        if (reload && !isValidating) {
+            dispatch({ type: t.SHOW_BACKDROP });
+            setForcingReload(true);
+            setRefreshInterval(1);
+        }
+    }, [reload, isValidating, dispatch]);
 
     useMemo(() => {
         if (trigger) {
@@ -356,6 +374,9 @@ function ResponsiveDrawer(props) {
                                                     <GlobalSearch />
                                                 </Grid>
                                             }
+                                            {
+                                                forcingReload && <CircularProgress size={30} color='white' sx={{ mr: 1 }} />
+                                            }
                                             <IconButton
                                                 sx={{
                                                     ...SXs.MUI_NAV_ICON_BUTTON,
@@ -502,6 +523,9 @@ function ResponsiveDrawer(props) {
                                             landing && windowSize?.width >= theme.breakpoints.values.sm && <Grid item display={['none', 'flex']}>
                                                 <GlobalSearch />
                                             </Grid>
+                                        }
+                                        {
+                                            forcingReload && <CircularProgress size={30} color='white' sx={{ mr: 1 }} />
                                         }
                                         <IconButton
                                             sx={{

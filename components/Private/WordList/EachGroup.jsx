@@ -4,16 +4,23 @@ import {
     Grid, Paper, Typography, IconButton,
     Divider, Chip, Button, Checkbox,
     FormControlLabel, FormGroup, FormControl,
-    MenuItem
+    MenuItem, CircularProgress
 } from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
 
 import ExpandLessRoundedIcon from '@mui/icons-material/ExpandLessRounded';
 import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded';
+import DeleteForeverRoundedIcon from '@mui/icons-material/DeleteForeverRounded';
 
 import { Props, SXs } from '@styles';
 
 import EachWord from './EachWord';
 import _ from 'lodash';
+
+import { useDispatch } from 'react-redux';
+import * as t from '@consts';
+import { RECAPTCHA } from '@config';
+import { deleteManyVIPs } from '@actions';
 
 const EachGroup = ({
     group, pageNumber,
@@ -21,10 +28,14 @@ const EachGroup = ({
     checkedAllGroups, setCheckedAllGroups,
     sumUpGroups, setSumUpGroups,
     indeterminateGroups, setIndeterminateGroups,
+    currentWord, setCurrentWord
 }) => {
+    const dispatch = useDispatch();
+
     const [selectedVips, setSelectedVips] = useState([]);
     const [localCheckAllGroups, setLocalCheckAllGroups] = useState([]);
     const [previousExist, setPreviousExist] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const vips = group.data;
     const label = group.date;
@@ -34,6 +45,7 @@ const EachGroup = ({
     const isIndeterminate = indeterminateGroups?.[label]?.length > 0
         && indeterminateGroups?.[label]?.length < totalVips;
     const numberOfSelectedVips = indeterminateGroups?.[label]?.length;
+    const indeterminateSelectedVips = indeterminateGroups?.[label];
 
     useEffect(() => {
         if (!_.isEqual(checkedAllGroups, localCheckAllGroups) && previousExist !== checkedAllGroups.includes(label)) {
@@ -77,6 +89,7 @@ const EachGroup = ({
         });
     }
 
+
     const checkIndeterminate = (newCheckedAllGroups) => {
         if (newCheckedAllGroups.includes(label)) {
             setIndeterminateGroups(prev => ({
@@ -89,6 +102,45 @@ const EachGroup = ({
                 [label]: []
             }))
         }
+    }
+
+    const handleDelete = (e) => {
+        e.preventDefault();
+
+        const nextAction = () => {
+
+            if (window?.adHocFetch && window?.grecaptcha) {
+                window.grecaptcha.ready(function () {
+                    window.grecaptcha
+                        .execute(`${RECAPTCHA}`, { action: "vip_authentication" })
+                        .then(function (token) {
+                            adHocFetch({
+                                dispatch,
+                                action: deleteManyVIPs({ token, data: indeterminateSelectedVips }),
+                                onSuccess: () => {
+                                    dispatch({ type: t.HIDE_CONFIRM_DIALOG });
+                                    dispatch({ type: t.FORCE_RELOAD });
+                                },
+                                onError: (error) => console.log(error),
+                                onStarting: () => setLoading(true),
+                                onFinally: () => setLoading(false),
+                                snackbarMessageOnSuccess: "Delete!",
+                            });
+                        });
+                });
+            }
+        }
+
+        dispatch({
+            type: t.SHOW_CONFIRM_DIALOG,
+            payload: {
+                title: "Warning",
+                message: "Are you sure you want to delete selected words? This action cannot be undone.",
+                onNext: nextAction,
+                nextText: "Delete",
+                type: 'danger'
+            }
+        })
     }
 
     return (
@@ -112,9 +164,14 @@ const EachGroup = ({
                             {label}
                         </Button>
                     </Divider>
-                    <Paper variant="outlined" sx={{ borderColor: 'transparent', pr: 1, pl: 0 }}>
+                    <Paper variant="outlined" sx={{
+                        borderColor: 'transparent', pr: 1, pl: 0,
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        width: '100%',
+                    }}>
                         <FormControlLabel
-                            label={numberOfSelectedVips > 0 ? `${numberOfSelectedVips} selected`:"Select all"}
+                            label={numberOfSelectedVips > 0 ? `${numberOfSelectedVips} selected` : "Select all"}
                             control={<Checkbox
                                 checked={checkedAllGroups.includes(label)}
                                 onChange={() => {
@@ -126,6 +183,18 @@ const EachGroup = ({
                             />}
                             sx={{ margin: 0 }}
                         />
+                        {
+                            numberOfSelectedVips > 0 && <IconButton
+                                aria-label='Delete selected'
+                                disabled={loading}
+                                onClick={handleDelete}
+                                color='primary'
+                            >
+                                {
+                                    !loading ? <DeleteForeverRoundedIcon /> : <CircularProgress size={22} />
+                                }
+                            </IconButton>
+                        }
                     </Paper>
                 </Grid>
             }
@@ -136,6 +205,8 @@ const EachGroup = ({
                         vip={vip}
                         selectedVips={selectedVips}
                         setSelectedVips={toggleSelected}
+                        currentWord={currentWord}
+                        setCurrentWord={setCurrentWord}
                     />
                 </Grid>)
             }

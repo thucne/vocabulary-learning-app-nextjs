@@ -150,6 +150,20 @@ export const updateManyVIPs = (data) => async (dispatch) => {
         .catch((err) => handleServerError(err));
 };
 
+export const deleteManyVIPs = (data) => async (dispatch) => {
+    if (!data || !getJWT()) {
+        return { error: "Empty body or jwt." };
+    }
+    return await axios
+        .put(`${API}/api/delvips`, data, {
+            headers: {
+                Authorization: `Bearer ${getJWT()}`,
+            }
+        })
+        .then((res) => handleCommonResponse(res))
+        .catch((err) => handleServerError(err));
+};
+
 
 export const updateSettings = (id, data) => async dispatch => {
     if (!data || !getJWT()) {
