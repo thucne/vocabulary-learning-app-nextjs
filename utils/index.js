@@ -1031,7 +1031,7 @@ export const getInfiniteVips = (wordList = [], page = 0, limit = 8) => {
     let sliced = local.slice(skip, skip + limit)
 
     // check if there can be next page
-    let nextSkip = skip + limit;
+    let nextSkip = (page + 1) * limit;
     let nextSliced = local.slice(nextSkip, nextSkip + limit)
 
     let hasNext = nextSliced.length > 0 ? page + 1 : -1;

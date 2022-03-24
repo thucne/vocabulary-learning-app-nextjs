@@ -36,8 +36,6 @@ const EachWord = ({ vip, selectedVips, setSelectedVips }) => {
 
     const audio = vip?.audio;
 
-    console.log(vip)
-
     useEffect(() => {
         const run = async () => {
             setAudioUrl("");

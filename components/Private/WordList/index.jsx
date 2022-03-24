@@ -13,7 +13,7 @@ import {
 import { Box } from "@mui/system";
 
 import { Fonts, Colors, Props, SXs } from "@styles";
-import { groupByDate, getWordList, gruopWordByDatePeriod, deepExtractObjectStrapi, getInfiniteVips } from "@utils";
+import { groupByDate, getWordList, gruopWordByDatePeriod, deepExtractObjectStrapi, useThisToGetPositionFromRef } from "@utils";
 
 import DateLabesSection from "./DateLabelsSection";
 import EditForm from "./EditForm";
@@ -37,7 +37,7 @@ const WordList = () => {
     const [checkList, setCheckList] = useState([]);
     const listRef = useRef(null);
 
-    const [numOfPages, setNumOfPages] = useState(0);
+    const [numOfPages, setNumOfPages] = useState(1);
 
     const [existingVips, setExistingVips] = useState([]);
     const [hasNext, setHasNext] = useState(0);
@@ -66,79 +66,56 @@ const WordList = () => {
             key={`eachpage-${i}`}
             vips={vips}
             pageNumber={i}
+            isLastPage={i === numOfPages - 1}
             {...pageProps}
         />)
     }
 
     useEffect(() => {
-        //scroll to bottom
-        if (listRef.current.scrollHeight === listRef.current.clientHeight) {
-            listRef.current.scrollTop = listRef.current.scrollHeight;
-        } else {
-            listRef.current.scrollTop =
-                listRef.current.scrollHeight - listRef.current.clientHeight;
+
+        const debounceSet = _.debounce((isBottom) => {
+            if (isBottom && (hasNext > -1) && (hasNext >= numOfPages)) {
+                setNumOfPages(prev => prev + 1);
+            }
+        }, 1000);
+
+        const handleScroll = () => {
+            let isBottom = listRef?.current?.scrollHeight - listRef?.current?.scrollTop === listRef?.current?.clientHeight;
+            debounceSet(isBottom);
         }
-    }, [userData]);
+        document.addEventListener('scroll', handleScroll);
+        return () => document.removeEventListener('scroll', handleScroll);
 
-    useEffect(() => {
-        const fectchWordList = getWordList(userData);
-        setWordList(fectchWordList);
-
-        setCheckList(
-            Array.from(Array(fectchWordList.length), function (_, index) {
-                return {
-                    id: fectchWordList[index].id,
-                    checked: false,
-                };
-            })
-        );
-    }, [userData]);
-
-    const handleUpdateCheckList = (udList, value) => {
-        let tempt = [...checkList];
-        tempt.map((element, index) => {
-            if (udList.includes(element.id)) {
-                tempt[index].checked = value;
-            }
-        });
-        setCheckList([...tempt]);
-    };
-
-    const handleCheckSingleBox = (id) => {
-        let tempt = [...checkList];
-        tempt.map((element, index) => {
-            if (element.id === id) {
-                tempt[index].checked = !element.checked;
-            }
-        });
-        setCheckList([...tempt]);
-    };
+    }, [hasNext, numOfPages]);
 
     const handleCloseDialog = () => {
         setCurrentWord(null);
         setOpen(false);
     };
 
-    const handleScroll = () => {
-        if (listRef.current.scrollBottom === 0) {
-            let fetchList = getWordList(userData, set + 1);
-            if (fetchList.length === 0) {
-                setEndOfList(true);
-                return;
-            }
-            setWordList((state) => [...fetchList, ...state]);
-            setCheckList((state) => [
-                ...Array.from(Array(fetchList.length), function (_, index) {
-                    return {
-                        id: fetchList[index].id,
-                        checked: false,
-                    };
-                }),
-                ...state,
-            ]);
-            setSet((state) => state + 1);
-        }
-    };
+    // const handleScroll = (e) => {
+    //     console.log('scrolling', listRef.current.scrollBottom);
+
+    //     if (listRef.current.scrollBottom === 0) {
+    //         console.log('scroll bottom');
+    //         let fetchList = getWordList(userData, set + 1);
+    //         if (fetchList.length === 0) {
+    //             setEndOfList(true);
+    //             return;
+    //         }
+    //         setWordList((state) => [...fetchList, ...state]);
+    //         setCheckList((state) => [
+    //             ...Array.from(Array(fetchList.length), function (_, index) {
+    //                 return {
+    //                     id: fetchList[index].id,
+    //                     checked: false,
+    //                 };
+    //             }),
+    //             ...state,
+    //         ]);
+    //         setSet((state) => state + 1);
+    //     }
+    // };
 
     return (
         <Container maxWidth="md" disableGutters>
@@ -166,16 +143,9 @@ const WordList = () => {
                     xs={12}
                     mt={[5, 5, 3]}
                     ref={listRef}
-                    onScroll={handleScroll}
                     {...Props.GICCC}
                 >
                     {pages}
-                    <Button
-                        onClick={() => setNumOfPages(prev => prev + 1)}
-                        disabled={!(hasNext > -1)}
-                    >
-                        Load more
-                    </Button>
                 </Grid>
             </Grid>
 
