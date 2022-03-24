@@ -43,10 +43,23 @@ const EachPage = ({
     useEffect(() => {
         groupedVips.forEach((group) => {
             let conditionA = sumUpGroups.findIndex(item => item.label === group.date && item.id === pageNumber) === -1;
-            let conditionB = !_.isEqual(sumUpGroups, [...sumUpGroups, { id: pageNumber, label: group.date, count: group.data.length }]);
+            let conditionB = !_.isEqual(sumUpGroups, [
+                ...sumUpGroups,
+                {
+                    id: pageNumber,
+                    label: group.date,
+                    count: group.data.length,
+                    ids: group.data.map(item => item.id)
+                }]);
 
             if (conditionA && conditionB) {
-                setSumUpGroups(prev => _.uniqWith([...prev, { id: pageNumber, label: group.date, count: group.data.length }], _.isEqual));
+                setSumUpGroups(prev => _.uniqWith([
+                    ...prev, {
+                        id: pageNumber,
+                        label: group.date,
+                        count: group.data.length,
+                        ids: group.data.map(item => item.id)
+                    }], _.isEqual));
             }
         })
     }, [groupedVips, pageNumber, sumUpGroups, setSumUpGroups]);

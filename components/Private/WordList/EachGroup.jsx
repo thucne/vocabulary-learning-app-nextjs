@@ -3,7 +3,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
     Grid, Paper, Typography, IconButton,
     Divider, Chip, Button, Checkbox,
-    FormControlLabel, FormGroup, FormControl
+    FormControlLabel, FormGroup, FormControl,
+    MenuItem
 } from '@mui/material';
 
 import ExpandLessRoundedIcon from '@mui/icons-material/ExpandLessRounded';
@@ -29,7 +30,10 @@ const EachGroup = ({
     const label = group.date;
     const displayLabel = group.isDisplay;
     const totalVips = _.groupBy(sumUpGroups, 'label')?.[label]?.reduce((acc, cur) => acc + cur.count, 0);
-    const isIndeterminate = indeterminateGroups?.[label]?.length > 0 && indeterminateGroups?.[label]?.length < totalVips;
+    const vipIds = _.groupBy(sumUpGroups, 'label')?.[label]?.reduce((acc, cur) => acc.concat(cur.ids), []);
+    const isIndeterminate = indeterminateGroups?.[label]?.length > 0
+        && indeterminateGroups?.[label]?.length < totalVips;
+    const numberOfSelectedVips = indeterminateGroups?.[label]?.length;
 
     useEffect(() => {
         if (!_.isEqual(checkedAllGroups, localCheckAllGroups) && previousExist !== checkedAllGroups.includes(label)) {
@@ -51,9 +55,8 @@ const EachGroup = ({
 
             // check selected in indeterminate
             setIndeterminateGroups(prev => {
-                let rs = _.uniq([...(prev?.[label] || []), ...selectedVips]).filter(item => isFilterOut ? item !== id : true);
-                
-                console.log(rs.length)
+                let rs = _.uniq([...(prev?.[label] || []), ...newVal]).filter(item => isFilterOut ? item !== id : true);
+
                 if (rs.length === totalVips) {
                     const newCheckedAllGroups = checkedAllGroups.includes(label) ? checkedAllGroups : [...checkedAllGroups, label];
                     setCheckedAllGroups(newCheckedAllGroups);
@@ -74,8 +77,22 @@ const EachGroup = ({
         });
     }
 
+    const checkIndeterminate = (newCheckedAllGroups) => {
+        if (newCheckedAllGroups.includes(label)) {
+            setIndeterminateGroups(prev => ({
+                ...prev,
+                [label]: vipIds
+            }))
+        } else {
+            setIndeterminateGroups(prev => ({
+                ...prev,
+                [label]: []
+            }))
+        }
+    }
+
     return (
-        <Grid container {...Props.GCRCS}>
+        <Grid container {...Props.GCRCC}>
             {
                 displayLabel && label && <Grid item xs={12} {...Props.GICCS} mx={1} my={0.5}>
                     <Divider sx={{ width: '100%', my: 2 }}>
@@ -95,14 +112,15 @@ const EachGroup = ({
                             {label}
                         </Button>
                     </Divider>
-                    <Paper variant="outlined" sx={{ borderColor: 'transparent' }}>
+                    <Paper variant="outlined" sx={{ borderColor: 'transparent', pr: 1, pl: 0 }}>
                         <FormControlLabel
-                            label="Select All"
+                            label={numberOfSelectedVips > 0 ? `${numberOfSelectedVips} selected`:"Select all"}
                             control={<Checkbox
                                 checked={checkedAllGroups.includes(label)}
                                 onChange={() => {
                                     const newCheckedAllGroups = checkedAllGroups.includes(label) ? checkedAllGroups.filter(g => g !== label) : [...checkedAllGroups, label];
                                     setCheckedAllGroups(newCheckedAllGroups);
+                                    checkIndeterminate(newCheckedAllGroups);
                                 }}
                                 indeterminate={isIndeterminate}
                             />}
@@ -118,7 +136,6 @@ const EachGroup = ({
                         vip={vip}
                         selectedVips={selectedVips}
                         setSelectedVips={toggleSelected}
-                    // defaultChecked={checkedAllGroups.includes(label)}
                     />
                 </Grid>)
             }

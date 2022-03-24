@@ -180,13 +180,15 @@ export const isValidHttpUrl = (string, canBeEmtyOrNull = false) => {
 };
 
 export function stringAvatar(name) {
+    let [bgcolor, origin] = getPastelColor(true);
     return {
         sx: {
-            bgcolor: stringToColor(name),
+            bgcolor,
+            origincolor: origin,
             width: 50,
             height: 50,
         },
-        children: `${name?.split(" ")?.[0]?.[0]}${name?.split(" ")?.[1]?.[0]}`,
+        children: `${name?.split(" ")?.[0]?.[0] || ''}${name?.split(" ")?.[1]?.[0] || ''}`,
     };
 }
 
@@ -829,7 +831,20 @@ export const shortenLink = (link, maxLength) => {
 
 }
 
-export function getPastelColor() {
+export function getPastelColor(getOrigin = false) {
+
+    if (getOrigin) {
+        let origin = 360 * Math.random();
+        return [
+            "hsl(" + origin + ',' +
+            (25 + 70 * Math.random()) + '%,' +
+            (85 + 10 * Math.random()) + '%)',
+            "hsl(" + origin + ',' +
+            (100) + '%,' +
+            (50) + '%)',
+        ]
+    }
+
     return "hsl(" + 360 * Math.random() + ',' +
         (25 + 70 * Math.random()) + '%,' +
         (85 + 10 * Math.random()) + '%)'
@@ -1075,9 +1090,12 @@ export const deepExtractObjectStrapi = (object = {}, options = {}) => {
                 const photoData = allKeys.filter(key => {
                     return minifyPhoto?.length ? minifyPhoto.includes(key) : false;
                 }).map(key => {
-                    const temp = object[key]?.data?.attributes;
+                    const temp = object[key]?.data?.attributes || object[key];
                     const photo = temp?.formats?.small?.url || temp?.formats?.medium?.url || temp?.formats?.large?.url || temp?.url;
-                    return { [key]: photo || (allowNullPhoto ? null : NO_PHOTO_SEO) }
+                    return {
+                        [key]: photo || (allowNullPhoto ? null : NO_PHOTO_SEO),
+                        [`${key}IsDefault`]: (photo || (allowNullPhoto ? null : NO_PHOTO_SEO)) === NO_PHOTO_SEO
+                    }
                 })
 
                 // convert to object

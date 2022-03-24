@@ -2,11 +2,11 @@ import React, { useState, useRef, useEffect, useCallback, useMemo } from "react"
 
 import Image from "next/image";
 
-import { Skeleton, Grid } from "@mui/material";
+import { Skeleton, Grid, Typography } from "@mui/material";
 
 import { IMAGE_ALT } from "@consts";
 import { useTheme } from "@mui/styles";
-import { useSelector } from 'react-redux';
+
 import _ from "lodash";
 
 const defaultImg = {
@@ -18,7 +18,7 @@ const defaultImg = {
 
 const Index = (props) => {
     const theme = useTheme();
-    const { doneLoading, bgColor, blurDataURL, ...imgProps } = useMemo(() => props, [props]);
+    const { doneLoading, bgColor, blurDataURL, borderRadius, ...imgProps } = useMemo(() => props, [props]);
 
     const [loading, setLoading] = useState(true);
     const [localProps, setLocalProps] = useState(defaultImg);
@@ -34,6 +34,10 @@ const Index = (props) => {
         return () => isMounted = false;
     }, [imgProps, localProps]);
 
+    if (!memoizedProps || !memoizedProps.src) {
+        return <div>No src found.</div>
+    }
+
     return (
         <div style={
             imgProps?.width && imgProps?.height ?
@@ -48,9 +52,15 @@ const Index = (props) => {
                         height: "100%",
                         opacity: loading ? (blurDataURL ? 1 : 0) : 1,
                         backgroundColor: bgColor || theme?.palette?.img_bg?.main,
+                        borderRadius: borderRadius || '0px',
+                        overflow: "hidden",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
                     }}
                 >
-                    {/*eslint-disable-next-line jsx-a11y/alt-text*/}
+
+                    {/* eslint-disable-next-line jsx-a11y/alt-text */}
                     <Image
                         {...memoizedProps}
                         onLoadingComplete={() => {
@@ -60,6 +70,7 @@ const Index = (props) => {
                             }
                         }}
                     />
+
                 </div>
             </div>
             {
@@ -83,8 +94,8 @@ const Index = (props) => {
                     <div
                         style={{
                             position: "absolute",
-                            width: 100,
-                            height: 100,
+                            width: imgProps?.width || 100,
+                            height: imgProps?.height || 100,
                             top: "50%",
                             left: "50%",
                             transform: "translate(-50%, -50%)",

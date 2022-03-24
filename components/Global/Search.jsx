@@ -61,7 +61,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
     const dispatch = useDispatch();
     const wordFirstResultRef = useRef(null);
     const directoryFirstResultRef = useRef(null);
-    const noExactMatchRef= useRef(null);
+    const noExactMatchRef = useRef(null);
 
     const actualSearchString = searchString?.replace(/(w:|W:)/, "")?.replace(/(d:|D:)/, "");
     const isDirectorySearch = /^(d:|D:)/.test(searchString);
@@ -270,7 +270,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                             </Grid>
                         }
                         {
-                            (!!wordResults?.length && !isDirectorySearch) && <Grid item xs={12} {...Props.GIRBC} sx={{ pt: 1, px: 1.5 }}>
+                            (!!wordResults?.length && !isDirectorySearch) && <Grid item xs={12} {...Props.GIRBC} sx={{ pt: 1, px: 3 }}>
                                 <Typography variant="h6">
                                     Word
                                 </Typography>
@@ -281,7 +281,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                                 }
                             </Grid>
                         }
-                        <MenuList sx={{ width: '100%', px: 1, display: (!!wordResults?.length && !isDirectorySearch) ? 'block' : 'none' }}>
+                        {(!!wordResults?.length && !isDirectorySearch) && <MenuList sx={{ width: '100%', px: 1 }}>
                             {
                                 !isThereExactMatch && <MenuItem
                                     aria-label={`/word/${actualSearchString}`}
@@ -339,7 +339,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                                                 <Grid item xs={12} {...Props.GIRBC}>
                                                     <Typography className='overflowTypography'>
                                                         No exact match for &quot;{actualSearchString}&quot;.
-                                                        Go to page of this word instead? 
+                                                        Go to page of this word instead?
                                                     </Typography>
                                                 </Grid>
                                             </Grid>
@@ -430,9 +430,9 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                                 })
                             }
                         </MenuList>
-
+                        }
                         {
-                            (!!results?.length && !isWordSearch) && <Grid item xs={12} {...Props.GIRBC} sx={{ pt: 1, px: 1.5 }}>
+                            (!!results?.length && !isWordSearch) && <Grid item xs={12} {...Props.GIRBC} sx={{ pt: 1, px: 3 }}>
                                 <Typography variant="h6">
                                     Directory
                                 </Typography>
@@ -443,7 +443,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                                 }
                             </Grid>
                         }
-                        <MenuList sx={{ width: '100%', px: 1, display: (!!results?.length && !isWordSearch) ? 'block' : 'none' }}>
+                        {(!!results?.length && !isWordSearch) && <MenuList sx={{ width: '100%', px: 1 }}>
                             {
                                 results?.map((result, index) => {
                                     return <MenuItem
@@ -503,6 +503,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                                 })
                             }
                         </MenuList>
+                        }
                     </Grid>
                 </div>
 
