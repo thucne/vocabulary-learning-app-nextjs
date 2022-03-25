@@ -75,6 +75,7 @@ export default function Login() {
     useEffect(() => {
         if (router?.query?.code) {
             setCode(router.query.code);
+            setStep(2);
         }
     }, [router?.query?.code]);
 

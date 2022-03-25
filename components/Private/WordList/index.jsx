@@ -5,10 +5,11 @@ import {
     Container,
     Grid,
     Typography,
+    CircularProgress
 } from "@mui/material";
 
 import { Fonts, Colors, Props, SXs } from "@styles";
-import { deepExtractObjectStrapi } from "@utils";
+import { deepExtractObjectStrapi, useWindowSize } from "@utils";
 
 import EditForm from "./EditForm";
 import Page from "./EachPage";
@@ -17,7 +18,7 @@ import _ from "lodash";
 
 const WordList = () => {
     const listRef = useRef(null);
-
+    const windowSizes = useWindowSize();
     const userData = useSelector((state) => state.userData);
 
     const [currentWord, setCurrentWord] = useState(null);
@@ -31,6 +32,7 @@ const WordList = () => {
     const [indeterminateGroups, setIndeterminateGroups] = useState({});
     const [sumUpGroups, setSumUpGroups] = useState([]);
     const [changed, setChanged] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const vips = deepExtractObjectStrapi(userData?.vips, {
         minifyPhoto: ['illustration']
@@ -43,7 +45,8 @@ const WordList = () => {
         checkedAllGroups, setCheckedAllGroups,
         indeterminateGroups, setIndeterminateGroups,
         sumUpGroups, setSumUpGroups,
-        currentWord, setCurrentWord
+        currentWord, setCurrentWord,
+        setIsLoading
     }
 
     let pages = [];
@@ -58,7 +61,7 @@ const WordList = () => {
         />)
     }
 
-    useEffect(() => { 
+    useEffect(() => {
         if (!changed) {
             setNumOfPages(1);
             setHasNext(0);
@@ -70,18 +73,20 @@ const WordList = () => {
 
         const debounceSet = _.debounce((isBottom) => {
             if (isBottom && (hasNext > -1) && (hasNext >= numOfPages)) {
+                setIsLoading(true);
                 setNumOfPages(prev => prev + 1);
             }
         }, 1000);
 
         const handleScroll = () => {
-            let isBottom = listRef?.current?.scrollHeight - listRef?.current?.scrollTop === listRef?.current?.clientHeight;
+            // let isBottom = listRef?.current?.scrollHeight - listRef?.current?.scrollTop === listRef?.current?.clientHeight;
+            let isBottom = listRef?.current?.getBoundingClientRect().bottom <= windowSizes?.height * 0.85;
             debounceSet(isBottom);
         }
         document.addEventListener('scroll', handleScroll);
         return () => document.removeEventListener('scroll', handleScroll);
 
-    }, [hasNext, numOfPages]);
+    }, [hasNext, numOfPages, windowSizes]);
 
     const handleCloseDialog = () => {
         setCurrentWord(null);
@@ -117,6 +122,9 @@ const WordList = () => {
                     {...Props.GICCC}
                 >
                     {pages}
+                    {
+                        isLoading && <CircularProgress />
+                    }
                 </Grid>
             </Grid>
 

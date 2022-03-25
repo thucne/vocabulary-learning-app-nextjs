@@ -135,50 +135,24 @@ const EachWord = ({ vip, selectedVips, setSelectedVips, setCurrentWord }) => {
                                         draggable={false}
                                     />
                                 </Grid>
-                                <ClickAwayListener onClickAway={(e) => handleTooltipClose(true)}>
-                                    <Grid item sx={{ px: 0.5 }}>
-                                        <Tooltip
-                                            PopperProps={{
-                                                disablePortal: true,
-                                            }}
-                                            onClose={() => handleTooltipClose(true)}
-                                            onClick={(e) => e.stopPropagation()}
-                                            open={tooltips.meanings}
-                                            disableFocusListener
-                                            disableHoverListener
-                                            disableTouchListener
-                                            title="Number of meanings"
-                                        >
-                                            <Paper sx={styles.meaningsCount} elevation={0} onClick={() => handleTooltipOpen(true)}>
-                                                <Typography className='overflowTypography'>
-                                                    {meaningsCount}
-                                                </Typography>
-                                            </Paper>
-                                        </Tooltip>
-                                    </Grid>
-                                </ClickAwayListener>
-                                <ClickAwayListener onClickAway={(e) => handleTooltipClose()}>
-                                    <Grid item sx={{ px: 0.5 }}>
-                                        <Tooltip
-                                            PopperProps={{
-                                                disablePortal: true,
-                                            }}
-                                            onClose={() => handleTooltipClose()}
-                                            onClick={(e) => e.stopPropagation()}
-                                            open={tooltips.examples}
-                                            disableFocusListener
-                                            disableHoverListener
-                                            disableTouchListener
-                                            title="Number of examples"
-                                        >
-                                            <Paper sx={styles.examplesCount} elevation={0} onClick={() => handleTooltipOpen()}>
-                                                <Typography className='overflowTypography'>
-                                                    {examplesCount}
-                                                </Typography>
-                                            </Paper>
-                                        </Tooltip>
-                                    </Grid>
-                                </ClickAwayListener>
+                                <Grid item sx={{ px: 0.5 }}>
+                                    <Tooltip title="Number of meanings">
+                                        <Paper sx={styles.meaningsCount} elevation={0}>
+                                            <Typography className='overflowTypography'>
+                                                {meaningsCount}
+                                            </Typography>
+                                        </Paper>
+                                    </Tooltip>
+                                </Grid>
+                                <Grid item sx={{ px: 0.5 }}>
+                                    <Tooltip title="Number of examples">
+                                        <Paper sx={styles.examplesCount} elevation={0} >
+                                            <Typography className='overflowTypography'>
+                                                {examplesCount}
+                                            </Typography>
+                                        </Paper>
+                                    </Tooltip>
+                                </Grid>
                                 <Grid item sx={{ px: 0.5 }}>
                                     <IconButton
                                         aria-label='more'

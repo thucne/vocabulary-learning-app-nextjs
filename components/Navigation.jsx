@@ -148,7 +148,7 @@ function ResponsiveDrawer(props) {
             });
         } else {
             // increase refresh interval
-            setRefreshInterval(prev => prev > 10000 ? 1000 : prev + 1000);
+            setRefreshInterval(prev => prev > 60000 ? 1000 : prev + 1000);
         }
     }, [data, error, isValidating, dispatch, userData]);
 

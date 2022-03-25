@@ -24,7 +24,7 @@ const EachPage = ({
     indeterminateGroups, setIndeterminateGroups,
     sumUpGroups, setSumUpGroups,
     currentWord, setCurrentWord,
-    isLastPage
+    isLastPage, setIsLoading
 }) => {
 
     const [groupedVips, setGroupedVips] = useState([]);
@@ -36,7 +36,9 @@ const EachPage = ({
             setExistingVips,
             pageNumber
         );
-        if (isLastPage) setHasNext(hasNextPage);
+        if (isLastPage) {
+            setHasNext(hasNextPage);
+        };
         setGroupedVips(localGroupedVips);
     }, [existingVips, pageNumber, vips, setExistingVips, hasNext, setHasNext, isLastPage]);
 
@@ -69,7 +71,8 @@ const EachPage = ({
         checkedAllGroups, setCheckedAllGroups,
         indeterminateGroups, setIndeterminateGroups,
         sumUpGroups, setSumUpGroups,
-        currentWord, setCurrentWord
+        currentWord, setCurrentWord,
+        setIsLoading
     }
 
     return <Grid container {...Props.GCRSC}>
@@ -78,6 +81,7 @@ const EachPage = ({
                 <EachGroup
                     group={group}
                     pageNumber={pageNumber}
+                    isLastGroup={index === groupedVips.length - 1 && isLastPage}
                     {...groupProps}
                 />
             </Grid>)

@@ -4,7 +4,7 @@ import {
     Grid, Paper, Typography, IconButton,
     Divider, Chip, Button, Checkbox,
     FormControlLabel, FormGroup, FormControl,
-    MenuItem, CircularProgress
+    MenuItem, CircularProgress, Grow, Collapse
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 
@@ -12,7 +12,7 @@ import ExpandLessRoundedIcon from '@mui/icons-material/ExpandLessRounded';
 import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded';
 import DeleteForeverRoundedIcon from '@mui/icons-material/DeleteForeverRounded';
 
-import { Props, SXs } from '@styles';
+import { Colors, Props, SXs } from '@styles';
 
 import EachWord from './EachWord';
 import _ from 'lodash';
@@ -28,7 +28,8 @@ const EachGroup = ({
     checkedAllGroups, setCheckedAllGroups,
     sumUpGroups, setSumUpGroups,
     indeterminateGroups, setIndeterminateGroups,
-    currentWord, setCurrentWord
+    currentWord, setCurrentWord,
+    isLastGroup, setIsLoading
 }) => {
     const dispatch = useDispatch();
 
@@ -58,6 +59,8 @@ const EachGroup = ({
             setPreviousExist(checkedAllGroups.includes(label))
         }
     }, [checkedAllGroups, label, vips, setSelectedVips, localCheckAllGroups, setLocalCheckAllGroups, previousExist]);
+
+    useEffect(() => isLastGroup && setIsLoading(false),[isLastGroup, setIsLoading]);
 
     const toggleSelected = (id) => {
 
@@ -164,52 +167,80 @@ const EachGroup = ({
                             {label}
                         </Button>
                     </Divider>
-                    <Paper variant="outlined" sx={{
-                        borderColor: 'transparent', pr: 1, pl: 0,
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        width: '100%',
-                    }}>
-                        <FormControlLabel
-                            label={numberOfSelectedVips > 0 ? `${numberOfSelectedVips} selected` : "Select all"}
-                            control={<Checkbox
-                                checked={checkedAllGroups.includes(label)}
-                                onChange={() => {
-                                    const newCheckedAllGroups = checkedAllGroups.includes(label) ? checkedAllGroups.filter(g => g !== label) : [...checkedAllGroups, label];
-                                    setCheckedAllGroups(newCheckedAllGroups);
-                                    checkIndeterminate(newCheckedAllGroups);
-                                }}
-                                indeterminate={isIndeterminate}
-                            />}
-                            sx={{ margin: 0 }}
-                        />
-                        {
-                            numberOfSelectedVips > 0 && <IconButton
-                                aria-label='Delete selected'
-                                disabled={loading}
-                                onClick={handleDelete}
-                                color='primary'
-                            >
-                                {
-                                    !loading ? <DeleteForeverRoundedIcon /> : <CircularProgress size={22} />
-                                }
-                            </IconButton>
-                        }
-                    </Paper>
                 </Grid>
             }
-
-            {
-                vips.map((vip, index) => <Grid item xs={12} key={`wordlist-${pageNumber}-${index}`}>
-                    <EachWord
-                        vip={vip}
-                        selectedVips={selectedVips}
-                        setSelectedVips={toggleSelected}
-                        currentWord={currentWord}
-                        setCurrentWord={setCurrentWord}
-                    />
-                </Grid>)
-            }
+            <Collapse in={!minimizedGroups.includes(label)} sx={{ width: '100%' }}>
+                {
+                    displayLabel && label && (
+                        <Grid item xs={12} {...Props.GICCS} mx={1} my={0.5}>
+                            <Paper variant="outlined" sx={{
+                                borderColor: 'transparent', pr: 1, pl: 0,
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                width: '100%',
+                            }}>
+                                <FormControlLabel
+                                    label={numberOfSelectedVips > 0 ? `${numberOfSelectedVips} selected` : "Select all"}
+                                    control={<Checkbox
+                                        checked={checkedAllGroups.includes(label)}
+                                        onChange={() => {
+                                            const newCheckedAllGroups = checkedAllGroups.includes(label) ? checkedAllGroups.filter(g => g !== label) : [...checkedAllGroups, label];
+                                            setCheckedAllGroups(newCheckedAllGroups);
+                                            checkIndeterminate(newCheckedAllGroups);
+                                        }}
+                                        indeterminate={isIndeterminate}
+                                    />}
+                                    sx={{ margin: 0 }}
+                                />
+                                {
+                                    numberOfSelectedVips > 0 && <IconButton
+                                        aria-label='Delete selected'
+                                        disabled={loading}
+                                        onClick={handleDelete}
+                                        color='primary'
+                                    >
+                                        {
+                                            !loading ? <DeleteForeverRoundedIcon /> : <CircularProgress size={22} />
+                                        }
+                                    </IconButton>
+                                }
+                            </Paper>
+                        </Grid>
+                    )
+                }
+                <Grid item xs={12}>
+                    <Grid container {...Props.GCRCC}>
+                        {
+                            vips.map((vip, index) => <Grid item xs={12} key={`wordlist-${pageNumber}-${index}`}>
+                                <EachWord
+                                    vip={vip}
+                                    selectedVips={selectedVips}
+                                    setSelectedVips={toggleSelected}
+                                    currentWord={currentWord}
+                                    setCurrentWord={setCurrentWord}
+                                />
+                            </Grid>)
+                        }
+                    </Grid>
+                </Grid>
+                {
+                    isLastGroup && <Grid item xs={12} {...Props.GIRSC} ml={1}>
+                        <div
+                            style={{ width: 10, height: 10, backgroundColor: Colors.LOGO_BLUE, borderRadius: '50%', marginRight: 5 }}
+                        />
+                        <Typography variant="caption" color="textSecondary">
+                            Meanings
+                        </Typography>
+                        <div
+                            style={{ width: 10, height: 10, backgroundColor: Colors.LOGO_YELLOW, borderRadius: '50%', marginRight: 5, marginLeft: 15 }}
+                        />
+                        <Typography variant="caption" color="textSecondary">
+                            Examples
+                        </Typography>
+                    </Grid>
+                }
+            </Collapse>
         </Grid>
     );
 };

@@ -85,6 +85,7 @@ export default function Login() {
                                 token,
                             }),
                             onSuccess: handleSuccessResponse,
+                            onError: (err) => console.log(err),
                             onStarting: () => setLoading(true),
                             onFinally: () => setLoading(false),
                             snackbarMessageOnSuccess: "Welcome back!",
