@@ -333,15 +333,8 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                                         borderRadius: '4px',
                                         border: `1px solid transparent`,
                                         borderBottomColor: theme => theme.palette.borderSearch.main,
-                                        ':hover': {
-                                            border: `1px solid ${Colors.SEARCH_RESULT}`,
-                                            color: Colors.SEARCH_RESULT,
-                                            '& .enter-icon-search': {
-                                                opacity: 1
-                                            }
-                                        },
-                                        ':focus, :active': {
-                                            border: `1px solid ${Colors.SEARCH_RESULT}`,
+                                        ':focus, :active, :hover': {
+                                            border: `1px solid ${Colors.SEARCH_RESULT} !important`,
                                             color: Colors.SEARCH_RESULT,
                                             '& .enter-icon-search': {
                                                 opacity: 1
@@ -412,14 +405,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                                             borderRadius: '4px',
                                             border: `1px solid transparent`,
                                             borderBottomColor: theme => theme.palette.borderSearch.main,
-                                            ':hover': {
-                                                border: `1px solid ${Colors.SEARCH_RESULT}`,
-                                                color: Colors.SEARCH_RESULT,
-                                                '& .enter-icon-search': {
-                                                    opacity: 1
-                                                }
-                                            },
-                                            ':focus, :active': {
+                                            ':focus, :active, :hover': {
                                                 border: `1px solid ${Colors.SEARCH_RESULT}`,
                                                 color: Colors.SEARCH_RESULT,
                                                 '& .enter-icon-search': {
@@ -531,7 +517,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                                             borderRadius: '4px',
                                             border: `1px solid transparent`,
                                             borderBottomColor: theme => theme.palette.borderSearch.main,
-                                            ':focus, :active, :hover, :focus-visible': {
+                                            ':focus, :active, :hover': {
                                                 border: `1px solid ${Colors.SEARCH_RESULT} !important`,
                                                 color: Colors.SEARCH_RESULT,
                                                 '& .enter-icon-search': {
@@ -543,7 +529,6 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                                                 opacity: 0
                                             }
                                         }}
-                                        className="on-focus-search"
                                         onMouseOver={() => setHoveredItem(result?.item?.link)}
                                         onMouseLeave={() => setHoveredItem(null)}
                                         onFocus={() => console.log('focus')}
