@@ -531,15 +531,8 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                                             borderRadius: '4px',
                                             border: `1px solid transparent`,
                                             borderBottomColor: theme => theme.palette.borderSearch.main,
-                                            ':hover': {
-                                                border: `1px solid ${Colors.SEARCH_RESULT}`,
-                                                color: Colors.SEARCH_RESULT,
-                                                '& .enter-icon-search': {
-                                                    opacity: 1
-                                                }
-                                            },
-                                            ':focus, :active': {
-                                                border: `1px solid ${Colors.SEARCH_RESULT}`,
+                                            ':focus, :active, :hover, :focus-visible': {
+                                                border: `1px solid ${Colors.SEARCH_RESULT} !important`,
                                                 color: Colors.SEARCH_RESULT,
                                                 '& .enter-icon-search': {
                                                     opacity: 1
@@ -550,8 +543,10 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                                                 opacity: 0
                                             }
                                         }}
+                                        className="on-focus-search"
                                         onMouseOver={() => setHoveredItem(result?.item?.link)}
                                         onMouseLeave={() => setHoveredItem(null)}
+                                        onFocus={() => console.log('focus')}
                                         ref={index === 0 ? directoryFirstResultRef : null}
                                     >
                                         <KeyboardReturnRoundedIcon
@@ -844,6 +839,8 @@ const searchDefaultData = [
     { link: '/signup', title: 'Sign up', icon: <VpnKeyRoundedIcon />, tags: ['signup', 'register', 'account', 'user', 'auth', 'create account'] },
     { link: '/forgot-password', title: 'Forgot password', icon: <VpnKeyRoundedIcon />, tags: ['forgot password', 'reset password', 'account', 'user', 'auth', 'reset password'] },
     { link: '/my-account', title: 'Change password', icon: <PasswordIcon />, tags: ['change password', 'update password'] },
+    { link: '/privacy-policy', title: 'Privacy Policy', icon: <PolicyIcon />, tags: ['privacy policy', 'terms of service', 'terms', 'service', 'policy'] },
+    { link: '/terms-of-service', title: 'Terms of Service', icon: <DensityMediumIcon />, tags: ['terms of service', 'terms', 'service', 'policy'] },
 
 ];
 
