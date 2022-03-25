@@ -83,6 +83,7 @@ const Index = (props) => {
                             top: 0,
                             left: 0,
                             background: "linear-gradient(to right, #64b5f6 0%, #ffd54f 100%)",
+                            borderRadius: borderRadius || '0px',
                         }}
                         variant="rectangular"
                         animation="wave"

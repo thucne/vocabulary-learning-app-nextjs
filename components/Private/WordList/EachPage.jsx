@@ -82,6 +82,7 @@ const EachPage = ({
                     group={group}
                     pageNumber={pageNumber}
                     isLastGroup={index === groupedVips.length - 1 && isLastPage}
+                    isFistGroup={index === 0 && pageNumber === 0}
                     {...groupProps}
                 />
             </Grid>)

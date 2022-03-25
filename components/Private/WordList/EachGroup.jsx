@@ -12,7 +12,7 @@ import ExpandLessRoundedIcon from '@mui/icons-material/ExpandLessRounded';
 import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded';
 import DeleteForeverRoundedIcon from '@mui/icons-material/DeleteForeverRounded';
 
-import { Colors, Props, SXs } from '@styles';
+import { Colors, Props, SXs, Fonts } from '@styles';
 
 import EachWord from './EachWord';
 import _ from 'lodash';
@@ -29,7 +29,8 @@ const EachGroup = ({
     sumUpGroups, setSumUpGroups,
     indeterminateGroups, setIndeterminateGroups,
     currentWord, setCurrentWord,
-    isLastGroup, setIsLoading
+    isLastGroup, setIsLoading,
+    isFistGroup
 }) => {
     const dispatch = useDispatch();
 
@@ -60,7 +61,7 @@ const EachGroup = ({
         }
     }, [checkedAllGroups, label, vips, setSelectedVips, localCheckAllGroups, setLocalCheckAllGroups, previousExist]);
 
-    useEffect(() => isLastGroup && setIsLoading(false),[isLastGroup, setIsLoading]);
+    useEffect(() => isLastGroup && setIsLoading(false), [isLastGroup, setIsLoading]);
 
     const toggleSelected = (id) => {
 
@@ -191,7 +192,7 @@ const EachGroup = ({
                                         }}
                                         indeterminate={isIndeterminate}
                                     />}
-                                    sx={{ margin: 0 }}
+                                    sx={{ m: 0, mr: 1 }}
                                 />
                                 {
                                     numberOfSelectedVips > 0 && <IconButton
@@ -201,7 +202,7 @@ const EachGroup = ({
                                         color='primary'
                                     >
                                         {
-                                            !loading ? <DeleteForeverRoundedIcon /> : <CircularProgress size={22} />
+                                            !loading ? <DeleteForeverRoundedIcon fontSize="inherit" /> : <CircularProgress size={22} />
                                         }
                                     </IconButton>
                                 }

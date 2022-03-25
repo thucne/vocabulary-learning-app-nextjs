@@ -16,7 +16,6 @@ import {
     Search as SearchIcon,
     Home as HomeIcon,
     Dashboard as DashboardIcon,
-    ListAlt as ListAltIcon,
     AccountCircle as AccountCircleIcon,
     Settings as SettingsIcon,
     PhotoLibrary as PhotoLibraryIcon,
@@ -24,12 +23,17 @@ import {
     Article as ArticleIcon,
     ToggleOff as ToggleOffIcon,
     ArrowForwardIos as ArrowForwardIosIcon,
-    FindInPage as FindInPageIcon,
     SearchOffRounded as SearchOffRoundedIcon,
-    DirectionsRounded as DirectionsRoundedIcon,
     KeyboardReturnRounded as KeyboardReturnRoundedIcon,
     QuestionMarkRounded as QuestionMarkRoundedIcon,
 } from '@mui/icons-material';
+
+import LoginIcon from '@mui/icons-material/Login';
+import LogoutIcon from '@mui/icons-material/Logout';
+import PasswordIcon from '@mui/icons-material/Password';
+import PolicyIcon from '@mui/icons-material/Policy';
+import DensityMediumIcon from '@mui/icons-material/DensityMedium';
+import VpnKeyRoundedIcon from '@mui/icons-material/VpnKeyRounded';
 
 import { Props, SXs, Fonts, Colors } from '@styles';
 
@@ -102,7 +106,11 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
             if (event.ctrlKey && event.key === 'k') {
                 event?.preventDefault();
                 setForcedClose(false);
-                inputRef?.current?.focus()
+                inputRef?.current?.focus();
+                if (localStorage.getItem('vip-search-prefix') && inputRef?.current) {
+                    inputRef.current.value = `${localStorage.getItem('vip-search-prefix')}`;
+                    setSearchString(`${localStorage.getItem('vip-search-prefix')}`);
+                }
             }
             if (event.key === 'Escape') {
                 setForcedClose(true);
@@ -133,7 +141,20 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
         }
     }, [mobile, open]);
 
-    const debounceSearch = useMemo(() => _.debounce((e) => setSearchString(e.target.value), 500), []);
+    const debounceSearch = useMemo(() => _.debounce((e) => {
+        setSearchString(e.target.value);
+        setTimeout(() => {
+            if (inputRef?.current) {
+                if (isDirectorySearch) {
+                    localStorage.setItem('vip-search-prefix', 'd:');
+                } else if (isWordSearch) {
+                    localStorage.setItem('vip-search-prefix', 'w:');
+                } else {
+                    localStorage.removeItem('vip-search-prefix');
+                }
+            }
+        }, 200);
+    }, 500), [isDirectorySearch, isWordSearch]);
 
     const handleSearch = (e) => {
         e?.preventDefault();
@@ -145,7 +166,13 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
     const openSearch = (e) => {
         e?.preventDefault();
         setForcedClose(false);
-        setTimeout(() => inputRef?.current?.focus(), 100);
+        setTimeout(() => {
+            inputRef?.current?.focus();
+            if (localStorage.getItem('vip-search-prefix') && inputRef?.current) {
+                inputRef.current.value = `${localStorage.getItem('vip-search-prefix')}`;
+                setSearchString(`${localStorage.getItem('vip-search-prefix')}`);
+            }
+        }, 100);
     }
 
     const isThereExactMatch = useMemo(() => wordResults?.map(item => deepExtractObjectStrapi(item.item)).findIndex(item => item.vip === actualSearchString) > -1, [wordResults, actualSearchString]);
@@ -212,7 +239,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                 <Grid container {...Props.GCRSC} p={2} sx={{
                     borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
                 }}>
-                    <IconButton aria-label="search" size="small" disableRipple onClick={() => inputRef?.current?.focus()}>
+                    <IconButton aria-label="search" size="small" disableRipple onClick={openSearch}>
                         <SearchIcon />
                     </IconButton>
                     <InputBase
@@ -230,10 +257,7 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                         fontWeight: Fonts.FW_600,
                         cursor: 'pointer',
                         display: mobile ? 'none' : 'flex',
-                    }} onClick={() => {
-                        setForcedClose(false);
-                        inputRef?.current?.focus()
-                    }}>
+                    }} onClick={openSearch}>
                         ESC
                     </Typography>
                 </Grid>
@@ -275,7 +299,25 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                                     Word
                                 </Typography>
                                 {
-                                    !isWordSearch && <Typography variant="caption" sx={{ backgroundColor: Colors.LOGO_BLUE, color: Colors.WHITE, px: 1, borderRadius: '4px' }}>
+                                    !isWordSearch && <Typography
+                                        variant="caption" sx={{
+                                            backgroundColor: Colors.LOGO_BLUE,
+                                            color: Colors.WHITE,
+                                            px: 1, borderRadius: '4px',
+                                            cursor: 'pointer',
+                                        }}
+                                        onClick={() => {
+                                            const oldValue = inputRef?.current?.value;
+                                            inputRef.current.value = `w:${oldValue}`;
+                                            let temp = {
+                                                target: {
+                                                    value: `w:${oldValue}`
+                                                }
+                                            }
+                                            debounceSearch(temp);
+                                            localStorage.setItem('vip-search-prefix', 'w:');
+                                        }}
+                                    >
                                         Start with &quot;w:&quot; for words only
                                     </Typography>
                                 }
@@ -293,30 +335,38 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                                         borderBottomColor: theme => theme.palette.borderSearch.main,
                                         ':hover': {
                                             border: `1px solid ${Colors.SEARCH_RESULT}`,
-                                            color: Colors.SEARCH_RESULT
+                                            color: Colors.SEARCH_RESULT,
+                                            '& .enter-icon-search': {
+                                                opacity: 1
+                                            }
                                         },
                                         ':focus, :active': {
                                             border: `1px solid ${Colors.SEARCH_RESULT}`,
-                                            color: Colors.SEARCH_RESULT
+                                            color: Colors.SEARCH_RESULT,
+                                            '& .enter-icon-search': {
+                                                opacity: 1
+                                            }
                                         },
-                                        p: 1
+                                        py: 1,
+                                        '& .enter-icon-search': {
+                                            opacity: 0
+                                        }
                                     }}
                                     onMouseOver={() => setHoveredItem(`/word/${actualSearchString}`)}
                                     onMouseLeave={() => setHoveredItem(null)}
                                     ref={noExactMatchRef}
                                 >
-                                    {
-                                        hoveredItem === `/word/${actualSearchString}` && <KeyboardReturnRoundedIcon
-                                            sx={{
-                                                position: 'absolute',
-                                                top: '50%',
-                                                right: '16px',
-                                                transform: 'translateY(-50%)',
-                                                width: 22,
-                                                height: 22,
-                                            }}
-                                        />
-                                    }
+                                    <KeyboardReturnRoundedIcon
+                                        sx={{
+                                            position: 'absolute',
+                                            top: '50%',
+                                            right: '16px',
+                                            transform: 'translateY(-50%)',
+                                            width: 22,
+                                            height: 22,
+                                        }}
+                                        className="enter-icon-search"
+                                    />
                                     <Link href={`/word/${actualSearchString}`} passHref>
                                         <MuiLink underline="none" sx={{
                                             display: 'flex',
@@ -364,30 +414,38 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                                             borderBottomColor: theme => theme.palette.borderSearch.main,
                                             ':hover': {
                                                 border: `1px solid ${Colors.SEARCH_RESULT}`,
-                                                color: Colors.SEARCH_RESULT
+                                                color: Colors.SEARCH_RESULT,
+                                                '& .enter-icon-search': {
+                                                    opacity: 1
+                                                }
                                             },
                                             ':focus, :active': {
                                                 border: `1px solid ${Colors.SEARCH_RESULT}`,
-                                                color: Colors.SEARCH_RESULT
+                                                color: Colors.SEARCH_RESULT,
+                                                '& .enter-icon-search': {
+                                                    opacity: 1
+                                                }
                                             },
-                                            p: 1
+                                            py: 1,
+                                            '& .enter-icon-search': {
+                                                opacity: 0
+                                            }
                                         }}
                                         onMouseOver={() => setHoveredItem(displayData?.link)}
                                         onMouseLeave={() => setHoveredItem(null)}
                                         ref={index === 0 ? wordFirstResultRef : null}
                                     >
-                                        {
-                                            hoveredItem === displayData?.link && <KeyboardReturnRoundedIcon
-                                                sx={{
-                                                    position: 'absolute',
-                                                    top: '50%',
-                                                    right: '16px',
-                                                    transform: 'translateY(-50%)',
-                                                    width: 22,
-                                                    height: 22,
-                                                }}
-                                            />
-                                        }
+                                        <KeyboardReturnRoundedIcon
+                                            sx={{
+                                                position: 'absolute',
+                                                top: '50%',
+                                                right: '16px',
+                                                transform: 'translateY(-50%)',
+                                                width: 22,
+                                                height: 22,
+                                            }}
+                                            className="enter-icon-search"
+                                        />
                                         <Link href={displayData?.link || '/'} passHref>
                                             <MuiLink underline="none" sx={{
                                                 display: 'flex',
@@ -437,7 +495,25 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                                     Directory
                                 </Typography>
                                 {
-                                    !isDirectorySearch && <Typography variant="caption" sx={{ backgroundColor: Colors.LOGO_BLUE, color: Colors.WHITE, px: 1, borderRadius: '4px' }}>
+                                    !isDirectorySearch && <Typography
+                                        variant="caption" sx={{
+                                            backgroundColor: Colors.LOGO_BLUE,
+                                            color: Colors.WHITE,
+                                            px: 1, borderRadius: '4px',
+                                            cursor: 'pointer',
+                                        }}
+                                        onClick={() => {
+                                            const oldValue = inputRef?.current?.value;
+                                            inputRef.current.value = `d:${oldValue}`;
+                                            let temp = {
+                                                target: {
+                                                    value: `d:${oldValue}`
+                                                }
+                                            }
+                                            debounceSearch(temp);
+                                            localStorage.setItem('vip-search-prefix', 'd:');
+                                        }}
+                                    >
                                         Start with &quot;d:&quot; for directory only
                                     </Typography>
                                 }
@@ -457,30 +533,38 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                                             borderBottomColor: theme => theme.palette.borderSearch.main,
                                             ':hover': {
                                                 border: `1px solid ${Colors.SEARCH_RESULT}`,
-                                                color: Colors.SEARCH_RESULT
+                                                color: Colors.SEARCH_RESULT,
+                                                '& .enter-icon-search': {
+                                                    opacity: 1
+                                                }
                                             },
                                             ':focus, :active': {
                                                 border: `1px solid ${Colors.SEARCH_RESULT}`,
-                                                color: Colors.SEARCH_RESULT
+                                                color: Colors.SEARCH_RESULT,
+                                                '& .enter-icon-search': {
+                                                    opacity: 1
+                                                }
                                             },
-                                            py: 1
+                                            py: 1,
+                                            '& .enter-icon-search': {
+                                                opacity: 0
+                                            }
                                         }}
                                         onMouseOver={() => setHoveredItem(result?.item?.link)}
                                         onMouseLeave={() => setHoveredItem(null)}
                                         ref={index === 0 ? directoryFirstResultRef : null}
                                     >
-                                        {
-                                            hoveredItem === result?.item?.link && <KeyboardReturnRoundedIcon
-                                                sx={{
-                                                    position: 'absolute',
-                                                    top: '50%',
-                                                    right: '16px',
-                                                    transform: 'translateY(-50%)',
-                                                    width: 22,
-                                                    height: 22,
-                                                }}
-                                            />
-                                        }
+                                        <KeyboardReturnRoundedIcon
+                                            sx={{
+                                                position: 'absolute',
+                                                top: '50%',
+                                                right: '16px',
+                                                transform: 'translateY(-50%)',
+                                                width: 22,
+                                                height: 22,
+                                            }}
+                                            className='enter-icon-search'
+                                        />
                                         <Link href={result?.item?.link || '/'} passHref>
                                             <MuiLink underline="none" sx={{
                                                 display: 'flex',
@@ -513,9 +597,18 @@ export default function CustomizedInputBase({ open = true, mobile = false }) {
                     <Typography variant="caption" sx={{
                         display: 'flex',
                         alignItems: 'center',
-                        opacity: isValidating ? 1 : 0
+                        px: 1,
+                        backgroundColor: (isWordSearch || isDirectorySearch) ? Colors.LOGO_BLUE : 'transparent',
+                        color: (isWordSearch || isDirectorySearch) ? Colors.WHITE : 'inherit',
+                        borderRadius: '4px',
                     }} className='overflowTypography'>
-                        Searching...
+                        {
+                            isValidating ? 'Searching...' : (
+                                isWordSearch ? 'Word Search' : (
+                                    isDirectorySearch ? 'Directory Search' : ''
+                                )
+                            )
+                        }
                     </Typography>
 
                     <Typography variant="caption" sx={{
@@ -746,7 +839,12 @@ const searchDefaultData = [
     { link: '/my-account', title: 'Account', icon: <AccountCircleIcon />, tags: ['account', 'my account', 'profile', 'user', 'user profile', 'username', 'email', 'password', 'change', 'avatar', 'photo'] },
     { link: '/my-settings', title: 'Settings', icon: <SettingsIcon />, tags: ['settings', 'my settings', 'autofill', 'examples', 'meaning', 'practice set', 'number of questions', 'image fit', 'public', 'private', 'priority'] },
     { link: '/my-library', title: 'Library', icon: <PhotoLibraryIcon />, tags: ['images', 'photos', 'my', 'urls', 'illustrations', 'library', 'gallery'] },
-    { link: '/my-word-list', title: 'Word List', icon: <BallotIcon />, tags: ['edit', 'delete', 'update', 'word', 'find word', 'my words', 'word list'] }
+    { link: '/my-word-list', title: 'Word List', icon: <BallotIcon />, tags: ['edit', 'delete', 'update', 'word', 'find word', 'my words', 'word list'] },
+    { link: '/login', title: 'Log in', icon: <LoginIcon />, tags: ['login', 'signin', 'signup', 'account', 'user', 'auth'] },
+    { link: '/signup', title: 'Sign up', icon: <VpnKeyRoundedIcon />, tags: ['signup', 'register', 'account', 'user', 'auth', 'create account'] },
+    { link: '/forgot-password', title: 'Forgot password', icon: <VpnKeyRoundedIcon />, tags: ['forgot password', 'reset password', 'account', 'user', 'auth', 'reset password'] },
+    { link: '/my-account', title: 'Change password', icon: <PasswordIcon />, tags: ['change password', 'update password'] },
+
 ];
 
 const searchKeys = [

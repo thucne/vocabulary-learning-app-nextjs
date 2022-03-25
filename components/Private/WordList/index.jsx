@@ -69,9 +69,11 @@ const WordList = () => {
         }
     }, [vips, changed]);
 
+
+    // check nếu trang chưa full thì kéo thêm trang tiếp theo
     useEffect(() => {
         const loop = setInterval(() => {
-            let isBottom = listRef?.current?.getBoundingClientRect().bottom <= windowSizes?.height * 0.85;
+            let isBottom = listRef?.current?.getBoundingClientRect().bottom <= windowSizes?.height * 1.25;
             if (isBottom && (hasNext > -1) && (hasNext >= numOfPages)) {
                 setIsLoading(true);
                 setNumOfPages(prev => prev + 1);
@@ -83,6 +85,7 @@ const WordList = () => {
         return () => clearInterval(loop);
     }, [hasNext, numOfPages, windowSizes]);
 
+    // scroll thì kéo thêm trang mới
     useEffect(() => {
 
         const debounceSet = _.debounce((isBottom) => {
@@ -93,9 +96,15 @@ const WordList = () => {
         }, 100);
 
         const handleScroll = () => {
-            // let isBottom = listRef?.current?.scrollHeight - listRef?.current?.scrollTop === listRef?.current?.clientHeight;
-            let isBottom = listRef?.current?.getBoundingClientRect().bottom <= windowSizes?.height * 0.85;
-            debounceSet(isBottom);
+            // render trước một chút
+            let isBottom = listRef?.current?.getBoundingClientRect().bottom <= windowSizes?.height * 1.25;
+            // debounceSet(isBottom);
+
+            // thử nghiệm ko debounce
+            if (isBottom && (hasNext > -1) && (hasNext >= numOfPages)) {
+                setIsLoading(true);
+                setNumOfPages(prev => prev + 1);
+            }
         }
         document.addEventListener('scroll', handleScroll);
         return () => document.removeEventListener('scroll', handleScroll);
