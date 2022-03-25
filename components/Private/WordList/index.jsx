@@ -70,13 +70,27 @@ const WordList = () => {
     }, [vips, changed]);
 
     useEffect(() => {
+        const loop = setInterval(() => {
+            let isBottom = listRef?.current?.getBoundingClientRect().bottom <= windowSizes?.height * 0.85;
+            if (isBottom && (hasNext > -1) && (hasNext >= numOfPages)) {
+                setIsLoading(true);
+                setNumOfPages(prev => prev + 1);
+            } else {
+                clearInterval(loop);
+            }
+        }, 500);
+
+        return () => clearInterval(loop);
+    }, [hasNext, numOfPages, windowSizes]);
+
+    useEffect(() => {
 
         const debounceSet = _.debounce((isBottom) => {
             if (isBottom && (hasNext > -1) && (hasNext >= numOfPages)) {
                 setIsLoading(true);
                 setNumOfPages(prev => prev + 1);
             }
-        }, 1000);
+        }, 100);
 
         const handleScroll = () => {
             // let isBottom = listRef?.current?.scrollHeight - listRef?.current?.scrollTop === listRef?.current?.clientHeight;
