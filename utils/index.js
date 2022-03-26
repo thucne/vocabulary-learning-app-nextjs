@@ -974,7 +974,13 @@ const dateLabels = [
     },
 ]
 
-export const groupByDate = (wordList = [], previousData = [], setNewPreviousData, pageNumber, type = 1) => {
+export const groupByDate = (wordList = [], previousData = [], setNewPreviousData, pageNumber, options = {}) => {
+    const {
+        type = 1,
+        groupByField,
+        sortVerse = 1,
+    } = options;
+
     let raw = [];
     let res = [];
     // sort by date
@@ -988,13 +994,14 @@ export const groupByDate = (wordList = [], previousData = [], setNewPreviousData
             fromNowString: moment(item.createdAt).fromNow(),
         }
     ));
-
-    if (type === 1) {
-        let hh = Object.entries(_.groupBy(raw.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)), 'fromNowString'));
+    if (groupByField) {
+        let hh = Object
+            .entries(_.groupBy(raw, `${groupByField}`))
+            .sort((a, b) => sortVerse === 0 ? a[0] - b[0] : b[0] - a[0]);
 
         hh.map((item, index) => {
 
-            const isDateExist = previousData.find(i => i.date === item.date);
+            const isDateExist = previousData.find(i => i.date === item[0]);
 
             let isDisplay = true;
 
@@ -1003,7 +1010,31 @@ export const groupByDate = (wordList = [], previousData = [], setNewPreviousData
                     isDisplay = false;
                 }
             } else {
-                previousData.push({ date: item.date, page: pageNumber })
+                previousData.push({ date: item[0], page: pageNumber })
+                setNewPreviousData(previousData)
+            }
+
+
+            res.push({
+                date: item[0],
+                data: item[1],
+                isDisplay
+            })
+        })
+    } else if (type === 1) {
+        let hh = Object.entries(_.groupBy(raw.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)), 'fromNowString'));
+        hh.map((item, index) => {
+
+            const isDateExist = previousData.find(i => i.date === item[0]);
+
+            let isDisplay = true;
+
+            if (isDateExist) {
+                if (isDateExist.page !== pageNumber) {
+                    isDisplay = false;
+                }
+            } else {
+                previousData.push({ date: item[0], page: pageNumber })
                 setNewPreviousData(previousData)
             }
 
@@ -1048,10 +1079,17 @@ export const groupByDate = (wordList = [], previousData = [], setNewPreviousData
     return res;
 }
 
-export const getInfiniteVips = (wordList = [], page = 0, limit = 8) => {
-
+export const getInfiniteVips = (wordList = [], page = 0, limit = 8, options = {}) => {
+    const {
+        groupByField,
+        sortVerse = 1,
+    } = options;
     // sort by createdAt first
-    const local = wordList.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    let local = wordList.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+
+    if (groupByField) {
+        local = local.sort((a, b) => sortVerse === 0 ? a[groupByField] - b[groupByField] : b[groupByField] - a[groupByField])
+    }
 
     let skip = page * limit;
     let sliced = local.slice(skip, skip + limit)
@@ -1420,3 +1458,12 @@ export const fuzzyWordToSearchData = (word) => {
         description: word?.hightlight,
     }
 }
+
+export const keyify = (obj, prefix = '') => Object.keys(obj).reduce((res, el) => {
+    if (Array.isArray(obj[el])) {
+        return res;
+    } else if (typeof obj[el] === 'object' && obj[el] !== null) {
+        return [...res, ...keyify(obj[el], prefix + el + '.')];
+    }
+    return [...res, prefix + el];
+}, []);

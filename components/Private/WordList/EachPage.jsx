@@ -25,24 +25,35 @@ const EachPage = ({
     sumUpGroups, setSumUpGroups,
     currentWord, setCurrentWord,
     isLastPage, setIsLoading,
-    displayMode
+    displayMode, isGroupByFieldValid,
 }) => {
 
     const [groupedVips, setGroupedVips] = useState([]);
 
     useEffect(() => {
-        const [inifiniteVips, hasNextPage] = getInfiniteVips(_.isArray(vips) && !_.isEmpty(vips) ? vips : [], pageNumber, PAGE_SIZE);
+        const [inifiniteVips, hasNextPage] = getInfiniteVips(_.isArray(vips) && !_.isEmpty(vips) ? vips : [],
+            pageNumber,
+            PAGE_SIZE,
+            {
+                groupByField: isGroupByFieldValid ? displayMode : undefined,
+            }
+        );
         const localGroupedVips = groupByDate(_.isArray(inifiniteVips) && !_.isEmpty(inifiniteVips) ? inifiniteVips : [],
             existingVips,
             setExistingVips,
             pageNumber,
-            displayMode === 'date' ? 2 : 1
+            {
+                groupByField: isGroupByFieldValid && !['date', 'time'].includes(displayMode) ? displayMode : undefined,
+                type: displayMode === 'date' ? 2 : 1,
+            }
         );
         if (isLastPage) {
             setHasNext(hasNextPage);
         };
+
         setGroupedVips(localGroupedVips);
-    }, [existingVips, pageNumber, vips, setExistingVips, hasNext, setHasNext, isLastPage, displayMode]);
+
+    }, [existingVips, pageNumber, vips, setExistingVips, hasNext, setHasNext, isLastPage, displayMode, isGroupByFieldValid]);
 
     useEffect(() => {
         groupedVips.forEach((group) => {

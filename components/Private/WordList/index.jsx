@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -6,17 +6,20 @@ import {
     Grid,
     Typography,
     CircularProgress,
-    ToggleButton,
-    ToggleButtonGroup,
+    Chip,
+    Stack,
+    TextField,
+    InputAdornment
 } from "@mui/material";
-
+import SearchIcon from '@mui/icons-material/Search';
 import { Fonts, Colors, Props, SXs } from "@styles";
-import { deepExtractObjectStrapi, useWindowSize } from "@utils";
+import { deepExtractObjectStrapi, useWindowSize, keyify } from "@utils";
 
 import EditForm from "./EditForm";
 import Page from "./EachPage";
 
 import _ from "lodash";
+import Fuse from 'fuse.js';
 
 const WordList = () => {
     const listRef = useRef(null);
@@ -35,34 +38,30 @@ const WordList = () => {
     const [sumUpGroups, setSumUpGroups] = useState([]);
     const [changed, setChanged] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [displayMode, setDisplayMode] = useState("time");
+    const [displayMode, setDisplayMode] = useState('time');
 
-    const vips = deepExtractObjectStrapi(userData?.vips, {
+    const [searchTerm, setSearchTerm] = useState("");
+
+    const rawVips = deepExtractObjectStrapi(userData?.vips, {
         minifyPhoto: ['illustration']
     });
 
-    const pageProps = {
-        existingVips, setExistingVips,
-        hasNext, setHasNext,
-        minimizedGroups, setMinimizedGroups,
-        checkedAllGroups, setCheckedAllGroups,
-        indeterminateGroups, setIndeterminateGroups,
-        sumUpGroups, setSumUpGroups,
-        currentWord, setCurrentWord,
-        setIsLoading, displayMode
-    }
+    const getWordList = useMemo(() => {
+        let keys = !_.isEmpty(rawVips) ? keyify(rawVips[0]) : [];
+        let fuse = !_.isEmpty(rawVips) ? new Fuse(rawVips, { keys, includeScore: true }) : null;
 
-    let pages = [];
+        let listWord = fuse && !_.isEmpty(searchTerm?.trim()) ? fuse.search(searchTerm).map(each => {
+            return {
+                ...each.item,
+                matched: Math.floor((1 - each.score) * 100),
+                matchedLabel: `${Math.floor((1 - each.score) * 100)}%`
+            }
+        }) : rawVips;
 
-    for (let i = 0; i < numOfPages; i++) {
-        pages.push(<Page
-            key={`eachpage-${i}`}
-            vips={vips}
-            pageNumber={i}
-            isLastPage={i === numOfPages - 1}
-            {...pageProps}
-        />)
-    }
+        return listWord;
+    }, [rawVips, searchTerm]);
+
+    const vips = getWordList;
 
     useEffect(() => {
         if (!changed) {
@@ -74,10 +73,16 @@ const WordList = () => {
 
     useEffect(() => {
         let displayMode = localStorage.getItem("vip-wordlist-displayMode");
-        if (displayMode) {
+        if (displayMode && ['date', 'time'].includes(displayMode)) {
             setDisplayMode(displayMode);
         }
     }, [])
+
+    useEffect(() => {
+        setCheckedAllGroups([]);
+        setIndeterminateGroups({});
+        setSumUpGroups([]);
+    }, [displayMode])
 
     // check nếu trang chưa full thì kéo thêm trang tiếp theo
     useEffect(() => {
@@ -120,6 +125,31 @@ const WordList = () => {
 
     }, [hasNext, numOfPages, windowSizes]);
 
+    const pageProps = {
+        existingVips, setExistingVips,
+        hasNext, setHasNext,
+        minimizedGroups, setMinimizedGroups,
+        checkedAllGroups, setCheckedAllGroups,
+        indeterminateGroups, setIndeterminateGroups,
+        sumUpGroups, setSumUpGroups,
+        currentWord, setCurrentWord,
+        setIsLoading, displayMode,
+        isGroupByFieldValid: !!searchTerm?.trim()?.length,
+    }
+
+    let pages = [];
+
+    for (let i = 0; i < numOfPages; i++) {
+        pages.push(<Page
+            key={`eachpage-${i}`}
+            vips={vips}
+            pageNumber={i}
+            isLastPage={i === numOfPages - 1}
+            {...pageProps}
+        />)
+    }
+
+
     const handleCloseDialog = () => {
         setCurrentWord(null);
         setOpen(false);
@@ -153,19 +183,56 @@ const WordList = () => {
                     ref={listRef}
                     {...Props.GICCC}
                 >
-                    <ToggleButtonGroup
-                        color="primary"
-                        value={displayMode}
-                        exclusive
-                        onChange={(e, newVal) => {
-                            setDisplayMode(newVal);
-                            localStorage.setItem('vip-wordlist-displayMode', JSON.stringify(newVal))
-                        }}
-                        size="small"
-                    >
-                        <ToggleButton value="time">Time</ToggleButton>
-                        <ToggleButton value="date">Date</ToggleButton>
-                    </ToggleButtonGroup>
+                    <Grid container {...Props.GCRBC} px={2}>
+                        <Grid item xs={12} sm={6} {...Props.GIRSC} justifyContent={['center', 'flex-start']}>
+                            <Stack direction="row" spacing={1}>
+                                <Typography>
+                                    Group by
+                                </Typography>
+                                <Chip
+                                    label="Time"
+                                    variant={displayMode === 'time' ? 'filled' : 'outlined'}
+                                    size="small"
+                                    onClick={() => {
+                                        setDisplayMode('time');
+                                        localStorage.setItem('vip-wordlist-displayMode', 'time');
+                                    }}
+                                    color={displayMode === 'time' ? 'primary' : 'default'}
+                                    sx={{ borderRadius: '4px' }}
+                                />
+                                <Chip
+                                    label="Date"
+                                    variant={displayMode === 'date' ? 'filled' : 'outlined'}
+                                    size="small"
+                                    onClick={() => {
+                                        setDisplayMode('date');
+                                        localStorage.setItem('vip-wordlist-displayMode', 'date');
+                                    }}
+                                    color={displayMode === 'date' ? 'primary' : 'default'}
+                                    sx={{ borderRadius: '4px' }}
+                                />
+                                {
+                                    !!searchTerm?.trim()?.length && <Chip
+                                        label="Matched"
+                                        variant={displayMode === 'matched' ? 'filled' : 'outlined'}
+                                        size="small"
+                                        onClick={() => {
+                                            setDisplayMode('matched');
+                                            localStorage.setItem('vip-wordlist-displayMode', 'matched');
+                                        }}
+                                        color={displayMode === 'matched' ? 'primary' : 'default'}
+                                        sx={{ borderRadius: '4px' }}
+                                    />
+                                }
+                            </Stack>
+                        </Grid>
+                        <Grid item xs={12} sm={6} {...Props.GIREC} mt={[2, 0]} justifyContent={['center', 'flex-end']}>
+                            <SearchWord
+                                searchTerm={searchTerm}
+                                setSearchTerm={setSearchTerm}
+                            />
+                        </Grid>
+                    </Grid>
                     {pages}
                     {
                         isLoading && <CircularProgress />
@@ -184,5 +251,35 @@ const WordList = () => {
         </Container>
     );
 };
+
+const SearchWord = ({ searchTerm, setSearchTerm }) => {
+    // const wordList = useMemo(() => _.unionWith(wordListRaw, subscribedWordListRaw, _.isEqual), [wordListRaw, subscribedWordListRaw]);
+
+    const handleSearch = useMemo(() => _.debounce((e) => {
+        searchWord(e?.target?.value);
+    }, 250), [searchWord])
+
+    const searchWord = useCallback((searchTerm) => {
+        setSearchTerm(searchTerm);
+    }, [setSearchTerm]);
+
+    return (
+        <TextField
+            type="text"
+            size="small"
+            placeholder="Word, tag, etc."
+            label="Search"
+            sx={{ width: ['90%', 'auto'] }}
+            onChange={handleSearch}
+            InputProps={{
+                startAdornment: (
+                    <InputAdornment position="start">
+                        <SearchIcon />
+                    </InputAdornment>
+                ),
+            }}
+        />
+    )
+}
 
 export default WordList;

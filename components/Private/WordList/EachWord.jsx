@@ -116,13 +116,21 @@ const EachWord = ({ vip, selectedVips, setSelectedVips, setCurrentWord }) => {
                         </Grid>
                         <Grid item xs {...Props.GIRCC}>
                             <Grid container {...Props.GCRBC}>
-                                <Grid item xs={5} sm={7}>
-                                    <Typography className='overflow Typography' sx={{
+                                <Grid item xs={8} {...Props.GIRSE}>
+                                    <Typography className='overflowTypography' sx={{
                                         fontWeight: Fonts.FW_500,
                                         color: theme => theme.palette.publicWord3.main
                                     }}>
                                         {vip.vip}
                                     </Typography>
+                                    {
+                                        vip.matched && <Typography variant='caption' className='overflowTypography' sx={{
+                                            color: theme => theme.palette.publicWord3.main,
+                                            ml: 1
+                                        }}>
+                                            {vip.matched}%
+                                        </Typography>
+                                    }
                                 </Grid>
                                 <Grid item sx={{ px: 0.5 }}>
                                     <LoadingImage
@@ -135,7 +143,7 @@ const EachWord = ({ vip, selectedVips, setSelectedVips, setCurrentWord }) => {
                                         draggable={false}
                                     />
                                 </Grid>
-                                <Grid item sx={{ px: 0.5 }}>
+                                <Grid item sx={{ px: 0.5, display: ['none', 'flex'] }}>
                                     <Tooltip title="Number of meanings">
                                         <Paper sx={styles.meaningsCount} elevation={0}>
                                             <Typography className='overflowTypography'>
@@ -144,7 +152,7 @@ const EachWord = ({ vip, selectedVips, setSelectedVips, setCurrentWord }) => {
                                         </Paper>
                                     </Tooltip>
                                 </Grid>
-                                <Grid item sx={{ px: 0.5 }}>
+                                <Grid item sx={{ px: 0.5, display: ['none', 'flex'] }}>
                                     <Tooltip title="Number of examples">
                                         <Paper sx={styles.examplesCount} elevation={0} >
                                             <Typography className='overflowTypography'>
