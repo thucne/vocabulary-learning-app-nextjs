@@ -974,17 +974,12 @@ const dateLabels = [
     },
 ]
 
-export const groupByDate = (wordList = [], previousData = [], setNewPreviousData, pageNumber, options = {}) => {
-    const {
-        type = 1,
-        groupByField,
-        sortVerse = 1,
-    } = options;
+export const groupByDate = (wordList = [], previousData = [], setNewPreviousData, pageNumber, type, isReverse = false) => {
 
     let raw = [];
     let res = [];
     // sort by date
-    raw = wordList.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+    raw = _.cloneDeep(wordList);
 
     // calculate days from now
     raw = raw.map((item, index) => (
@@ -994,10 +989,11 @@ export const groupByDate = (wordList = [], previousData = [], setNewPreviousData
             fromNowString: moment(item.createdAt).fromNow(),
         }
     ));
-    if (groupByField) {
+
+    if (!['date', 'time'].includes(type)) {
         let hh = Object
-            .entries(_.groupBy(raw, `${groupByField}`))
-            .sort((a, b) => sortVerse === 0 ? a[0] - b[0] : b[0] - a[0]);
+            .entries(_.groupBy(raw, `${type}`))
+            .sort((a, b) => b[0] - a[0]);
 
         hh.map((item, index) => {
 
@@ -1021,7 +1017,9 @@ export const groupByDate = (wordList = [], previousData = [], setNewPreviousData
                 isDisplay
             })
         })
-    } else if (type === 1) {
+    }
+
+    if (type === 'time') {
         let hh = Object.entries(_.groupBy(raw.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)), 'fromNowString'));
         hh.map((item, index) => {
 
@@ -1045,7 +1043,9 @@ export const groupByDate = (wordList = [], previousData = [], setNewPreviousData
                 isDisplay
             })
         })
-    } else {
+    }
+
+    if (type === 'date') {
         // group word by date dateLabels
         dateLabels.map((item, index) => {
             let temp = raw.filter(word => {
@@ -1076,20 +1076,13 @@ export const groupByDate = (wordList = [], previousData = [], setNewPreviousData
 
     }
 
-    return res;
+    return isReverse ? res.reverse() : res;
 }
 
-export const getInfiniteVips = (wordList = [], page = 0, limit = 8, options = {}) => {
-    const {
-        groupByField,
-        sortVerse = 1,
-    } = options;
-    // sort by createdAt first
-    let local = wordList.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+export const getInfiniteVips = (wordList = [], page = 0, limit = 8) => {
 
-    if (groupByField) {
-        local = local.sort((a, b) => sortVerse === 0 ? a[groupByField] - b[groupByField] : b[groupByField] - a[groupByField])
-    }
+    // sort by createdAt first
+    let local = _.cloneDeep(wordList);
 
     let skip = page * limit;
     let sliced = local.slice(skip, skip + limit)

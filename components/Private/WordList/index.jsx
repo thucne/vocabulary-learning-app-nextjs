@@ -39,7 +39,7 @@ const WordList = () => {
     const [changed, setChanged] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [displayMode, setDisplayMode] = useState('time');
-
+    const [sortDirection, setSortDirection] = useState('asc');
     const [searchTerm, setSearchTerm] = useState("");
 
     const rawVips = deepExtractObjectStrapi(userData?.vips, {
@@ -61,7 +61,15 @@ const WordList = () => {
         return listWord;
     }, [rawVips, searchTerm]);
 
-    const vips = getWordList;
+    const vips = getWordList?.sort((a, b) => {
+
+        if (!['time', 'date'].includes(displayMode)) {
+            return sortDirection === 'asc' ? b[displayMode] - a[displayMode] : a[displayMode] - b[displayMode];
+        }
+
+        return sortDirection === 'asc' ? new Date(b.createdAt) - new Date(a.createdAt) : new Date(a.createdAt) - new Date(b.createdAt);
+    });
+
 
     useEffect(() => {
         if (!changed) {
@@ -72,9 +80,14 @@ const WordList = () => {
     }, [vips, changed]);
 
     useEffect(() => {
-        let displayMode = localStorage.getItem("vip-wordlist-displayMode");
+        let rawDisplayMode = localStorage.getItem("vip-wordlist-displayMode");
+        let displayMode = rawDisplayMode?.split("/")[0];
+        let sortDirection = rawDisplayMode?.split("/")[1];
         if (displayMode && ['date', 'time'].includes(displayMode)) {
             setDisplayMode(displayMode);
+        }
+        if (sortDirection && ['asc', 'desc'].includes(sortDirection)) {
+            setSortDirection(sortDirection);
         }
     }, [])
 
@@ -82,7 +95,8 @@ const WordList = () => {
         setCheckedAllGroups([]);
         setIndeterminateGroups({});
         setSumUpGroups([]);
-    }, [displayMode])
+        setExistingVips([]);
+    }, [displayMode, sortDirection])
 
     // check nếu trang chưa full thì kéo thêm trang tiếp theo
     useEffect(() => {
@@ -134,7 +148,6 @@ const WordList = () => {
         sumUpGroups, setSumUpGroups,
         currentWord, setCurrentWord,
         setIsLoading, displayMode,
-        isGroupByFieldValid: !!searchTerm?.trim()?.length,
     }
 
     let pages = [];
@@ -145,6 +158,7 @@ const WordList = () => {
             vips={vips}
             pageNumber={i}
             isLastPage={i === numOfPages - 1}
+            isReverse={sortDirection === 'desc'}
             {...pageProps}
         />)
     }
@@ -154,6 +168,16 @@ const WordList = () => {
         setCurrentWord(null);
         setOpen(false);
     };
+
+    const handleGroupBy = (type, value) => {
+        if (type === 'groupby') {
+            setDisplayMode(value);
+            localStorage.setItem("vip-wordlist-displayMode", `${value}/${sortDirection}`);
+        } else {
+            setSortDirection(value);
+            localStorage.setItem("vip-wordlist-displayMode", `${displayMode}/${value}`);
+        }
+    }
 
     return (
         <Container maxWidth="md" disableGutters>
@@ -193,10 +217,7 @@ const WordList = () => {
                                     label="Time"
                                     variant={displayMode === 'time' ? 'filled' : 'outlined'}
                                     size="small"
-                                    onClick={() => {
-                                        setDisplayMode('time');
-                                        localStorage.setItem('vip-wordlist-displayMode', 'time');
-                                    }}
+                                    onClick={() => handleGroupBy('groupby', 'time')}
                                     color={displayMode === 'time' ? 'primary' : 'default'}
                                     sx={{ borderRadius: '4px' }}
                                 />
@@ -204,10 +225,7 @@ const WordList = () => {
                                     label="Date"
                                     variant={displayMode === 'date' ? 'filled' : 'outlined'}
                                     size="small"
-                                    onClick={() => {
-                                        setDisplayMode('date');
-                                        localStorage.setItem('vip-wordlist-displayMode', 'date');
-                                    }}
+                                    onClick={() => handleGroupBy('groupby', 'date')}
                                     color={displayMode === 'date' ? 'primary' : 'default'}
                                     sx={{ borderRadius: '4px' }}
                                 />
@@ -216,14 +234,27 @@ const WordList = () => {
                                         label="Matched"
                                         variant={displayMode === 'matched' ? 'filled' : 'outlined'}
                                         size="small"
-                                        onClick={() => {
-                                            setDisplayMode('matched');
-                                            localStorage.setItem('vip-wordlist-displayMode', 'matched');
-                                        }}
+                                        onClick={() => handleGroupBy('groupby', 'matched')}
                                         color={displayMode === 'matched' ? 'primary' : 'default'}
                                         sx={{ borderRadius: '4px' }}
                                     />
                                 }
+                                <Chip
+                                    label="ASC"
+                                    variant={sortDirection === 'asc' ? 'filled' : 'outlined'}
+                                    size="small"
+                                    onClick={() => handleGroupBy('sort', 'asc')}
+                                    color={sortDirection === 'asc' ? 'secondary' : 'default'}
+                                    sx={{ borderRadius: '4px' }}
+                                />
+                                <Chip
+                                    label="DESC"
+                                    variant={sortDirection === 'desc' ? 'filled' : 'outlined'}
+                                    size="small"
+                                    onClick={() => handleGroupBy('sort', 'desc')}
+                                    color={sortDirection === 'desc' ? 'secondary' : 'default'}
+                                    sx={{ borderRadius: '4px' }}
+                                />
                             </Stack>
                         </Grid>
                         <Grid item xs={12} sm={6} {...Props.GIREC} mt={[2, 0]} justifyContent={['center', 'flex-end']}>
