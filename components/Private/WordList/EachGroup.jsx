@@ -123,6 +123,12 @@ const EachGroup = ({
                                 action: deleteManyVIPs({ token, data: indeterminateSelectedVips }),
                                 onSuccess: () => {
                                     dispatch({ type: t.HIDE_CONFIRM_DIALOG });
+                                    setIndeterminateGroups(prev => ({
+                                        ...prev,
+                                        [label]: []
+                                    }));
+                                    setSelectedVips([]);
+                                    setCheckedAllGroups(checkedAllGroups.filter(item => item !== label));
                                     dispatch({ type: t.FORCE_RELOAD });
                                 },
                                 onError: (error) => console.log(error),
