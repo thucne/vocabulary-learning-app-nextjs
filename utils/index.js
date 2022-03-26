@@ -974,7 +974,7 @@ const dateLabels = [
     },
 ]
 
-export const groupByDate = (wordList = [], previousData = [], setNewPreviousData, pageNumber) => {
+export const groupByDate = (wordList = [], previousData = [], setNewPreviousData, pageNumber, type = 1) => {
     let raw = [];
     let res = [];
     // sort by date
@@ -985,15 +985,14 @@ export const groupByDate = (wordList = [], previousData = [], setNewPreviousData
         raw[index] = {
             ...item,
             fromNow: moment({ hours: 0 }).diff(item.createdAt, 'days'),
+            fromNowString: moment(item.createdAt).fromNow(),
         }
     ));
 
-    // group word by date dateLabels
-    dateLabels.map((item, index) => {
-        let temp = raw.filter(word => {
-            return word.fromNow < item.range[1] && word.fromNow >= item.range[0]
-        })
-        if (temp.length) {
+    if (type === 1) {
+        let hh = Object.entries(_.groupBy(raw.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)), 'fromNowString'));
+
+        hh.map((item, index) => {
 
             const isDateExist = previousData.find(i => i.date === item.date);
 
@@ -1008,15 +1007,43 @@ export const groupByDate = (wordList = [], previousData = [], setNewPreviousData
                 setNewPreviousData(previousData)
             }
 
+
             res.push({
-                date: _.isFunction(item.date) ? item.date(Math.max(raw.map(item => item.fromNow))) : item.date,
-                data: [...temp],
+                date: item[0],
+                data: item[1],
                 isDisplay
             })
-        }
-    })
+        })
+    } else {
+        // group word by date dateLabels
+        dateLabels.map((item, index) => {
+            let temp = raw.filter(word => {
+                return word.fromNow < item.range[1] && word.fromNow >= item.range[0]
+            })
+            if (temp.length) {
 
+                const isDateExist = previousData.find(i => i.date === item.date);
 
+                let isDisplay = true;
+
+                if (isDateExist) {
+                    if (isDateExist.page !== pageNumber) {
+                        isDisplay = false;
+                    }
+                } else {
+                    previousData.push({ date: item.date, page: pageNumber })
+                    setNewPreviousData(previousData)
+                }
+
+                res.push({
+                    date: _.isFunction(item.date) ? item.date(Math.max(raw.map(item => item.fromNow))) : item.date,
+                    data: [...temp],
+                    isDisplay
+                })
+            }
+        })
+
+    }
 
     return res;
 }

@@ -5,7 +5,9 @@ import {
     Container,
     Grid,
     Typography,
-    CircularProgress
+    CircularProgress,
+    ToggleButton,
+    ToggleButtonGroup,
 } from "@mui/material";
 
 import { Fonts, Colors, Props, SXs } from "@styles";
@@ -33,6 +35,7 @@ const WordList = () => {
     const [sumUpGroups, setSumUpGroups] = useState([]);
     const [changed, setChanged] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [displayMode, setDisplayMode] = useState("time");
 
     const vips = deepExtractObjectStrapi(userData?.vips, {
         minifyPhoto: ['illustration']
@@ -46,7 +49,7 @@ const WordList = () => {
         indeterminateGroups, setIndeterminateGroups,
         sumUpGroups, setSumUpGroups,
         currentWord, setCurrentWord,
-        setIsLoading
+        setIsLoading, displayMode
     }
 
     let pages = [];
@@ -69,6 +72,12 @@ const WordList = () => {
         }
     }, [vips, changed]);
 
+    useEffect(() => {
+        let displayMode = localStorage.getItem("vip-wordlist-displayMode");
+        if (displayMode) {
+            setDisplayMode(displayMode);
+        }
+    }, [])
 
     // check nếu trang chưa full thì kéo thêm trang tiếp theo
     useEffect(() => {
@@ -144,6 +153,19 @@ const WordList = () => {
                     ref={listRef}
                     {...Props.GICCC}
                 >
+                    <ToggleButtonGroup
+                        color="primary"
+                        value={displayMode}
+                        exclusive
+                        onChange={(e, newVal) => {
+                            setDisplayMode(newVal);
+                            localStorage.setItem('vip-wordlist-displayMode', JSON.stringify(newVal))
+                        }}
+                        size="small"
+                    >
+                        <ToggleButton value="time">Time</ToggleButton>
+                        <ToggleButton value="date">Date</ToggleButton>
+                    </ToggleButtonGroup>
                     {pages}
                     {
                         isLoading && <CircularProgress />
