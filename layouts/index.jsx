@@ -54,21 +54,22 @@ const Layout = ({ children, login = false, landing = false, noMeta = false, tabN
     const blurScreen = useSelector((state) => state?.blurScreen);
 
     useEffect(() => {
-        const handleRouteChange = (url, { shallow }) => {
-            console.log(
-                `App is changing to ${url} ${shallow ? 'with' : 'without'
-                } shallow routing`
-            )
-        }
+        const handleRouteChange = () => dispatch({ type: t.SHOW_BACKDROP });
 
-        router.events.on('routeChangeStart', handleRouteChange)
+        const handleDone = () => dispatch({ type: t.HIDE_BACKDROP })
+
+        router.events.on('routeChangeStart', handleRouteChange);
+        router.events.on('routeChangeComplete', handleDone);
+        router.events.on('routeChangeError', handleDone);
 
         // If the component is unmounted, unsubscribe
         // from the event with the `off` method:
         return () => {
-            router.events.off('routeChangeStart', handleRouteChange)
+            router.events.off('routeChangeStart', handleRouteChange);
+            router.events.off('routeChangeComplete', handleDone);
+            router.events.off('routeChangeError', handleDone);
         }
-    }, [router.events])
+    }, [router.events, dispatch]);
 
     useEffect(() => {
         if (router?.query?.message) {

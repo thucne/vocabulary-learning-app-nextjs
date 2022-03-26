@@ -204,7 +204,8 @@ export default function CreateNewWord({ open = false, setOpen }) {
                             onError: (error) => console.log(error),
                             onStarting: () => setLoading(true),
                             onFinally: () => setLoading(false),
-                            snackbarMessageOnSuccess: "Added new word successfully!",
+                            snackbarMessageOnSuccess: "Successfully!",
+                            showLinear: false
                         });
                     });
             });

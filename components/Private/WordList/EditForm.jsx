@@ -215,6 +215,7 @@ function EditForm({ open = false, setOpen, word, setCurrentWord }) {
                             onStarting: () => setLoading(true),
                             onFinally: () => setLoading(false),
                             snackbarMessageOnSuccess: "Updated!",
+                            showLinear: false
                         });
                     });
             });
