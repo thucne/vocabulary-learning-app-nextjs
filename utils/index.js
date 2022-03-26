@@ -497,7 +497,7 @@ export const handleDictionaryData = (
 
         return {
             pronounce: text || altPronounce,
-            audio: camAudio ? `${camAudio}<vip>${audio}` : audio,
+            audio: `${camAudio}<vip>${oxfordAudio}<vip>${audio}`,
             clasifyVocab: [...new Set(allTypes)],
             examples: filteredExamples,
             engMeanings: filteredMeanings,
@@ -985,7 +985,6 @@ export const groupByDate = (wordList = [], previousData = [], setNewPreviousData
         raw[index] = {
             ...item,
             fromNow: moment({ hours: 0 }).diff(item.createdAt, 'days'),
-            checked: false
         }
     ));
 

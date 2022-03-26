@@ -39,7 +39,7 @@ const EachGroup = ({
     const [previousExist, setPreviousExist] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    const vips = group.data;
+    const vips = group.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     const label = group.date;
     const displayLabel = group.isDisplay;
     const totalVips = _.groupBy(sumUpGroups, 'label')?.[label]?.reduce((acc, cur) => acc + cur.count, 0);

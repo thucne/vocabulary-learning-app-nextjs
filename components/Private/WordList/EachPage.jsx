@@ -13,7 +13,7 @@ import { Props } from '@styles';
 
 import _ from 'lodash';
 
-const PAGE_SIZE = 4;
+const PAGE_SIZE = 8;
 
 const EachPage = ({
     vips, pageNumber,
