@@ -104,12 +104,14 @@ const PublicWord = ({ vip: buildVip, params: buildParams }) => {
     if (loading && _.isEmpty(vip)) {
         return (
             <Layout tabName={buildVip?.vip || "Loading..."}>
+                <MetaTag vip={buildVip} params={buildParams} />
             </Layout>
         )
     }
 
     if (!loading && _.isEmpty(vip)) {
         <Layout tabName="Not Found">
+            <MetaTag vip={buildVip} params={buildParams} />
             <ErrorPage
                 title="Word Not Found | VIP"
                 errorMessage="Not Found"
