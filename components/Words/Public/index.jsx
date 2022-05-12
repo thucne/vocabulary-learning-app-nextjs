@@ -69,8 +69,8 @@ const PublicWord = ({ vip, relatedVips: externalRelatedVips, unsplashVip }) => {
     const splitWord = vip?.vip?.split(" ");
     const regex = new RegExp(splitWord?.join("|"), "gi");
 
-    let actualRelatedVips = relatedVips?.filter(item => item?.priority < -2)?.sort((a, b) => a?.priority - b?.priority) || [];
-    const moreRelatedVips = relatedVips?.filter(item => item?.priority >= -2)?.sort((a, b) => a?.priority - b?.priority) || [];
+    let actualRelatedVips = _.isArray(relatedVips) && relatedVips?.filter(item => item?.priority < -2)?.sort((a, b) => a?.priority - b?.priority) || [];
+    const moreRelatedVips = _.isArray(relatedVips) && relatedVips?.filter(item => item?.priority >= -2)?.sort((a, b) => a?.priority - b?.priority) || [];
 
     const ifAnyExactMatch = actualRelatedVips?.find(item => item.vip === vip?.vip);
 

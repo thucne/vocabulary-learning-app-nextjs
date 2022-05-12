@@ -25,7 +25,7 @@ const AnyWord = () => {
         max: 10,
     }, { encodeValuesOnly: true });
 
-    const { data } = useSWR(vip ? `${API}/api/fuzzy-search/${vip}?${queryString}` : null, fetcher, {
+    const { data, isValidating } = useSWR(vip ? `${API}/api/fuzzy-search/${vip}?${queryString}` : null, fetcher, {
         onSuccess: () => setLoading(false)
     });
 
