@@ -64,12 +64,12 @@ const Layout = ({ children, login = false, landing = false, noMeta = false, tabN
 
         // If the component is unmounted, unsubscribe
         // from the event with the `off` method:
-        return () => {
-            router.events.off('routeChangeStart', handleRouteChange);
-            router.events.off('routeChangeComplete', handleDone);
-            router.events.off('routeChangeError', handleDone);
-        }
-    }, [router.events, dispatch]);
+        // return () => {
+        //     router.events.off('routeChangeStart', handleRouteChange);
+        //     router.events.off('routeChangeComplete', handleDone);
+        //     router.events.off('routeChangeError', handleDone);
+        // }
+    }, [router, dispatch]);
 
     useEffect(() => {
         if (router?.query?.message) {
