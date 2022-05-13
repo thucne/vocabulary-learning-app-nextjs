@@ -24,9 +24,6 @@ import {
     Container, Grid, Typography, Skeleton, Divider,
 } from '@mui/material';
 
-import { Props, Fonts, Colors } from '@styles';
-
-
 const fetcher = async (...args) => await fetcherJWTIfAny(...args);
 
 const LoadingOrNotFound = () => (
@@ -49,8 +46,8 @@ const LoadingOrNotFound = () => (
                 {/* type2 */}
                 <Grid container justifyContent='flex-start' alignItems='center' direction='row' spacing={0.5} mt={1}>
                     <Typography sx={{
-                        fontWeight: Fonts.FW_500,
-                        fontSize: Fonts.FS_14,
+                        fontWeight: 500,
+                        fontSize: 14,
                         px: 0.5,
                         mr: 1,
                         borderRadius: '0.25rem',
@@ -80,9 +77,8 @@ const LoadingOrNotFound = () => (
                     <Skeleton />
                 </Typography>
             </Grid>
-
         </Grid>
-    </Container >
+    </Container>
 )
 
 const PublicWord = ({ vip: buildVip, params: buildParams }) => {
