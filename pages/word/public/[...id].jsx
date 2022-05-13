@@ -29,6 +29,62 @@ import { Props, Fonts, Colors } from '@styles';
 
 const fetcher = async (...args) => await fetcherJWTIfAny(...args);
 
+const LoadingOrNotFound = () => (
+    <Container maxWidth="md">
+        <Grid container justifyContent='flex-start' alignItems='center' direction='row'>
+            <Grid item xs={12} mt={2}>
+                <Typography variant="caption">
+                    <Skeleton width="50%" />
+                </Typography>
+                <Divider sx={{ my: 2 }} />
+            </Grid>
+
+            <Grid item xs={12}>
+
+                {/* main word */}
+                <Typography variant="h4" component="h1">
+                    <Skeleton width="20%" />
+                </Typography>
+
+                {/* type2 */}
+                <Grid container justifyContent='flex-start' alignItems='center' direction='row' spacing={0.5} mt={1}>
+                    <Typography sx={{
+                        fontWeight: Fonts.FW_500,
+                        fontSize: Fonts.FS_14,
+                        px: 0.5,
+                        mr: 1,
+                        borderRadius: '0.25rem',
+                    }}>
+                        <Skeleton width={30} />
+                    </Typography>
+                </Grid>
+
+                {/* audio */}
+                <Grid container justifyContent='flex-start' alignItems='center' direction='row'>
+                    <Grid item xs={12} justifyContent='flex-start' alignItems='center' direction='row' mt={1}>
+
+                        <Typography variant="body2">
+                            <Skeleton width={50} />
+                        </Typography>
+                    </Grid>
+                </Grid>
+
+                <Divider sx={{ my: 2 }}>
+                </Divider>
+
+            </Grid>
+
+            <Grid item xs={12}>
+                <Skeleton height={100} />
+                <Typography variant="p">
+                    <Skeleton />
+                </Typography>
+            </Grid>
+
+        </Grid>
+    </Container >
+)
+
 const PublicWord = ({ vip: buildVip, params: buildParams }) => {
     const router = useRouter();
     const { id: [word, id] } = router?.query;
@@ -228,61 +284,6 @@ export async function getStaticProps(ctx) {
 
 export default PublicWord;
 
-const LoadingOrNotFound = () => (
-    <Container maxWidth="md">
-        <Grid container justifyContent='flex-start' alignItems='center' direction='row'>
-            <Grid item xs={12} mt={2}>
-                <Typography variant="caption">
-                    <Skeleton width="50%" />
-                </Typography>
-                <Divider sx={{ my: 2 }} />
-            </Grid>
-
-            <Grid item xs={12}>
-
-                {/* main word */}
-                <Typography variant="h4" component="h1">
-                    <Skeleton width="20%" />
-                </Typography>
-
-                {/* type2 */}
-                <Grid container justifyContent='flex-start' alignItems='center' direction='row' spacing={0.5} mt={1}>
-                    <Typography sx={{
-                        fontWeight: Fonts.FW_500,
-                        fontSize: Fonts.FS_14,
-                        px: 0.5,
-                        mr: 1,
-                        borderRadius: '0.25rem',
-                    }}>
-                        <Skeleton width={30} />
-                    </Typography>
-                </Grid>
-
-                {/* audio */}
-                <Grid container justifyContent='flex-start' alignItems='center' direction='row'>
-                    <Grid item xs={12} justifyContent='flex-start' alignItems='center' direction='row' mt={1}>
-
-                        <Typography variant="body2">
-                            <Skeleton width={50} />
-                        </Typography>
-                    </Grid>
-                </Grid>
-
-                <Divider sx={{ my: 2 }}>
-                </Divider>
-
-            </Grid>
-
-            <Grid item xs={12}>
-                <Skeleton height={100} />
-                <Typography variant="p">
-                    <Skeleton />
-                </Typography>
-            </Grid>
-
-        </Grid>
-    </Container >
-)
 
     // const randomSixRelatedVips = _.isObject(matchedVip) && !_.isEmpty(matchedVip) && await getNRelatedVips(matchedVip, 6);
 
