@@ -174,7 +174,7 @@ export async function getStaticPaths() {
 
     return {
         paths,
-        fallback: 'blocking',
+        fallback: true,
     };
 }
 
@@ -193,6 +193,23 @@ export async function getStaticProps(ctx) {
     const matchedVip = deepExtractObjectStrapi(foundVip, {
         minifyPhoto: ['illustration']
     });
+
+    return {
+        props: {
+            vip: matchedVip,
+            // relatedVips: randomSixRelatedVips,
+            // unsplashVip: {
+            //     word: randomWord,
+            //     photo: randomPhotoData
+            // },
+            params: ctx.params,
+        },
+        revalidate: 10
+    }
+}
+
+export default PublicWord;
+
 
     // const randomSixRelatedVips = _.isObject(matchedVip) && !_.isEmpty(matchedVip) && await getNRelatedVips(matchedVip, 6);
 
@@ -245,19 +262,3 @@ export async function getStaticProps(ctx) {
 
     //     }
     // }
-
-    return {
-        props: {
-            vip: matchedVip,
-            // relatedVips: randomSixRelatedVips,
-            // unsplashVip: {
-            //     word: randomWord,
-            //     photo: randomPhotoData
-            // },
-            params: ctx.params,
-        },
-        revalidate: 60
-    }
-}
-
-export default PublicWord;
