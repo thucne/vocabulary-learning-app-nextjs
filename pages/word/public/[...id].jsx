@@ -103,9 +103,11 @@ const PublicWord = ({ vip: buildVip, params: buildParams }) => {
     const { vip, relatedVips, unsplashVip, params } = localProps;
 
     if (router.isFallback) {
-        <Layout tabName={"Loading..."}>
-            <LoadingOrNotFound />
-        </Layout>
+        return (
+            <Layout tabName={"Loading..."}>
+                <LoadingOrNotFound />
+            </Layout>
+        )
     }
 
     if (loading && _.isEmpty(vip)) {
@@ -190,9 +192,18 @@ export async function getStaticProps(ctx) {
     const foundVipRaw = await fetch(`${API}/api/vips/${id}?populate=*`);
     const foundVip = await foundVipRaw.json();
 
+    if (!foundVip) {
+        return {
+            notFound: true,
+            revalidate: 60
+        }
+    }
+
+
     const matchedVip = deepExtractObjectStrapi(foundVip, {
         minifyPhoto: ['illustration']
     });
+
 
     return {
         props: {
@@ -204,7 +215,7 @@ export async function getStaticProps(ctx) {
             // },
             params: ctx.params,
         },
-        revalidate: 10
+        revalidate: 60
     }
 }
 
