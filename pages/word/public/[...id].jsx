@@ -17,6 +17,7 @@ import _ from 'lodash';
 
 import words from "@components/Words/words";
 import useSWR from 'swr';
+import LoadingOrNotFound from '@components/Words/LoadingOrNotFound';
 
 import { fetcherJWTIfAny } from '@actions';
 const fetcher = async (...args) => await fetcherJWTIfAny(...args);
@@ -100,6 +101,12 @@ const PublicWord = ({ vip: buildVip, params: buildParams }) => {
     }
 
     const { vip, relatedVips, unsplashVip, params } = localProps;
+
+    if (router.isFallback) {
+        <Layout tabName={"Loading..."}>
+            <LoadingOrNotFound />
+        </Layout>
+    }
 
     if (loading && _.isEmpty(vip)) {
         return (
