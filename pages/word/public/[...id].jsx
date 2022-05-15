@@ -235,7 +235,7 @@ export async function getStaticPaths() {
 
     return {
         paths,
-        fallback: 'blocking',
+        fallback: true,
     };
 }
 
@@ -274,7 +274,7 @@ export async function getStaticProps(ctx) {
             // },
             params: ctx.params,
         },
-        revalidate: 10
+        // revalidate: 10
     }
 }
 
