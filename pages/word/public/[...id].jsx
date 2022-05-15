@@ -26,6 +26,12 @@ import {
 
 const fetcher = async (...args) => await fetcherJWTIfAny(...args);
 
+
+const RANDOM_QUERY = (word) => `https://api.unsplash.com/search/photos?query=${word}&per_page=1&client_id=${UNSPLASH}`;
+const RANDOM_PHOTO = (word) => `https://source.unsplash.com/random?${word}`;
+const UPDATE_UNSPLASH = (word) => `${API}/api/unsplashes/update-keyword/${word}`;
+const GET_LOCAL_UNSPLASH = (word) => `${API}/api/unsplashes?word=${word}`;
+
 const LoadingOrNotFound = () => (
     <Container maxWidth="md">
         <Grid container justifyContent='flex-start' alignItems='center' direction='row'>
@@ -83,7 +89,9 @@ const LoadingOrNotFound = () => (
 
 const PublicWord = ({ vip: buildVip, params: buildParams }) => {
     const router = useRouter();
-    const { id: [word, id] } = router?.query;
+
+    const { id : rawID } = router?.query || {};
+    const [ word, id ] = rawID || [];
     const [loading, setLoading] = useState(true);
 
     const { data: foundVip } = useSWR(id ? `${API}/api/vips/${id}?populate=*` : null, fetcher, {
@@ -104,10 +112,9 @@ const PublicWord = ({ vip: buildVip, params: buildParams }) => {
     let randomPhotoData = useMemo(async () => _.isFunction(randomPhoto?.json) && await randomPhoto.json().catch(err => console.log(err)) || {}, [randomPhoto]);
 
     const localRes = useMemo(async () => _.isEmpty(randomPhotoData?.results) && await fetch(GET_LOCAL_UNSPLASH(randomWord)), [randomWord, randomPhotoData?.results]);
-    const localData = useMemo(async () => _.isFunction(localRes.json) && await localRes.json().catch(() => ({})), [localRes]);
+    const localData = useMemo(async () => _.isFunction(localRes?.json) && await localRes.json().catch(() => ({})), [localRes]);
 
     const handledData = deepExtractObjectStrapi(localData)?.[0];
-
     // random
     let url = !_.isEmpty(handledData) && handledData.urls[Math.floor(Math.random() * handledData.urls.length)];
 
@@ -133,7 +140,6 @@ const PublicWord = ({ vip: buildVip, params: buildParams }) => {
             ]
         }
     }
-
     // save to cms
     useCallback(async () => {
         if (_.isEmpty(handledData)) {
@@ -169,7 +175,7 @@ const PublicWord = ({ vip: buildVip, params: buildParams }) => {
         )
     }
 
-    if (loading && _.isEmpty(vip)) {
+    if (loading && _.isEmpty(vip) && !_.isEmpty(buildVip)) {
         return (
             <Layout tabName={buildVip?.vip || "Loading..."}>
                 <MetaTag vip={buildVip} params={buildParams} />
@@ -177,7 +183,7 @@ const PublicWord = ({ vip: buildVip, params: buildParams }) => {
         )
     }
 
-    if (!loading && _.isEmpty(vip)) {
+    if (!loading && _.isEmpty(vip) && !_.isEmpty(buildVip)) {
         <Layout tabName="Not Found">
             <MetaTag vip={buildVip} params={buildParams} />
             <ErrorPage
@@ -203,10 +209,8 @@ const PublicWord = ({ vip: buildVip, params: buildParams }) => {
 
 
 const MetaTag = ({ vip, params }) => {
-
     const photo = vip?.illustration;
     const firstMeaning = vip?.meanings?.english[0] || vip?.meanings?.vietnamese[0];
-
     return (
         <Meta
             title={`${vip?.vip} - VIP`}
@@ -231,7 +235,7 @@ export async function getStaticPaths() {
     const res = await fetch(`${API}/api/vips?${qs.stringify(querySearchRelated, { encodeValuesOnly: true })}`);
     const data = (await res.json()).data;
 
-    const paths = !!data?.length ? data.map(item => ({ params: { id: [item.attributes.vip, item.id.toString()] } })) : [];
+    const paths = !!data?.length ? data.map(item => ({ params: { id: [item?.attributes?.vip, item?.id?.toString()] } })) : [];
 
     return {
         paths,
@@ -239,10 +243,6 @@ export async function getStaticPaths() {
     };
 }
 
-const RANDOM_QUERY = (word) => `https://api.unsplash.com/search/photos?query=${word}&per_page=1&client_id=${UNSPLASH}`;
-const RANDOM_PHOTO = (word) => `https://source.unsplash.com/random?${word}`;
-const UPDATE_UNSPLASH = (word) => `${API}/api/unsplashes/update-keyword/${word}`;
-const GET_LOCAL_UNSPLASH = (word) => `${API}/api/unsplashes?word=${word}`;
 
 export async function getStaticProps(ctx) {
 
@@ -251,12 +251,12 @@ export async function getStaticProps(ctx) {
     const foundVipRaw = await fetch(`${API}/api/vips/${id}?populate=*`);
     const foundVip = await foundVipRaw.json();
 
-    // if (!foundVip) {
-    //     return {
-    //         notFound: true,
-    //         revalidate: 60
-    //     }
-    // }
+    if (!foundVip) {
+        return {
+            notFound: true,
+            revalidate: 60
+        }
+    }
 
 
     const matchedVip = deepExtractObjectStrapi(foundVip, {
