@@ -251,12 +251,12 @@ export async function getStaticProps(ctx) {
     const foundVipRaw = await fetch(`${API}/api/vips/${id}?populate=*`);
     const foundVip = await foundVipRaw.json();
 
-    if (!foundVip) {
-        return {
-            notFound: true,
-            revalidate: 60
-        }
-    }
+    // if (!foundVip) {
+    //     return {
+    //         notFound: true,
+    //         revalidate: 60
+    //     }
+    // }
 
 
     const matchedVip = deepExtractObjectStrapi(foundVip, {
@@ -274,7 +274,7 @@ export async function getStaticProps(ctx) {
             // },
             params: ctx.params,
         },
-        // revalidate: 10
+        revalidate: 10
     }
 }
 
