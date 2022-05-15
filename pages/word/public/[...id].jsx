@@ -254,7 +254,7 @@ export async function getStaticProps(ctx) {
     if (!foundVip) {
         return {
             notFound: true,
-            revalidate: 60
+            revalidate: 10
         }
     }
 
