@@ -61,6 +61,7 @@ const getNumberOfWordsToBeShown = (windowSizes) => {
 }
 
 const WordListBlock = () => {
+    const containerRef = useRef(null);
     const [sizes, setSizes] = useState({ width: 0, height: 0 });
     const [searchTerm, setSearchTerm] = useState("");
     const windowSizes = useWindowSize();
@@ -111,11 +112,12 @@ const WordListBlock = () => {
         setSearchTerm(searchTerm);
     }
 
+    const containerSizes = useThisToGetSizesFromRef(containerRef, PROPS_1);
+
     return (
         <Container maxWidth="lg" disableGutters>
-            <Grid container direction="row" mt={[0, 1, 2, 3]}>
+            <Grid ref={containerRef} container direction="row" mt={[0, 1, 2, 3]}>
                 <Grid item xs={12}>
-
                     <Grid container {...Props.GCRBC}>
                         <Grid item {...Props.GIRSC}>
                             <Typography
@@ -155,6 +157,7 @@ const WordListBlock = () => {
                     config={config(sizes, setSizes)}
                     evidences={_.isEmpty(searchTerm) ? [] : evidences}
                     windowSizes={windowSizes}
+                    containerSizes={containerSizes}
                 />
 
             </Grid>
@@ -174,14 +177,20 @@ const NewWord = () => {
     )
 }
 
-const ListWord = ({ wordList = [], sizes, evidences = [], windowSizes }) => {
+const ListWord = ({ wordList = [], sizes, evidences = [], windowSizes, containerSizes }) => {
     const numberOfWords = windowSizes.width > 0 ? getNumberOfWordsToBeShown(windowSizes) : 0;
     const eachChildRef = useRef(null);
     const childSizes = useThisToGetSizesFromRef(eachChildRef, PROPS_1);
-    console.log(windowSizes, numberOfWords)
 
     return (
-        <Grid item xs={12} mt={2} sx={{ px: wordList?.length === 0 ? 0 : 2, position: 'relative' }}>
+        <Grid item xs={12} mt={2} sx={{
+            px: wordList?.length === 0 ? 0 : 2,
+            position: 'relative',
+            '& .mySwiper': {
+                width: containerSizes?.width * 0.9,
+                overflowX: 'hidden'
+            }
+        }}>
             {/* {
                 wordList?.length === 0 && <Alert severity="info">
                     No words in your list
@@ -218,7 +227,7 @@ const ListWord = ({ wordList = [], sizes, evidences = [], windowSizes }) => {
                         disableOnInteraction: false,
                     }}
                     spaceBetween={10}
-                // className="mySwiper"
+                    className="mySwiper"
                 >
                     {
                         wordList?.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)).map((word, index) => (

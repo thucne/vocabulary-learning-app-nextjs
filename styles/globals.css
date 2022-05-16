@@ -30,7 +30,6 @@ a {
 	width: 12px;
 	height: 12px;
 	/* border-radius: 10px; */
-    
 }
 
 /* Track */
@@ -43,7 +42,7 @@ a {
 ::-webkit-scrollbar-thumb {
 	background: #888;
 	border-radius: 12px;
-    border: 3px solid #f1f1f1;
+	border: 3px solid #f1f1f1;
 }
 
 /* Handle on hover */
@@ -106,10 +105,10 @@ a {
 	-webkit-hyphens: auto !important;
 	hyphens: auto !important;
 
-    white-space: pre-wrap; /* css-3 */
-    white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
-    white-space: -pre-wrap; /* Opera 4-6 */
-    white-space: -o-pre-wrap; /* Opera 7 */
+	white-space: pre-wrap; /* css-3 */
+	white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
+	white-space: -pre-wrap; /* Opera 4-6 */
+	white-space: -o-pre-wrap; /* Opera 7 */
 }
 
 .grecaptcha-badge {
