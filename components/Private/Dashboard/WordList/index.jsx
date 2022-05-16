@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 
 import {
     Container, Grid, Typography, IconButton, Stack,
@@ -14,7 +14,7 @@ import {
 } from "@mui/icons-material";
 
 import { Fonts, SXs, Colors, Props } from "@styles";
-import { IMAGE_ALT, NO_PHOTO } from "@consts";
+import { IMAGE_ALT, NO_PHOTO, PROPS_1 } from "@consts";
 
 import LoadingImage from "@components/LoadingImage";
 import { useSelector } from "react-redux";
@@ -23,14 +23,47 @@ import ScrollPaper from "@tallis/react-mui-scroll-view";
 // import ScrollPaper from './ScrollPaper';
 
 import CreateNewWord from "@components/WordForm";
-import { useSettings } from "@utils";
+import { useSettings, useWindowSize, useThisToGetSizesFromRef } from "@utils";
 import _, { isEqual } from "lodash";
 
 import Link from 'next/link';
 
+import { Swiper, SwiperSlide } from "swiper/react";
+
+// Import Swiper styles
+import "swiper/css";
+// import "swiper/css/pagination";
+
+// import required modules
+import { Pagination } from "swiper";
+
+const getNumberOfWordsToBeShown = (windowSizes) => {
+    const sw = windowSizes.width;
+    const defaultSizes = {
+        xs: 0,
+        sm: 600,
+        md: 900,
+        lg: 1200,
+        xl: 1536
+    }
+
+    if (sw < defaultSizes.sm) {
+        return 1;
+    } else if (sw < defaultSizes.md) {
+        return 3;
+    } else if (sw < defaultSizes.lg) {
+        return 5;
+    } else if (sw < defaultSizes.xl) {
+        return 6;
+    } else {
+        return 7;
+    }
+}
+
 const WordListBlock = () => {
     const [sizes, setSizes] = useState({ width: 0, height: 0 });
     const [searchTerm, setSearchTerm] = useState("");
+    const windowSizes = useWindowSize();
 
     const wordListRaw = useSelector((state) =>
         state.userData?.vips?.length > 0 ? state.userData.vips : []
@@ -121,6 +154,7 @@ const WordListBlock = () => {
                     sizes={sizes}
                     config={config(sizes, setSizes)}
                     evidences={_.isEmpty(searchTerm) ? [] : evidences}
+                    windowSizes={windowSizes}
                 />
 
             </Grid>
@@ -140,9 +174,14 @@ const NewWord = () => {
     )
 }
 
-const ListWord = ({ wordList = [], config, sizes, evidences = [] }) => {
+const ListWord = ({ wordList = [], sizes, evidences = [], windowSizes }) => {
+    const numberOfWords = windowSizes.width > 0 ? getNumberOfWordsToBeShown(windowSizes) : 0;
+    const eachChildRef = useRef(null);
+    const childSizes = useThisToGetSizesFromRef(eachChildRef, PROPS_1);
+    console.log(windowSizes, numberOfWords)
+
     return (
-        <Grid item xs={12} mt={2} sx={{ px: wordList?.length === 0 ? 0 : 2 }}>
+        <Grid item xs={12} mt={2} sx={{ px: wordList?.length === 0 ? 0 : 2, position: 'relative' }}>
             {/* {
                 wordList?.length === 0 && <Alert severity="info">
                     No words in your list
@@ -155,7 +194,7 @@ const ListWord = ({ wordList = [], config, sizes, evidences = [] }) => {
                     noJump
                 />
             }
-            {
+            {/* {
                 wordList?.length > 0 && <ScrollPaper {...config}>
                     {wordList.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)).map((word, index) => (
                         <EachChild
@@ -166,13 +205,47 @@ const ListWord = ({ wordList = [], config, sizes, evidences = [] }) => {
                         />
                     ))}
                 </ScrollPaper>
+            } */}
+            {
+                wordList?.length > 0 && <Swiper
+                    slidesPerView={numberOfWords}
+                    pagination={{
+                        clickable: true,
+                    }}
+                    modules={[Pagination]}
+                    autoplay={{
+                        delay: 1000,
+                        disableOnInteraction: false,
+                    }}
+                    spaceBetween={10}
+                // className="mySwiper"
+                >
+                    {
+                        wordList?.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)).map((word, index) => (
+                            <SwiperSlide
+                                key={`render-word-list-${index}`}
+                                ref={index === 0 ? eachChildRef : null}
+                            >
+                                {({ isActive }) => {
+                                    return (
+                                        <EachChild
+                                            // key={`render-word-list-${index}`}
+                                            word={word}
+                                            sizes={childSizes}
+                                            evidence={evidences?.find(item => item.id === word.id)}
+                                        />
+                                    )
+                                }}
+                            </SwiperSlide>
+                        ))
+                    }
+                </Swiper>
             }
         </Grid>
     )
 }
 
-const EachChild = ({ word, width, evidence, noJump }) => {
-    const theme = useTheme();
+const EachChild = ({ word, sizes, evidence, noJump }) => {
 
     const [loading, setLoading] = useState(true);
 
@@ -198,13 +271,16 @@ const EachChild = ({ word, width, evidence, noJump }) => {
                     alignItems: "center",
                     flexDirection: "column",
                     cursor: "pointer",
+                    maxWidth: sizes?.width,
+                    overflow: "hidden",
+                    // border: '1px solid blue'
                 }}
             >
                 <div
                     style={{
                         position: "relative",
-                        width: `calc(${width}px - ${theme.spacing(3)})`,
-                        height: `calc(${width}px - ${theme.spacing(3)})`,
+                        width: sizes?.width,
+                        height: sizes?.width,
                         overflow: "hidden",
                         borderRadius: "10px",
                     }}

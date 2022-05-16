@@ -334,7 +334,7 @@ export function useWindowSize() {
     });
     useIsomorphicLayoutEffect(() => {
         function updateSize() {
-            setSize({ width: window.innerWidth, height: window.innerHeight });
+            setSize({ width: window.screen.width, height: window.screen.height });
         }
         window.addEventListener("resize", updateSize);
         updateSize();

@@ -64,3 +64,14 @@ export const UNBLUR_SCREEN = "UNBLUR_SCREEN";
 
 export const FORCE_RELOAD = "FORCE_RELOAD";
 export const DONE_RELOAD = "DONE_RELOAD";
+
+export const PROPS_1 = {
+    revalidate: 1000,
+    terminalCondition: ({ width }) => width !== 0,
+    falseCondition: ({ width }) => width === 0,
+}
+
+export const PROPS_2 = {
+    revalidate: 1000,
+    falseCondition: ({ width }) => width === 0,
+}
