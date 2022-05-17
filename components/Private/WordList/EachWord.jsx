@@ -199,7 +199,7 @@ const EachWord = ({ vip, selectedVips, setSelectedVips, setCurrentWord }) => {
                 </MenuItem>
                 <MenuItem onClick={() => {
                     handleClose();
-                    Router.push(vip?.public ? `/word/public/${vip?.vip}/${vip?.id}` : `/word/${vip?.vip}/${vip?.id}`)
+                    Router.push(vip?.public ? `/word/o/${vip?.vip}/${vip?.id}` : `/word/${vip?.vip}/${vip?.id}`)
                 }}>
                     <LaunchRoundedIcon />
                     Open

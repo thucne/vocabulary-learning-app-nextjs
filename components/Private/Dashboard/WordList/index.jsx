@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from "react";
 
 import {
     Container, Grid, Typography, IconButton, Stack,
-    Alert, Tooltip, TextField
+    Alert, Tooltip, TextField, Link as MuiLink
 } from "@mui/material";
 
 import { useTheme } from "@mui/material/styles";
@@ -273,86 +273,88 @@ const EachChild = ({ word, sizes, evidence, noJump }) => {
     }
 
     return (
-        <Link href={noJump ? '#' : word?.public ? `/word/public/${word?.vip}/${word?.id}` : `/word/${word?.vip}/${word?.id}`} passHref>
-            <div
-                style={{
-                    display: "flex",
-                    alignItems: "center",
-                    flexDirection: "column",
-                    cursor: "pointer",
-                    maxWidth: sizes?.width,
-                    overflow: "hidden",
-                    // border: '1px solid blue'
-                }}
-            >
+        <Link href={noJump ? '#' : word?.public ? `/word/o/${word?.vip}/${word?.id}` : `/word/${word?.vip}/${word?.id}`} passHref>
+            <MuiLink underline="none">
                 <div
                     style={{
-                        position: "relative",
-                        width: sizes?.width,
-                        height: sizes?.width,
+                        display: "flex",
+                        alignItems: "center",
+                        flexDirection: "column",
+                        cursor: "pointer",
+                        maxWidth: sizes?.width,
                         overflow: "hidden",
-                        borderRadius: "10px",
+                        // border: '1px solid blue'
                     }}
                 >
-                    <LoadingImage
-                        src={photo}
-                        alt="Illustration"
-                        layout="fill"
-                        objectFit={objectFit}
-                        draggable={false}
-                        doneLoading={() => setLoading(false)}
-                    />
-                </div>
-                {!loading && (
-                    <Grid item>
-                        <Typography
-                            sx={{
-                                fontWeight: Fonts.FW_500,
-                                fontSize: [Fonts.FS_18],
-                                mt: 2,
-                            }}
-                            className="overflowTypography"
-                        >
-                            {word?.vip}
-                        </Typography>
-                    </Grid>
-                )}
-                {!loading && (
-                    <Grid item>
-                        <Typography
-                            sx={{
-                                fontWeight: Fonts.FW_500,
-                                fontSize: [Fonts.FS_13],
-                            }}
-                            className="overflowTypography"
-                            align="center"
-                        >
-                            {word?.pronounce}
-                        </Typography>
-                    </Grid>
-                )}
-
-                {/* render evidence of search */}
-                {evidence && (
-                    <Grid item>
-                        <Tooltip title="Matched field">
+                    <div
+                        style={{
+                            position: "relative",
+                            width: sizes?.width,
+                            height: sizes?.width,
+                            overflow: "hidden",
+                            borderRadius: "10px",
+                        }}
+                    >
+                        <LoadingImage
+                            src={photo}
+                            alt="Illustration"
+                            layout="fill"
+                            objectFit={objectFit}
+                            draggable={false}
+                            doneLoading={() => setLoading(false)}
+                        />
+                    </div>
+                    {!loading && (
+                        <Grid item>
+                            <Typography
+                                sx={{
+                                    fontWeight: Fonts.FW_500,
+                                    fontSize: [Fonts.FS_18],
+                                    mt: 2,
+                                }}
+                                className="overflowTypography"
+                            >
+                                {word?.vip}
+                            </Typography>
+                        </Grid>
+                    )}
+                    {!loading && (
+                        <Grid item>
                             <Typography
                                 sx={{
                                     fontWeight: Fonts.FW_500,
                                     fontSize: [Fonts.FS_13],
-                                    px: 1, mt: 1,
-                                    borderRadius: "4px",
-                                    backgroundColor: Colors.LOGO_BLUE,
-                                    color: Colors.WHITE,
                                 }}
                                 className="overflowTypography"
+                                align="center"
                             >
-                                {evidence.field}
+                                {word?.pronounce}
                             </Typography>
-                        </Tooltip>
-                    </Grid>
-                )}
-            </div>
+                        </Grid>
+                    )}
+
+                    {/* render evidence of search */}
+                    {evidence && (
+                        <Grid item>
+                            <Tooltip title="Matched field">
+                                <Typography
+                                    sx={{
+                                        fontWeight: Fonts.FW_500,
+                                        fontSize: [Fonts.FS_13],
+                                        px: 1, mt: 1,
+                                        borderRadius: "4px",
+                                        backgroundColor: Colors.LOGO_BLUE,
+                                        color: Colors.WHITE,
+                                    }}
+                                    className="overflowTypography"
+                                >
+                                    {evidence.field}
+                                </Typography>
+                            </Tooltip>
+                        </Grid>
+                    )}
+                </div>
+            </MuiLink>
         </Link>
     );
 };
