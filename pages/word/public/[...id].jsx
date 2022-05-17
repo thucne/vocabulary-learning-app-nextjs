@@ -185,8 +185,8 @@ const PublicWord = ({ vip: buildVip, params: buildParams }) => {
 
     if (loading) {
         return (
-            <Layout tabName={buildVip?.vip || "Loading..."}>
-                <MetaTag vip={buildVip} params={buildParams} />
+            <Layout tabName={"Loading..."}>
+                <MetaTag vip={{}} params={{ id: id }} />
                 <LoadingOrNotFound />
             </Layout>
         )
@@ -209,13 +209,21 @@ const PublicWord = ({ vip: buildVip, params: buildParams }) => {
     }
 
     return (
-        <Layout noMeta tabName={vip?.vip || buildVip?.vip}>
-            <MetaTag vip={vip || buildVip} params={params || buildParams} />
+        <Layout noMeta tabName={vip?.vip}>
+            <MetaTag vip={vip} params={params} />
             {
                 window && <PublicWordComponent vip={vip} params={params} relatedVips={relatedVips} unsplashVip={unsplashVip} />
             }
         </Layout>
     );
+    // return (
+    //     <Layout noMeta tabName={vip?.vip || buildVip?.vip}>
+    //         <MetaTag vip={vip || buildVip} params={params || buildParams} />
+    //         {
+    //             window && <PublicWordComponent vip={vip} params={params} relatedVips={relatedVips} unsplashVip={unsplashVip} />
+    //         }
+    //     </Layout>
+    // );
 
 };
 
