@@ -212,7 +212,9 @@ const PublicWord = ({ vip: buildVip, params: buildParams }) => {
         return (
             <Layout noMeta tabName={vip?.vip || buildVip?.vip}>
                 <MetaTag vip={vip || buildVip} params={params || buildParams} />
-                <PublicWordComponent vip={vip} params={params} relatedVips={relatedVips} unsplashVip={unsplashVip} />
+                {
+                    window && <PublicWordComponent vip={vip} params={params} relatedVips={relatedVips} unsplashVip={unsplashVip} />
+                }
             </Layout>
         );
     }
