@@ -90,8 +90,8 @@ const LoadingOrNotFound = () => (
 const PublicWord = ({ vip: buildVip, params: buildParams }) => {
     const router = useRouter();
 
-    const { id : rawID } = router?.query || {};
-    const [ word, id ] = rawID || [];
+    const { id: rawID } = router?.query || {};
+    const [word, id] = rawID || [];
     const [loading, setLoading] = useState(true);
 
     const { data: foundVip } = useSWR(id ? `${API}/api/vips/${id}?populate=*` : null, fetcher, {
@@ -175,10 +175,19 @@ const PublicWord = ({ vip: buildVip, params: buildParams }) => {
     //     )
     // }
 
-    if (loading && _.isEmpty(vip) && !_.isEmpty(buildVip)) {
+    // if (loading && _.isEmpty(vip) && !_.isEmpty(buildVip)) {
+    //     return (
+    //         <Layout tabName={buildVip?.vip || "Loading..."}>
+    //             <MetaTag vip={buildVip} params={buildParams} />
+    //         </Layout>
+    //     )
+    // }
+
+    if (loading) {
         return (
             <Layout tabName={buildVip?.vip || "Loading..."}>
                 <MetaTag vip={buildVip} params={buildParams} />
+                <LoadingOrNotFound />
             </Layout>
         )
     }
@@ -199,12 +208,14 @@ const PublicWord = ({ vip: buildVip, params: buildParams }) => {
         </Layout>
     }
 
-    return (
-        <Layout noMeta tabName={vip?.vip || buildVip?.vip}>
-            <MetaTag vip={vip || buildVip} params={params || buildParams} />
-            {!_.isEmpty(vip) && <PublicWordComponent vip={vip} params={params} relatedVips={relatedVips} unsplashVip={unsplashVip} />}
-        </Layout>
-    );
+    if (!loading && !_.isEmpty(vip)) {
+        return (
+            <Layout noMeta tabName={vip?.vip || buildVip?.vip}>
+                <MetaTag vip={vip || buildVip} params={params || buildParams} />
+                <PublicWordComponent vip={vip} params={params} relatedVips={relatedVips} unsplashVip={unsplashVip} />
+            </Layout>
+        );
+    }
 };
 
 
