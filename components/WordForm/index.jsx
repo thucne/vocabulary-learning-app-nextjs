@@ -99,6 +99,8 @@ export default function CreateNewWord({ open = false, setOpen }) {
 
     const [opens, setOpens] = useState(initOpens);
 
+    const [lock, setLock] = useState(false);
+
     const resetWhole = () => {
         setTemptInput(initTempInputs);
         setForm(initForm(settings?.publicWords));
@@ -160,7 +162,6 @@ export default function CreateNewWord({ open = false, setOpen }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
         let formData = new FormData();
 
         // prepare object
@@ -186,9 +187,11 @@ export default function CreateNewWord({ open = false, setOpen }) {
 
         formData.append("files.illustration", photo?.get("illustration"));
 
-        if (window?.adHocFetch && recaptcha === true && window.grecaptcha) {
-            grecaptcha.ready(function () {
-                grecaptcha
+        if (window?.adHocFetch && recaptcha === true && window.grecaptcha && !lock) {
+            setLock(true);
+
+            window.grecaptcha.ready(function () {
+                window.grecaptcha
                     .execute(`${RECAPTCHA}`, { action: "vip_authentication" })
                     .then(function (token) {
                         // Add your logic to submit to your backend server here.
@@ -203,7 +206,10 @@ export default function CreateNewWord({ open = false, setOpen }) {
                             },
                             onError: (error) => console.log(error),
                             onStarting: () => setLoading(true),
-                            onFinally: () => setLoading(false),
+                            onFinally: () => {
+                                setLoading(false);
+                                setLock(false);
+                            },
                             snackbarMessageOnSuccess: "Successfully!",
                             showLinear: false
                         });
