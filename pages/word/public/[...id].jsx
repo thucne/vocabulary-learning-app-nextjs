@@ -192,9 +192,9 @@ const PublicWord = ({ vip: buildVip, params: buildParams }) => {
         )
     }
 
-    if (!loading && _.isEmpty(vip) && !_.isEmpty(buildVip)) {
+    if (!loading && _.isEmpty(vip)) {
         <Layout tabName="Not Found">
-            <MetaTag vip={buildVip} params={buildParams} />
+            {/* <MetaTag vip={buildVip} params={buildParams} /> */}
             <ErrorPage
                 title="Word Not Found | VIP"
                 errorMessage="Not Found"
@@ -208,16 +208,15 @@ const PublicWord = ({ vip: buildVip, params: buildParams }) => {
         </Layout>
     }
 
-    if (!loading && !_.isEmpty(vip)) {
-        return (
-            <Layout noMeta tabName={vip?.vip || buildVip?.vip}>
-                <MetaTag vip={vip || buildVip} params={params || buildParams} />
-                {
-                    window && <PublicWordComponent vip={vip} params={params} relatedVips={relatedVips} unsplashVip={unsplashVip} />
-                }
-            </Layout>
-        );
-    }
+    return (
+        <Layout noMeta tabName={vip?.vip || buildVip?.vip}>
+            <MetaTag vip={vip || buildVip} params={params || buildParams} />
+            {
+                window && <PublicWordComponent vip={vip} params={params} relatedVips={relatedVips} unsplashVip={unsplashVip} />
+            }
+        </Layout>
+    );
+
 };
 
 
@@ -237,59 +236,59 @@ const MetaTag = ({ vip, params }) => {
     )
 };
 
-export async function getStaticPaths() {
+// export async function getStaticPaths() {
 
-    const querySearchRelated = {
-        pagination: {
-            limit: -1
-        }
-    }
+//     const querySearchRelated = {
+//         pagination: {
+//             limit: -1
+//         }
+//     }
 
-    const res = await fetch(`${API}/api/vips?${qs.stringify(querySearchRelated, { encodeValuesOnly: true })}`);
-    const data = (await res.json()).data;
+//     const res = await fetch(`${API}/api/vips?${qs.stringify(querySearchRelated, { encodeValuesOnly: true })}`);
+//     const data = (await res.json()).data;
 
-    const paths = !!data?.length ? data.map(item => ({ params: { id: [item?.attributes?.vip, item?.id?.toString()] } })) : [];
+//     const paths = !!data?.length ? data.map(item => ({ params: { id: [item?.attributes?.vip, item?.id?.toString()] } })) : [];
 
-    return {
-        paths,
-        fallback: 'blocking',
-    };
-}
-
-
-export async function getStaticProps(ctx) {
-
-    const { id: [vip, id] } = ctx.params;
-
-    const foundVipRaw = await fetch(`${API}/api/vips/${id}?populate=*`);
-    const foundVip = await foundVipRaw.json();
-
-    if (!foundVip) {
-        return {
-            notFound: true,
-            revalidate: 10
-        }
-    }
+//     return {
+//         paths,
+//         fallback: 'blocking',
+//     };
+// }
 
 
-    const matchedVip = deepExtractObjectStrapi(foundVip, {
-        minifyPhoto: ['illustration']
-    });
+// export async function getStaticProps(ctx) {
+
+//     const { id: [vip, id] } = ctx.params;
+
+//     const foundVipRaw = await fetch(`${API}/api/vips/${id}?populate=*`);
+//     const foundVip = await foundVipRaw.json();
+
+//     if (!foundVip) {
+//         return {
+//             notFound: true,
+//             revalidate: 10
+//         }
+//     }
 
 
-    return {
-        props: {
-            vip: matchedVip,
-            // relatedVips: randomSixRelatedVips,
-            // unsplashVip: {
-            //     word: randomWord,
-            //     photo: randomPhotoData
-            // },
-            params: ctx.params,
-        },
-        revalidate: 10
-    }
-}
+//     const matchedVip = deepExtractObjectStrapi(foundVip, {
+//         minifyPhoto: ['illustration']
+//     });
+
+
+//     return {
+//         props: {
+//             vip: matchedVip,
+//             // relatedVips: randomSixRelatedVips,
+//             // unsplashVip: {
+//             //     word: randomWord,
+//             //     photo: randomPhotoData
+//             // },
+//             params: ctx.params,
+//         },
+//         revalidate: 10
+//     }
+// }
 
 export default PublicWord;
 
